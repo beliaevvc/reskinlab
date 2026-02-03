@@ -26,7 +26,7 @@ export function useComments(entityType, entityId) {
         .eq('entity_type', entityType)
         .eq('entity_id', entityId)
         .is('parent_comment_id', null) // Only top-level comments
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: false }); // Newest first
 
       if (error) throw error;
 
@@ -100,7 +100,7 @@ export function useAddComment() {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ entityType, entityId, content, parentCommentId }) => {
+    mutationFn: async ({ entityType, entityId, content, parentCommentId, attachments = [] }) => {
       if (!user?.id) {
         throw new Error('User not authenticated');
       }
@@ -113,6 +113,7 @@ export function useAddComment() {
           content,
           author_id: user.id,
           parent_comment_id: parentCommentId || null,
+          attachments: attachments,
         })
         .select(`
           *,
@@ -125,6 +126,15 @@ export function useAddComment() {
         .single();
 
       if (error) throw error;
+      
+      // Update files with comment_id if attachments provided
+      if (attachments.length > 0 && data.id) {
+        await supabase
+          .from('project_files')
+          .update({ comment_id: data.id })
+          .in('id', attachments);
+      }
+      
       return data;
     },
     onSuccess: (data) => {
@@ -179,20 +189,48 @@ export function useDeleteComment() {
 
   return useMutation({
     mutationFn: async ({ commentId, entityType, entityId }) => {
+      // First, get files attached to this comment
+      const { data: files } = await supabase
+        .from('project_files')
+        .select('id, bucket, path, project_id')
+        .eq('comment_id', commentId);
+
+      // Delete files from storage and metadata
+      if (files && files.length > 0) {
+        for (const file of files) {
+          // Delete from storage
+          await supabase.storage.from(file.bucket).remove([file.path]);
+          // Delete metadata
+          await supabase.from('project_files').delete().eq('id', file.id);
+        }
+      }
+
+      // Delete the comment
       const { error } = await supabase
         .from('comments')
         .delete()
         .eq('id', commentId);
 
       if (error) throw error;
-      return { commentId, entityType, entityId };
+      
+      const projectId = files?.[0]?.project_id;
+      return { commentId, entityType, entityId, projectId };
     },
-    onSuccess: ({ entityType, entityId }) => {
+    onSuccess: ({ entityType, entityId, projectId }) => {
       queryClient.invalidateQueries({
         queryKey: ['comments', entityType, entityId],
       });
       queryClient.invalidateQueries({
         queryKey: ['comments', 'count', entityType, entityId],
+      });
+      // Also invalidate project files
+      if (projectId) {
+        queryClient.invalidateQueries({
+          queryKey: ['project-files', projectId],
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['task-files'],
       });
     },
   });

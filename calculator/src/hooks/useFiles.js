@@ -74,7 +74,8 @@ export function useProjectFiles(projectId, bucket = null) {
         .from('project_files')
         .select(`
           *,
-          uploader:profiles!uploaded_by(id, full_name, email)
+          uploader:profiles!uploaded_by(id, full_name, email),
+          task:tasks!task_id(id, title)
         `)
         .eq('project_id', projectId)
         .order('created_at', { ascending: false });
@@ -227,6 +228,30 @@ export function useDeleteFile() {
 
   return useMutation({
     mutationFn: async ({ fileId, bucket, path, projectId }) => {
+      // First, get the file to check if it's attached to a comment
+      const { data: fileData } = await supabase
+        .from('project_files')
+        .select('comment_id')
+        .eq('id', fileId)
+        .single();
+
+      // If file is attached to a comment, remove it from attachments array
+      if (fileData?.comment_id) {
+        const { data: comment } = await supabase
+          .from('comments')
+          .select('attachments, entity_type, entity_id')
+          .eq('id', fileData.comment_id)
+          .single();
+
+        if (comment?.attachments) {
+          const newAttachments = comment.attachments.filter(id => id !== fileId);
+          await supabase
+            .from('comments')
+            .update({ attachments: newAttachments })
+            .eq('id', fileData.comment_id);
+        }
+      }
+
       // Delete from storage
       const { error: storageError } = await supabase.storage
         .from(bucket)
@@ -245,11 +270,14 @@ export function useDeleteFile() {
 
       if (error) throw error;
 
-      return { fileId, projectId };
+      return { fileId, projectId, commentId: fileData?.comment_id };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['project-files', data.projectId] });
       queryClient.invalidateQueries({ queryKey: ['task-files'] });
+      queryClient.invalidateQueries({ queryKey: ['comment-files'] });
+      // Also invalidate comments to refresh attachments display
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
     },
   });
 }

@@ -239,6 +239,10 @@ export function ProjectPage() {
         onClose={() => setShowFilesGallery(false)}
         files={projectFiles || []}
         projectName={project?.name}
+        onTaskClick={(taskId) => {
+          setShowFilesGallery(false);
+          setSelectedTaskId(taskId);
+        }}
       />
 
       {/* Calculator Modal */}

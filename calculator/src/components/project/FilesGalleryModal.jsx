@@ -1,83 +1,328 @@
 import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
+import { getFileIcon, formatFileSize, useDeleteFile } from '../../hooks/useFiles';
+import { useAuth } from '../../contexts/AuthContext';
 
-// File type icons and colors
-const FILE_TYPE_CONFIG = {
-  image: { 
-    icon: '🖼️', 
-    color: 'bg-purple-100 text-purple-700',
-    extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
-  },
-  document: { 
-    icon: '📄', 
-    color: 'bg-blue-100 text-blue-700',
-    extensions: ['pdf', 'doc', 'docx', 'txt', 'rtf']
-  },
-  spreadsheet: { 
-    icon: '📊', 
-    color: 'bg-green-100 text-green-700',
-    extensions: ['xls', 'xlsx', 'csv']
-  },
-  archive: { 
-    icon: '📦', 
-    color: 'bg-amber-100 text-amber-700',
-    extensions: ['zip', 'rar', '7z', 'tar', 'gz']
-  },
-  video: { 
-    icon: '🎬', 
-    color: 'bg-red-100 text-red-700',
-    extensions: ['mp4', 'mov', 'avi', 'webm']
-  },
-  design: { 
-    icon: '🎨', 
-    color: 'bg-pink-100 text-pink-700',
-    extensions: ['psd', 'ai', 'sketch', 'fig', 'xd']
-  },
-  other: { 
-    icon: '📎', 
-    color: 'bg-neutral-100 text-neutral-700',
-    extensions: []
-  },
-};
+// Get signed URL for file
+function useSignedUrl(bucket, path) {
+  return useQuery({
+    queryKey: ['file-url', bucket, path],
+    queryFn: async () => {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(path, 3600);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+    enabled: !!bucket && !!path,
+    staleTime: 3000 * 1000,
+  });
+}
 
-function getFileType(filename) {
+// File type detection
+function getFileType(filename, mimeType) {
+  if (mimeType?.startsWith('image/')) return 'image';
+  if (mimeType?.startsWith('video/')) return 'video';
+  if (mimeType === 'application/pdf') return 'document';
+  
   const ext = filename?.split('.').pop()?.toLowerCase() || '';
-  for (const [type, config] of Object.entries(FILE_TYPE_CONFIG)) {
-    if (config.extensions.includes(ext)) {
-      return { type, ...config };
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return 'image';
+  if (['pdf', 'doc', 'docx', 'txt', 'rtf'].includes(ext)) return 'document';
+  if (['xls', 'xlsx', 'csv'].includes(ext)) return 'spreadsheet';
+  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return 'archive';
+  if (['mp4', 'mov', 'avi', 'webm'].includes(ext)) return 'video';
+  if (['psd', 'ai', 'sketch', 'fig', 'xd'].includes(ext)) return 'design';
+  return 'other';
+}
+
+// Grid view file card
+function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
+  const { data: signedUrl } = useSignedUrl(file.bucket, file.path);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const fileType = getFileType(file.filename, file.mime_type);
+  const isImage = fileType === 'image';
+  
+  const handleDownload = (e) => {
+    e.stopPropagation();
+    if (signedUrl) {
+      window.open(signedUrl, '_blank');
     }
-  }
-  return { type: 'other', ...FILE_TYPE_CONFIG.other };
+  };
+
+  const handleTaskClick = (e) => {
+    e.stopPropagation();
+    if (file.task_id && onTaskClick) {
+      onTaskClick(file.task_id);
+    }
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete(file);
+    setShowDeleteConfirm(false);
+  };
+
+  return (
+    <div className="border border-neutral-200 rounded-lg overflow-hidden hover:border-neutral-300 hover:shadow-sm transition-all group relative">
+      {/* Delete button */}
+      {canDelete && (
+        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          {showDeleteConfirm ? (
+            <div className="flex items-center gap-1 bg-white rounded-lg shadow-lg border border-neutral-200 px-2 py-1">
+              <button
+                onClick={handleDelete}
+                className="text-xs text-red-500 font-medium"
+              >
+                Delete
+              </button>
+              <span className="text-neutral-300">|</span>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false); }}
+                className="text-xs text-neutral-500"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
+              className="p-1.5 bg-white/90 rounded-full shadow hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-4 h-4 text-neutral-400 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Preview area */}
+      {isImage && signedUrl ? (
+        <a
+          href={signedUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block aspect-video bg-neutral-100 overflow-hidden"
+        >
+          <img
+            src={signedUrl}
+            alt={file.filename}
+            className="w-full h-full object-cover hover:scale-105 transition-transform"
+          />
+        </a>
+      ) : (
+        <a
+          href={signedUrl || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center aspect-video bg-neutral-50"
+        >
+          <span className="text-4xl">{getFileIcon(file.mime_type)}</span>
+        </a>
+      )}
+
+      {/* Info */}
+      <div className="p-3">
+        <div className="font-medium text-sm text-neutral-900 truncate" title={file.filename}>
+          {file.filename || 'Unnamed file'}
+        </div>
+        <div className="text-xs text-neutral-500 mt-0.5">
+          {formatFileSize(file.size_bytes)} • {formatDate(file.created_at)}
+        </div>
+        <div className="text-xs text-neutral-400 mt-0.5">
+          by {file.uploader?.full_name || 'Unknown'}
+        </div>
+
+        {/* Task link */}
+        {file.task_id && file.task && (
+          <button
+            onClick={handleTaskClick}
+            className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 flex items-center gap-1 truncate max-w-full"
+          >
+            <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="truncate">{file.task.title}</span>
+          </button>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-neutral-100">
+          <button
+            onClick={handleDownload}
+            className="flex-1 text-xs text-neutral-600 hover:text-neutral-900 flex items-center justify-center gap-1 py-1"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-function formatFileSize(bytes) {
-  if (!bytes) return 'N/A';
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+// List view file row
+function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
+  const { data: signedUrl } = useSignedUrl(file.bucket, file.path);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const fileType = getFileType(file.filename, file.mime_type);
+  const isImage = fileType === 'image';
+  
+  const handleDownload = (e) => {
+    e.stopPropagation();
+    if (signedUrl) {
+      window.open(signedUrl, '_blank');
+    }
+  };
+
+  const handleTaskClick = (e) => {
+    e.stopPropagation();
+    if (file.task_id && onTaskClick) {
+      onTaskClick(file.task_id);
+    }
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete(file);
+    setShowDeleteConfirm(false);
+  };
+
+  return (
+    <div className="flex items-center gap-3 p-3 border border-neutral-200 rounded-lg hover:border-neutral-300 transition-colors group">
+      {/* Thumbnail */}
+      <div className="shrink-0">
+        {isImage && signedUrl ? (
+          <a href={signedUrl} target="_blank" rel="noopener noreferrer">
+            <img
+              src={signedUrl}
+              alt={file.filename}
+              className="w-12 h-12 object-cover rounded"
+            />
+          </a>
+        ) : (
+          <div className="w-12 h-12 bg-neutral-100 rounded flex items-center justify-center">
+            <span className="text-2xl">{getFileIcon(file.mime_type)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <a 
+          href={signedUrl || '#'} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="font-medium text-sm text-neutral-900 hover:text-emerald-600 truncate block"
+        >
+          {file.filename || 'Unnamed file'}
+        </a>
+        <div className="flex items-center gap-2 text-xs text-neutral-500 mt-0.5">
+          <span>{formatFileSize(file.size_bytes)}</span>
+          <span>•</span>
+          <span>{formatDate(file.created_at)}</span>
+          <span>•</span>
+          <span>by {file.uploader?.full_name || 'Unknown'}</span>
+        </div>
+        {file.task_id && file.task && (
+          <button
+            onClick={handleTaskClick}
+            className="text-xs text-emerald-600 hover:text-emerald-700 flex items-center gap-1 mt-1"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            {file.task.title}
+          </button>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          onClick={handleDownload}
+          className="p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded transition-colors"
+          title="Download"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+        </button>
+        {canDelete && (
+          <>
+            {showDeleteConfirm ? (
+              <div className="flex items-center gap-1 bg-white rounded-lg border border-neutral-200 px-2 py-1">
+                <button
+                  onClick={handleDelete}
+                  className="text-xs text-red-500 font-medium"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false); }}
+                  className="text-xs text-neutral-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
+                className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                title="Delete"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export function FilesGalleryModal({ isOpen, onClose, files = [], projectName }) {
+const FILES_VIEW_MODE_KEY = 'reskin-files-view-mode';
+
+export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, onTaskClick }) {
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState(() => {
+    const saved = localStorage.getItem(FILES_VIEW_MODE_KEY);
+    return saved === 'list' ? 'list' : 'grid';
+  });
+  
+  const { isAdmin, user } = useAuth();
+  const { mutate: deleteFile, isPending: isDeleting } = useDeleteFile();
 
-  // Group files by task
-  const groupedFiles = useMemo(() => {
-    let filtered = files;
+  const handleViewModeChange = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem(FILES_VIEW_MODE_KEY, mode);
+  };
+
+  // Process and filter files
+  const processedFiles = useMemo(() => {
+    let filtered = [...files];
 
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(f => 
-        f.name?.toLowerCase().includes(query) ||
-        f.task?.title?.toLowerCase().includes(query)
+        f.filename?.toLowerCase().includes(query) ||
+        f.task?.title?.toLowerCase().includes(query) ||
+        f.uploader?.full_name?.toLowerCase().includes(query)
       );
     }
 
     // Apply type filter
     if (filter !== 'all') {
-      filtered = filtered.filter(f => getFileType(f.name).type === filter);
+      filtered = filtered.filter(f => getFileType(f.filename, f.mime_type) === filter);
     }
 
     // Sort
@@ -86,32 +331,50 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName }) 
         return new Date(b.created_at) - new Date(a.created_at);
       }
       if (sortBy === 'name') {
-        return (a.name || '').localeCompare(b.name || '');
+        return (a.filename || '').localeCompare(b.filename || '');
       }
       if (sortBy === 'size') {
-        return (b.file_size || 0) - (a.file_size || 0);
+        return (b.size_bytes || 0) - (a.size_bytes || 0);
       }
       return 0;
     });
 
-    // Group by task
+    return filtered;
+  }, [files, filter, sortBy, searchQuery]);
+
+  // Group by task
+  const groupedFiles = useMemo(() => {
     const grouped = {};
-    filtered.forEach(file => {
+    processedFiles.forEach(file => {
       const taskKey = file.task_id || 'unassigned';
       const taskTitle = file.task?.title || 'Project Files';
       if (!grouped[taskKey]) {
-        grouped[taskKey] = { title: taskTitle, files: [] };
+        grouped[taskKey] = { title: taskTitle, taskId: file.task_id, files: [] };
       }
       grouped[taskKey].files.push(file);
     });
-
     return grouped;
-  }, [files, filter, sortBy, searchQuery]);
+  }, [processedFiles]);
 
   const totalFiles = files.length;
-  const filteredCount = Object.values(groupedFiles).reduce((sum, g) => sum + g.files.length, 0);
+  const filteredCount = processedFiles.length;
+
+  const handleDeleteFile = (file) => {
+    deleteFile({
+      fileId: file.id,
+      bucket: file.bucket,
+      path: file.path,
+      projectId: file.project_id,
+    });
+  };
+
+  const canDeleteFile = (file) => {
+    return isAdmin || file.uploaded_by === user?.id;
+  };
 
   if (!isOpen) return null;
+
+  const FileCard = viewMode === 'grid' ? FileCardGrid : FileCardList;
 
   return (
     <div 
@@ -183,6 +446,28 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName }) 
               <option value="name">Name A-Z</option>
               <option value="size">Largest First</option>
             </select>
+
+            {/* View toggle */}
+            <div className="flex items-center border border-neutral-200 rounded overflow-hidden">
+              <button
+                onClick={() => handleViewModeChange('grid')}
+                className={`p-2 ${viewMode === 'grid' ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-400 hover:text-neutral-600'}`}
+                title="Grid view"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleViewModeChange('list')}
+                className={`p-2 ${viewMode === 'list' ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-400 hover:text-neutral-600'}`}
+                title="List view"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -207,63 +492,49 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName }) 
               {Object.entries(groupedFiles).map(([taskId, group]) => (
                 <div key={taskId}>
                   {/* Task header */}
-                  <h3 className="text-sm font-medium text-neutral-700 mb-3 flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    {group.title}
-                    <span className="text-neutral-400 font-normal">({group.files.length})</span>
-                  </h3>
-
-                  {/* Files grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {group.files.map((file) => {
-                      const fileType = getFileType(file.name);
-                      return (
-                        <div
-                          key={file.id}
-                          className="border border-neutral-200 rounded-lg p-3 hover:border-neutral-300 hover:shadow-sm transition-all cursor-pointer group"
-                        >
-                          <div className="flex items-start gap-3">
-                            {/* Icon */}
-                            <div className={`w-10 h-10 rounded flex items-center justify-center text-lg ${fileType.color}`}>
-                              {fileType.icon}
-                            </div>
-                            
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm text-neutral-900 truncate" title={file.name}>
-                                {file.name}
-                              </div>
-                              <div className="text-xs text-neutral-500 mt-0.5">
-                                {formatFileSize(file.file_size)} • {formatDate(file.created_at)}
-                              </div>
-                              {file.uploaded_by && (
-                                <div className="text-xs text-neutral-400 mt-0.5">
-                                  by {file.uploaded_by.full_name || 'Unknown'}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Download button */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // TODO: Implement download
-                                console.log('Download:', file);
-                              }}
-                              className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-neutral-100 rounded transition-opacity"
-                              title="Download"
-                            >
-                              <svg className="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {group.taskId ? (
+                      <button
+                        onClick={() => onTaskClick?.(group.taskId)}
+                        className="text-sm font-medium text-neutral-700 hover:text-emerald-600"
+                      >
+                        {group.title}
+                      </button>
+                    ) : (
+                      <span className="text-sm font-medium text-neutral-700">{group.title}</span>
+                    )}
+                    <span className="text-neutral-400 text-sm">({group.files.length})</span>
                   </div>
+
+                  {/* Files */}
+                  {viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {group.files.map((file) => (
+                        <FileCardGrid 
+                          key={file.id} 
+                          file={file} 
+                          onTaskClick={onTaskClick}
+                          canDelete={canDeleteFile(file)}
+                          onDelete={handleDeleteFile}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {group.files.map((file) => (
+                        <FileCardList 
+                          key={file.id} 
+                          file={file} 
+                          onTaskClick={onTaskClick}
+                          canDelete={canDeleteFile(file)}
+                          onDelete={handleDeleteFile}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
