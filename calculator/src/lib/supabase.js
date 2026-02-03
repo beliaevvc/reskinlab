@@ -29,7 +29,7 @@ export const supabase = createClient(
 );
 
 // CRITICAL: Disable Realtime by default - it blocks HTTP requests on page reload
-// Realtime will be enabled selectively only for admin features that need it
+// See memory-bank/systemPatterns.md for details
 supabase.realtime.disconnect();
 
 // Helper to check if Supabase is properly configured

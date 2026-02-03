@@ -101,6 +101,10 @@ export function useAddComment() {
 
   return useMutation({
     mutationFn: async ({ entityType, entityId, content, parentCommentId }) => {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+      
       const { data, error } = await supabase
         .from('comments')
         .insert({
@@ -130,6 +134,13 @@ export function useAddComment() {
       queryClient.invalidateQueries({
         queryKey: ['comments', 'count', data.entity_type, data.entity_id],
       });
+      // Refresh tasks list to update comments counter
+      if (data.entity_type === 'task') {
+        // Invalidate all tasks queries (any projectId)
+        queryClient.invalidateQueries({
+          predicate: (query) => query.queryKey[0] === 'tasks',
+        });
+      }
     },
   });
 }

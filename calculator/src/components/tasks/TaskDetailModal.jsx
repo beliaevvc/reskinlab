@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { useTask, useUpdateTask, useDeleteTask, TASK_STATUSES } from '../../hooks/useTasks';
-import { useStages } from '../../hooks/useStages';
+import { useState, useEffect } from 'react';
+import { useTask, useUpdateTask, useDeleteTask, useMarkCommentsAsRead, TASK_STATUSES } from '../../hooks/useTasks';
 import { CommentThread } from '../comments';
 import { TaskChecklist } from './TaskChecklist';
 import { formatDate } from '../../lib/utils';
@@ -9,14 +8,21 @@ import { ALL_ITEMS } from '../../data/categories';
 
 export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
   const { data: task, isLoading } = useTask(taskId);
-  const { data: stages } = useStages(projectId);
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
+  const { mutate: markCommentsAsRead } = useMarkCommentsAsRead();
   const { isClient, isAdmin, isAM } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+
+  // Mark comments as read when task is loaded
+  useEffect(() => {
+    if (isOpen && taskId && projectId && task) {
+      markCommentsAsRead({ taskId, projectId });
+    }
+  }, [isOpen, taskId, projectId, task, markCommentsAsRead]);
 
   if (!isOpen) return null;
 
@@ -48,13 +54,6 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
         status: newStatus,
         completed_at: newStatus === 'done' ? new Date().toISOString() : null,
       },
-    });
-  };
-
-  const handleStageChange = (stageId) => {
-    updateTask({
-      taskId: task.id,
-      updates: { stage_id: stageId || null },
     });
   };
 
@@ -136,14 +135,16 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
                     <h3 className="text-xl font-semibold text-neutral-900">
                       {task.title}
                     </h3>
-                    <button
-                      onClick={handleStartEdit}
-                      className="p-2 hover:bg-neutral-100 rounded transition-colors shrink-0"
-                    >
-                      <svg className="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
+                    {!isClient && (
+                      <button
+                        onClick={handleStartEdit}
+                        className="p-2 hover:bg-neutral-100 rounded transition-colors shrink-0"
+                      >
+                        <svg className="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                   {task.description && (
                     <p className="mt-2 text-neutral-600 whitespace-pre-wrap">
@@ -154,44 +155,22 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
                 </div>
               )}
 
-              {/* Properties */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Status */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    value={task.status}
-                    onChange={(e) => handleStatusChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  >
-                    {TASK_STATUSES.map((status) => (
-                      <option key={status.id} value={status.id}>
-                        {status.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Stage */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Stage
-                  </label>
-                  <select
-                    value={task.stage_id || ''}
-                    onChange={(e) => handleStageChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  >
-                    <option value="">No stage</option>
-                    {stages?.map((stage) => (
-                      <option key={stage.id} value={stage.id}>
-                        {stage.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Status
+                </label>
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className="w-full max-w-xs px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  {TASK_STATUSES.map((status) => (
+                    <option key={status.id} value={status.id}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Dates */}

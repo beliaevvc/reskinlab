@@ -4,11 +4,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useDeleteComment } from '../../hooks/useComments';
 
 export function CommentItem({ comment, entityType, entityId, onReply }) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment();
 
   const isAuthor = user?.id === comment.author_id;
+  const canDelete = isAuthor || isAdmin;
 
   const handleDelete = () => {
     deleteComment({
@@ -52,11 +53,13 @@ export function CommentItem({ comment, entityType, entityId, onReply }) {
             >
               Reply
             </button>
-            {isAuthor && (
+            {canDelete && (
               <>
                 {showDeleteConfirm ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-neutral-500">Delete?</span>
+                    <span className="text-xs text-neutral-500">
+                      {isAdmin && !isAuthor ? 'Delete this comment?' : 'Delete?'}
+                    </span>
                     <button
                       onClick={handleDelete}
                       disabled={isDeleting}

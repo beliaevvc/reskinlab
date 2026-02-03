@@ -1,6 +1,23 @@
 # Tasks
 
 ## Recent Task
+**Task Card & Comments Improvements** — ARCHIVED ✅
+
+### Summary
+Комплексное улучшение карточек задач и системы комментариев:
+- UI улучшения (убрано Stage, Unassigned, лишний футер)
+- Ограничение прав клиентов (нельзя редактировать название/описание)
+- Система отслеживания непрочитанных комментариев
+- Система уведомлений (для будущего)
+- Админ может удалять любые комментарии
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-task-card-comments-improvements.md`
+- **Reflection:** `memory-bank/reflection/reflection-task-card-comments-improvements.md`
+
+---
+
+## Recent Task
 **Kanban Drag Card Fix** — ARCHIVED ✅
 
 ### Summary

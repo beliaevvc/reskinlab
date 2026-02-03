@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 /**
@@ -13,7 +14,7 @@ export const TASK_STATUSES = [
 ];
 
 /**
- * Fetch all tasks for a project
+ * Fetch all tasks for a project with comments stats
  */
 export function useTasks(projectId) {
   return useQuery({
@@ -21,7 +22,8 @@ export function useTasks(projectId) {
     queryFn: async () => {
       if (!projectId) return [];
 
-      const { data, error } = await supabase
+      // Get tasks
+      const { data: tasks, error } = await supabase
         .from('tasks')
         .select(`
           *,
@@ -40,9 +42,66 @@ export function useTasks(projectId) {
         .order('order', { ascending: true });
 
       if (error) throw error;
-      return data || [];
+      if (!tasks || tasks.length === 0) return [];
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+
+      // Get comments stats for all tasks
+      const taskIds = tasks.map(t => t.id);
+      const { data: comments } = await supabase
+        .from('comments')
+        .select('id, entity_id, author_id')
+        .eq('entity_type', 'task')
+        .in('entity_id', taskIds);
+
+      // Get read status for current user
+      let readCommentIds = new Set();
+      if (userId && comments?.length > 0) {
+        const commentIds = comments.map(c => c.id);
+        try {
+          const { data: reads, error: readsError } = await supabase
+            .from('comment_reads')
+            .select('comment_id')
+            .eq('user_id', userId)
+            .in('comment_id', commentIds);
+          
+          if (!readsError && reads) {
+            readCommentIds = new Set(reads.map(r => r.comment_id));
+          }
+        } catch (e) {
+          // Table might not exist yet, treat all as unread
+          console.warn('comment_reads table not available:', e);
+        }
+      }
+
+      // Calculate stats per task
+      const statsMap = {};
+      (comments || []).forEach(comment => {
+        if (!statsMap[comment.entity_id]) {
+          statsMap[comment.entity_id] = { total: 0, unread: 0 };
+        }
+        statsMap[comment.entity_id].total++;
+        // Unread = not read AND not authored by current user
+        if (!readCommentIds.has(comment.id) && comment.author_id !== userId) {
+          statsMap[comment.entity_id].unread++;
+        }
+      });
+
+      // Merge stats into tasks
+      return tasks.map(task => ({
+        ...task,
+        comments_count: statsMap[task.id]?.total || 0,
+        unread_comments_count: statsMap[task.id]?.unread || 0,
+      }));
     },
     enabled: !!projectId,
+    // Auto-refresh every 10 seconds to check for new comments
+    // Using polling because Supabase Realtime blocks HTTP requests on page reload
+    // See memory-bank/systemPatterns.md for details
+    refetchInterval: 10000,
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -268,4 +327,59 @@ export function getTaskStatusInfo(status) {
     color: statusConfig.color,
     ...colorMap[statusConfig.color],
   };
+}
+
+/**
+ * Mark all comments of a task as read
+ */
+export function useMarkCommentsAsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ taskId, projectId }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      // Get unread comments for this task
+      const { data: comments } = await supabase
+        .from('comments')
+        .select('id, author_id')
+        .eq('entity_type', 'task')
+        .eq('entity_id', taskId)
+        .neq('author_id', user.id);
+
+      if (!comments || comments.length === 0) return null;
+
+      // Check which are already read
+      const commentIds = comments.map(c => c.id);
+      const { data: existingReads } = await supabase
+        .from('comment_reads')
+        .select('comment_id')
+        .eq('user_id', user.id)
+        .in('comment_id', commentIds);
+
+      const alreadyReadIds = new Set(existingReads?.map(r => r.comment_id) || []);
+      const unreadCommentIds = commentIds.filter(id => !alreadyReadIds.has(id));
+
+      if (unreadCommentIds.length === 0) return null;
+
+      // Insert read records
+      const records = unreadCommentIds.map(commentId => ({
+        user_id: user.id,
+        comment_id: commentId,
+      }));
+
+      const { error } = await supabase
+        .from('comment_reads')
+        .insert(records);
+
+      if (error) throw error;
+      return { taskId, projectId };
+    },
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ['tasks', data.projectId] });
+      }
+    },
+  });
 }
