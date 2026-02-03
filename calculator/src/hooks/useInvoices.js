@@ -7,13 +7,10 @@ import { useAuth } from '../contexts/AuthContext';
  */
 export function useInvoices() {
   const { client, isAdmin, isStaff } = useAuth();
-  
-  console.log('🟠 useInvoices RENDER:', { clientId: client?.id, isAdmin, isStaff });
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ['invoices', isAdmin || isStaff ? 'all' : client?.id],
     queryFn: async () => {
-      console.log('🟠 useInvoices queryFn EXECUTING...');
       // Admin/staff sees all invoices with client info
       if (isAdmin || isStaff) {
         const { data, error } = await supabase
@@ -67,22 +64,10 @@ export function useInvoices() {
         .eq('project.client_id', client.id)
         .order('created_at', { ascending: false });
 
-      console.log('🟠 useInvoices result:', { count: data?.length, error });
       if (error) throw error;
       return data || [];
     },
-    // RLS handles authorization
   });
-  
-  console.log('🟠 useInvoices QUERY STATE:', { 
-    status: query.status, 
-    fetchStatus: query.fetchStatus,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    dataLength: query.data?.length 
-  });
-  
-  return query;
 }
 
 /**
@@ -194,7 +179,6 @@ export function useUploadPaymentProof() {
         .update({
           payment_proof_url: proofUrl,
           tx_hash: txHash || null,
-          // Note: Status stays 'pending' until AM confirms
         })
         .eq('id', invoiceId)
         .select()
@@ -233,9 +217,6 @@ export function useSubmitPayment() {
 
   return useMutation({
     mutationFn: async ({ invoiceId, txHash }) => {
-      console.log('Submitting payment:', { invoiceId, txHash: txHash.trim() });
-      
-      // Update invoice with tx hash and change status
       const { data, error } = await supabase
         .from('invoices')
         .update({
@@ -246,12 +227,7 @@ export function useSubmitPayment() {
         .select()
         .single();
 
-      if (error) {
-        console.error('Submit payment error:', error);
-        throw error;
-      }
-
-      console.log('Payment submitted successfully:', data);
+      if (error) throw error;
 
       // Log to audit (don't fail if audit fails)
       try {
@@ -276,9 +252,6 @@ export function useSubmitPayment() {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
       queryClient.invalidateQueries({ queryKey: ['offer'] });
-    },
-    onError: (error) => {
-      console.error('useSubmitPayment mutation error:', error);
     },
   });
 }
@@ -347,13 +320,11 @@ export function usePendingConfirmationsCount() {
       if (error) throw error;
       return count || 0;
     },
-    // RLS handles authorization
   });
 }
 
 /**
  * Confirm payment (admin/AM only)
- * Changes status from 'awaiting_confirmation' to 'paid'
  */
 export function useConfirmPayment() {
   const queryClient = useQueryClient();
@@ -404,8 +375,6 @@ export function useConfirmPayment() {
 
 /**
  * Reject payment (admin/AM only)
- * Always returns invoice to 'pending' status with rejection reason
- * Client can see the reason and retry payment
  */
 export function useRejectPayment() {
   const queryClient = useQueryClient();
@@ -421,8 +390,8 @@ export function useRejectPayment() {
         .from('invoices')
         .update({
           status: 'pending',
-          tx_hash: null, // Clear the tx_hash so client can try again
-          rejection_reason: reason.trim(), // Save rejection reason for client to see
+          tx_hash: null,
+          rejection_reason: reason.trim(),
         })
         .eq('id', invoiceId)
         .eq('status', 'awaiting_confirmation')

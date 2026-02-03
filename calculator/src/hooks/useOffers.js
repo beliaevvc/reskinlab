@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { logOfferEvent, logPaymentEvent } from '../lib/auditLog';
+import { logOfferEvent } from '../lib/auditLog';
 import {
   generateOfferNumber,
   getLegalText,
@@ -16,7 +16,6 @@ import {
 
 /**
  * Fetch all offers for the current client
- * RLS handles filtering by client ownership
  */
 export function useOffers() {
   const { user } = useAuth();
@@ -26,7 +25,6 @@ export function useOffers() {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // RLS policy filters offers by client ownership
       const { data, error } = await supabase
         .from('offers')
         .select(`
@@ -62,12 +60,9 @@ export function useOffers() {
  * Fetch all offers for admin/AM (no client filtering)
  */
 export function useAllOffers() {
-  console.log('🟢 useAllOffers RENDER');
-  
-  const query = useQuery({
+  return useQuery({
     queryKey: ['offers', 'all'],
     queryFn: async () => {
-      console.log('🟢 useAllOffers queryFn EXECUTING...');
       const { data, error } = await supabase
         .from('offers')
         .select(`
@@ -92,22 +87,10 @@ export function useAllOffers() {
         `)
         .order('created_at', { ascending: false });
 
-      console.log('🟢 useAllOffers result:', { count: data?.length, error: error?.message });
       if (error) throw error;
       return data || [];
     },
   });
-  
-  console.log('🟢 useAllOffers QUERY STATE:', {
-    status: query.status,
-    fetchStatus: query.fetchStatus,
-    isLoading: query.isLoading,
-    isPending: query.isPending,
-    isFetching: query.isFetching,
-    dataLength: query.data?.length
-  });
-  
-  return query;
 }
 
 /**
@@ -153,7 +136,6 @@ export function useOffer(offerId) {
 
       if (error) throw error;
       
-      // Sort invoices by milestone_order client-side
       if (data?.invoices) {
         data.invoices.sort((a, b) => a.milestone_order - b.milestone_order);
       }
@@ -215,7 +197,7 @@ export function useCreateOffer() {
         throw new Error('Specification must be finalized before creating an offer');
       }
 
-      // 3. Check if offer already exists - return it instead of error
+      // 3. Check if offer already exists
       const { data: existingOffer } = await supabase
         .from('offers')
         .select('*')
@@ -223,7 +205,6 @@ export function useCreateOffer() {
         .single();
 
       if (existingOffer) {
-        // Return existing offer instead of creating duplicate
         return existingOffer;
       }
 
@@ -234,7 +215,6 @@ export function useCreateOffer() {
       while (retries > 0) {
         const offerNumber = await generateOfferNumber();
 
-        // 5. Create offer
         const { data: newOffer, error: offerError } = await supabase
           .from('offers')
           .insert({
@@ -253,7 +233,6 @@ export function useCreateOffer() {
           break;
         }
 
-        // If duplicate key error, retry with new number
         if (offerError.code === '23505') {
           retries--;
           if (retries === 0) {
@@ -265,14 +244,13 @@ export function useCreateOffer() {
         throw offerError;
       }
 
-      // 6. Generate invoices based on payment milestones from specification
+      // 5. Generate invoices based on payment milestones
       const milestones = calculatePaymentMilestones(spec);
-      console.log('Creating invoices for milestones:', milestones);
 
       for (const milestone of milestones) {
         const invoiceNumber = await generateInvoiceNumber();
 
-        const { data: invoiceData, error: invoiceError } = await supabase
+        await supabase
           .from('invoices')
           .insert({
             offer_id: offer.id,
@@ -287,19 +265,10 @@ export function useCreateOffer() {
             due_date: getInvoiceDueDate(milestone.order),
             wallet_address: WALLET_ADDRESSES.TRC20,
             network: 'TRC20',
-          })
-          .select()
-          .single();
-
-        if (invoiceError) {
-          console.error('Error creating invoice:', invoiceError);
-          // Continue with other invoices even if one fails
-        } else {
-          console.log('Invoice created:', invoiceData);
-        }
+          });
       }
 
-      // 7. Update project status
+      // 6. Update project status
       await supabase
         .from('projects')
         .update({ status: 'offer_pending' })
@@ -319,12 +288,11 @@ export function useCreateOffer() {
 
       return offer;
     },
-    onSuccess: (offer) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['offers'] });
       queryClient.invalidateQueries({ queryKey: ['offer'] });
       queryClient.invalidateQueries({ queryKey: ['specifications'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      // Invalidate all project queries (both list and individual)
       queryClient.invalidateQueries({ 
         predicate: (query) => query.queryKey[0] === 'projects'
       });
@@ -360,7 +328,6 @@ export function useAcceptOffer() {
         throw new Error('Offer is not in pending status');
       }
 
-      // Check if expired
       if (new Date(offer.valid_until) < new Date()) {
         throw new Error('Offer has expired');
       }
@@ -373,7 +340,6 @@ export function useAcceptOffer() {
           user_id: user.id,
           action: 'accepted',
           user_agent: userAgent || navigator.userAgent,
-          // IP address will be captured server-side if needed
           offer_snapshot: {
             offer,
             accepted_at: new Date().toISOString(),
@@ -396,7 +362,7 @@ export function useAcceptOffer() {
 
       if (updateError) throw updateError;
 
-      // 4. Update project status to pending_payment
+      // 4. Update project status
       await supabase
         .from('projects')
         .update({ status: 'pending_payment' })

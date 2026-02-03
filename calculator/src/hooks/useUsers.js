@@ -7,14 +7,10 @@ import { logAuditEvent } from '../lib/auditLog';
  */
 export function useUsers(filters = {}) {
   const { role, search } = filters;
-  
-  console.log('🔴 useUsers RENDER:', { filters });
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ['users', filters],
     queryFn: async () => {
-      console.log('🔴 useUsers queryFn EXECUTING...');
-      // Simple query first - just profiles
       let profilesQuery = supabase
         .from('profiles')
         .select('*')
@@ -28,57 +24,44 @@ export function useUsers(filters = {}) {
         profilesQuery = profilesQuery.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);
       }
 
-      console.log('🔴 useUsers: fetching profiles...');
       const { data: users, error } = await profilesQuery;
-      console.log('🔴 useUsers: profiles fetched:', { count: users?.length, error: error?.message });
       
-      if (error) {
-        console.error('useUsers error:', error);
-        throw error;
-      }
-
-      if (!users || users.length === 0) {
-        return [];
-      }
+      if (error) throw error;
+      if (!users || users.length === 0) return [];
 
       // Get client info separately
       const userIds = users.map(u => u.id);
-      let clients = [];
-      let clientMap = {};
+      const clientMap = {};
+      
       try {
-        const { data: clientsData, error: clientsError } = await supabase
+        const { data: clientsData } = await supabase
           .from('clients')
           .select('user_id, id, company_name, contact_phone')
           .in('user_id', userIds);
         
-        if (!clientsError && clientsData) {
-          clients = clientsData;
-          clients.forEach(c => {
-            clientMap[c.user_id] = c;
-          });
-        }
+        clientsData?.forEach(c => {
+          clientMap[c.user_id] = c;
+        });
       } catch (err) {
         console.warn('Failed to fetch clients:', err);
       }
 
-      // Get all projects with client info (admin can see all via RLS)
+      // Get all projects with client info
       let allProjects = [];
-      let projectCounts = {};
+      const projectCounts = {};
+      
       try {
-        const { data: projectsData, error: projError } = await supabase
+        const { data: projectsData } = await supabase
           .from('projects')
           .select('id, client_id, am_id, client:clients(user_id, company_name)');
         
-        if (!projError && projectsData) {
+        if (projectsData) {
           allProjects = projectsData;
           
-          // Count projects per user
           allProjects.forEach(p => {
-            // Count for client (via clients.user_id)
             if (p.client?.user_id) {
               projectCounts[p.client.user_id] = (projectCounts[p.client.user_id] || 0) + 1;
             }
-            // Count for AM
             if (p.am_id) {
               projectCounts[p.am_id] = (projectCounts[p.am_id] || 0) + 1;
             }
@@ -86,19 +69,19 @@ export function useUsers(filters = {}) {
         }
       } catch (err) {
         console.warn('Failed to fetch projects:', err);
-        // Continue without project counts - users should still be returned
       }
 
-      // Get all invoices to calculate revenue per user (with error handling)
-      let revenueMap = {};
+      // Get all invoices to calculate revenue per user
+      const revenueMap = {};
+      
       try {
-        const { data: allInvoices, error: invoicesError } = await supabase
+        const { data: allInvoices } = await supabase
           .from('invoices')
           .select('project_id, status, amount_usd, paid_at');
         
-        if (!invoicesError && allInvoices && allInvoices.length > 0 && allProjects && allProjects.length > 0 && clients && clients.length > 0) {
+        if (allInvoices && allProjects.length > 0) {
           const clientIdToUserId = {};
-          clients.forEach(c => {
+          Object.values(clientMap).forEach(c => {
             clientIdToUserId[c.id] = c.user_id;
           });
 
@@ -106,7 +89,6 @@ export function useUsers(filters = {}) {
             const project = allProjects.find(p => p.id === invoice.project_id);
             if (!project) return;
 
-            // Count all invoices with status 'paid' (paid_at is optional)
             if (invoice.status === 'paid') {
               const projectOwnerUserId = clientIdToUserId[project.client_id];
               if (projectOwnerUserId) {
@@ -117,98 +99,59 @@ export function useUsers(filters = {}) {
         }
       } catch (err) {
         console.warn('Failed to fetch invoices for revenue calculation:', err);
-        // Continue without revenue data - users should still be returned
       }
 
       // Merge data
-      const usersWithClients = users.map(user => {
-        const clientData = clientMap[user.id];
-        
-        return {
-          ...user,
-          client: clientData || null,
-          projects_count: projectCounts[user.id] || 0,
-          total_revenue: revenueMap[user.id] || 0,
-        };
-      });
-
-      console.log('📊 useUsers returning:', { 
-        usersCount: usersWithClients.length, 
-        projectsCount: Object.keys(projectCounts).length,
-        revenueCount: Object.keys(revenueMap).length 
-      });
-
-      return usersWithClients;
+      return users.map(user => ({
+        ...user,
+        client: clientMap[user.id] || null,
+        projects_count: projectCounts[user.id] || 0,
+        total_revenue: revenueMap[user.id] || 0,
+      }));
     },
   });
-  
-  console.log('🔴 useUsers QUERY STATE:', {
-    status: query.status,
-    fetchStatus: query.fetchStatus,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    dataLength: query.data?.length
-  });
-  
-  return query;
 }
 
 /**
  * Fetch single user with full details
  */
 export function useUser(userId) {
-  console.log('🟡 useUser RENDER:', { userId });
-  
-  const query = useQuery({
+  return useQuery({
     queryKey: ['user', userId],
     queryFn: async () => {
-      console.log('🟡 useUser queryFn EXECUTING for:', userId);
-      
-      console.log('🟡 useUser: fetching profile...');
       const { data: user, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      console.log('🟡 useUser: profile fetched:', { hasUser: !!user, error: error?.message });
 
       if (error) throw error;
 
-      // Get all projects with related data (admin can see all via RLS)
-      // First get projects
-      const { data: allProjects, error: projectsError } = await supabase
+      // Get all projects with related data
+      const { data: allProjects } = await supabase
         .from('projects')
         .select('id, name, status, created_at, client_id, am_id')
         .order('created_at', { ascending: false });
       
-      if (projectsError) {
-        console.warn('Failed to fetch projects:', projectsError);
-      }
-      
-      // Then enrich projects with related data
       if (allProjects && allProjects.length > 0) {
         const projectIds = allProjects.map(p => p.id);
         
-        // Get specifications count for each project
         const { data: specsData } = await supabase
           .from('specifications')
           .select('project_id')
           .in('project_id', projectIds);
         
-        // Get workflow stages
         const { data: stagesData } = await supabase
           .from('workflow_stages')
           .select('project_id, status, stage_key, name, "order"')
           .in('project_id', projectIds)
           .order('"order"', { ascending: true });
         
-        // Get invoices
         const { data: invoicesData } = await supabase
           .from('invoices')
           .select('project_id, status')
           .in('project_id', projectIds);
         
-        // Group data by project_id
         const specsByProject = {};
         specsData?.forEach(spec => {
           specsByProject[spec.project_id] = (specsByProject[spec.project_id] || 0) + 1;
@@ -230,52 +173,39 @@ export function useUser(userId) {
           invoicesByProject[invoice.project_id].push(invoice);
         });
         
-        // Enrich projects with related data
         allProjects.forEach(project => {
           project.specifications = [{ count: specsByProject[project.id] || 0 }];
           project.workflow_stages = stagesByProject[project.id] || [];
           project.invoices = invoicesByProject[project.id] || [];
         });
       }
-      
-      console.log('📊 useUser - allProjects enriched:', { count: allProjects?.length, sample: allProjects?.[0] });
 
       // Get all clients to map client_id -> user_id
       const { data: allClients } = await supabase
         .from('clients')
         .select('id, user_id, company_name, contact_phone');
 
-      // Find this user's client record
       const clientData = allClients?.find(c => c.user_id === userId) || null;
 
       // Filter projects for this user
       let allUserProjects = [];
-      let projects = []; // For display (limited to 10)
+      let projects = [];
+      
       if (allProjects && allClients) {
         const clientIdToUserId = {};
         allClients.forEach(c => {
           clientIdToUserId[c.id] = c.user_id;
         });
 
-        // Get ALL projects for this user (for finance calculation)
         allUserProjects = allProjects.filter(p => {
           const projectOwnerUserId = clientIdToUserId[p.client_id];
           return projectOwnerUserId === userId || p.am_id === userId;
         });
         
-        // Get first 10 projects for display
         projects = allUserProjects.slice(0, 10);
       }
-      
-      console.log('📊 User projects:', { 
-        userId, 
-        clientData, 
-        projectsCount: allUserProjects.length, 
-        displayedProjects: projects.length,
-        sampleProject: projects[0] 
-      });
 
-      // Get invoices summary - use ALL projects for accurate finance calculation
+      // Get invoices summary
       const allProjectIds = allUserProjects.map(p => p.id);
       let finance = {
         total_revenue: 0,
@@ -291,7 +221,6 @@ export function useUser(userId) {
           .in('project_id', allProjectIds);
 
         if (invoices) {
-          // Count all invoices with status 'paid' (paid_at is optional)
           const paidInvoices = invoices.filter(i => i.status === 'paid');
           const pendingInvoices = invoices.filter(i => i.status === 'pending');
           finance = {
@@ -311,29 +240,18 @@ export function useUser(userId) {
         .order('created_at', { ascending: false })
         .limit(10);
 
-      console.log('🟡 useUser: returning data for', userId);
       return {
         ...user,
         client: clientData,
-        projects: projects,
+        projects,
         finance,
         audit_logs: auditLogs || [],
       };
     },
     enabled: !!userId,
-    staleTime: 0, // Always consider stale
-    refetchOnMount: 'always', // Always refetch when component mounts
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
-  
-  console.log('🟡 useUser QUERY STATE:', {
-    status: query.status,
-    fetchStatus: query.fetchStatus,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    hasData: !!query.data
-  });
-  
-  return query;
 }
 
 /**
@@ -353,7 +271,6 @@ export function useUpdateUserRole() {
 
       if (error) throw error;
 
-      // Log audit event
       try {
         await logAuditEvent({
           action: 'update_role',
@@ -394,7 +311,6 @@ export function useBulkUpdateRoles() {
 
       if (error) throw error;
 
-      // Log audit event
       try {
         await logAuditEvent({
           action: 'bulk_update_role',
@@ -487,14 +403,12 @@ export function useUserStats() {
 
       if (error) throw error;
 
-      const stats = {
+      return {
         total: data?.length || 0,
         admins: data?.filter(u => u.role === 'admin').length || 0,
         ams: data?.filter(u => u.role === 'am').length || 0,
         clients: data?.filter(u => u.role === 'client').length || 0,
       };
-
-      return stats;
     },
   });
 }

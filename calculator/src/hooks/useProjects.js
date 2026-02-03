@@ -8,64 +8,33 @@ import { logProjectEvent } from '../lib/auditLog';
  * RLS handles filtering by client ownership
  */
 export function useProjects() {
-  const { user, profile } = useAuth();
-  const enabled = !!user?.id;
-  
-  console.log('🔵 useProjects RENDER:', { userId: user?.id, role: profile?.role, enabled });
+  const { user } = useAuth();
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ['projects', user?.id],
     queryFn: async () => {
-      console.log('📦 Fetching projects... role:', profile?.role);
-      // #region agent log
-      fetch('http://127.0.0.1:7245/ingest/5fb3caf2-696c-4b24-a47d-721efc0dce43',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useProjects.js:queryFn:start',message:'queryFn EXECUTING - fetching projects',data:{userId:user?.id,profileRole:profile?.role},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
-      
       const { data, error } = await supabase
         .from('projects')
-        .select(
-          `
+        .select(`
           *,
           specifications:specifications(count)
-        `
-        )
+        `)
         .order('created_at', { ascending: false });
 
-      console.log('📦 Projects result:', { count: data?.length, error });
-      // #region agent log
-      fetch('http://127.0.0.1:7245/ingest/5fb3caf2-696c-4b24-a47d-721efc0dce43',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useProjects.js:queryFn:result',message:'queryFn completed',data:{count:data?.length||0,hasError:!!error,errorMsg:error?.message||null},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
-      
       if (error) throw error;
       return data;
     },
-    enabled,
+    enabled: !!user?.id,
   });
-  
-  console.log('🔵 useProjects QUERY STATE:', { 
-    status: query.status, 
-    fetchStatus: query.fetchStatus,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    dataLength: query.data?.length 
-  });
-  
-  return query;
 }
 
 /**
  * Fetch ALL projects with client info (for admin/AM)
  */
 export function useAllProjects() {
-  const { isAdmin, isAM } = useAuth();
-  const isStaff = isAdmin || isAM;
-
-  console.log('🟣 useAllProjects RENDER:', { isAdmin, isAM, isStaff });
-
-  const query = useQuery({
+  return useQuery({
     queryKey: ['projects', 'all'],
     queryFn: async () => {
-      console.log('🟣 useAllProjects queryFn EXECUTING...');
       const { data, error } = await supabase
         .from('projects')
         .select(`
@@ -79,22 +48,10 @@ export function useAllProjects() {
         `)
         .order('created_at', { ascending: false });
 
-      console.log('🟣 useAllProjects result:', { count: data?.length, error });
       if (error) throw error;
       return data;
     },
-    // Don't use enabled - RLS will handle authorization
   });
-  
-  console.log('🟣 useAllProjects QUERY STATE:', { 
-    status: query.status, 
-    fetchStatus: query.fetchStatus,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    dataLength: query.data?.length 
-  });
-  
-  return query;
 }
 
 /**
@@ -190,8 +147,7 @@ export function useProject(projectId) {
       // 1. Fetch project with specifications
       const { data, error } = await supabase
         .from('projects')
-        .select(
-          `
+        .select(`
           *,
           specifications (
             id,
@@ -204,8 +160,7 @@ export function useProject(projectId) {
             updated_at,
             finalized_at
           )
-        `
-        )
+        `)
         .eq('id', projectId)
         .single();
 
@@ -222,7 +177,6 @@ export function useProject(projectId) {
             .select('id, number, status, valid_until, specification_id')
             .in('specification_id', specIds);
 
-          // Map offers to specifications (even if empty or error)
           const offersBySpecId = {};
           if (!offersError && offers && offers.length > 0) {
             offers.forEach(offer => {
@@ -240,7 +194,6 @@ export function useProject(projectId) {
                   .order('milestone_order', { ascending: true });
 
                 if (!invoicesError && invoices && invoices.length > 0) {
-                  // Map invoices to offers
                   const invoicesByOfferId = {};
                   invoices.forEach(invoice => {
                     if (!invoicesByOfferId[invoice.offer_id]) {
@@ -249,30 +202,24 @@ export function useProject(projectId) {
                     invoicesByOfferId[invoice.offer_id].push(invoice);
                   });
 
-                  // Add invoices to offers
                   offers.forEach(offer => {
                     offer.invoices = invoicesByOfferId[offer.id] || [];
                   });
                 }
               } catch (invoiceErr) {
-                // Silently fail if invoices can't be loaded - not critical
                 console.warn('Failed to load invoices:', invoiceErr);
               }
             }
           }
 
-          // Map offers to specifications (with empty invoices array if no offer)
           data.specifications = data.specifications.map(spec => ({
             ...spec,
             offer: offersBySpecId[spec.id] || null,
           }));
 
-          // Sort specifications by version_number descending
           data.specifications.sort((a, b) => (b.version_number || 0) - (a.version_number || 0));
         } catch (offersErr) {
-          // Silently fail if offers can't be loaded - not critical
           console.warn('Failed to load offers:', offersErr);
-          // Still return project data without offers
         }
       }
 
@@ -291,14 +238,9 @@ export function useCreateProject() {
 
   return useMutation({
     mutationFn: async ({ name, description }) => {
-      // Debug logging
-      console.log('Creating project...', { client, user, name });
-
-      // If no client record, try to get or create one
       let clientId = client?.id;
 
       if (!clientId && user?.id) {
-        console.log('No client record, fetching...');
         // Try to fetch client record
         const { data: clientData, error: clientError } = await supabase
           .from('clients')
@@ -307,7 +249,6 @@ export function useCreateProject() {
           .single();
 
         if (clientError) {
-          console.error('Client fetch error:', clientError);
           // Client doesn't exist, try to create one
           const { data: newClient, error: createError } = await supabase
             .from('clients')
@@ -316,7 +257,6 @@ export function useCreateProject() {
             .single();
 
           if (createError) {
-            console.error('Client create error:', createError);
             throw new Error('Failed to create client record. Please try again.');
           }
           clientId = newClient.id;
@@ -329,8 +269,6 @@ export function useCreateProject() {
         throw new Error('Please log in to create a project.');
       }
 
-      console.log('Inserting project with client_id:', clientId);
-
       const { data, error } = await supabase
         .from('projects')
         .insert({
@@ -342,12 +280,7 @@ export function useCreateProject() {
         .select()
         .single();
 
-      if (error) {
-        console.error('Project insert error:', error);
-        throw error;
-      }
-
-      console.log('Project created:', data);
+      if (error) throw error;
 
       // Log audit event
       try {
@@ -434,7 +367,6 @@ export function useCompleteProject() {
 
       if (error) throw error;
 
-      // Log audit event
       try {
         await logProjectEvent('complete_project', projectId, {
           status: 'completed',
@@ -471,7 +403,6 @@ export function useArchiveProject() {
 
       if (error) throw error;
 
-      // Log audit event
       try {
         await logProjectEvent('archive_project', projectId, {
           status: 'archived',
