@@ -151,30 +151,6 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
                     </p>
                   )}
                   
-                  {/* Spec item connection */}
-                  {(task.spec_item_id || task.spec_anim_id) && (
-                    <div className="mt-4 p-3 bg-neutral-50 rounded-lg border border-neutral-200">
-                      <div className="text-sm font-medium text-neutral-700 mb-2">
-                        Связь со спецификацией:
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {task.spec_item_id && (() => {
-                          const item = ALL_ITEMS.find(i => i.id === task.spec_item_id);
-                          const itemName = item ? item.name : task.spec_item_id;
-                          return (
-                            <span className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-700 font-medium">
-                              📋 {itemName} <span className="text-purple-500 font-mono">({task.spec_item_id})</span>
-                            </span>
-                          );
-                        })()}
-                        {task.spec_anim_id && task.spec_anim_id !== 'none' && (
-                          <span className="px-2 py-1 rounded text-xs bg-emerald-100 text-emerald-700 font-medium">
-                            ✨ Анимация: {task.spec_anim_id}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
 

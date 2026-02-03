@@ -164,21 +164,6 @@ export function ProjectPage() {
         />
       )}
 
-      {/* Initialize stages prompt */}
-      {!hasStages && effectiveIsStaff && (
-        <div className="bg-amber-50 border-b border-amber-200 px-6 py-3 flex items-center justify-between">
-          <span className="text-sm text-amber-800">
-            No stages defined. Initialize default project stages to track progress.
-          </span>
-          <button
-            onClick={handleInitializeStages}
-            disabled={isCreatingStages}
-            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded font-medium disabled:opacity-50"
-          >
-            {isCreatingStages ? 'Creating...' : 'Initialize Stages'}
-          </button>
-        </div>
-      )}
 
       {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">

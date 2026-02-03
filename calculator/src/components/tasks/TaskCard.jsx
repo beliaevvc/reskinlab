@@ -38,23 +38,6 @@ export function TaskCard({ task, onClick, isDragging }) {
 
       {/* Meta */}
       <div className="flex items-center gap-2 mt-2 flex-wrap">
-        {/* Spec item badge */}
-        {task.spec_item_id && (() => {
-          const item = ALL_ITEMS.find(i => i.id === task.spec_item_id);
-          const itemName = item ? item.name : task.spec_item_id;
-          return (
-            <span className="px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700" title={`Пункт спецификации: ${itemName}`}>
-              📋 {itemName}
-            </span>
-          );
-        })()}
-        
-        {/* Animation badge */}
-        {task.spec_anim_id && task.spec_anim_id !== 'none' && (
-          <span className="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-700" title={`Анимация: ${task.spec_anim_id}`}>
-            ✨ {task.spec_anim_id}
-          </span>
-        )}
         
         {/* Stage badge */}
         {task.stage && (

@@ -3,17 +3,18 @@
 ## Current Status
 **Ready for Next Task** ✅
 
-## Recently Archived Tasks
+## Recently Completed Tasks
+
+### Auto Task Names Fix (4 Февраля 2026) — ARCHIVED ✅
+Комплексное исправление автоматического создания задач при первой оплате.
+- **Archive:** `memory-bank/archive/archive-auto-task-names-fix.md`
+- **Reflection:** `memory-bank/reflection/reflection-auto-task-names-fix.md`
 
 ### Account Switcher Fix (4 Февраля 2026) — ARCHIVED ✅
-Переключение аккаунтов не обновляло профиль пользователя. Добавлен явный вызов `fetchProfile()` в `signIn()`.
 - **Archive:** `memory-bank/archive/archive-account-switcher-fix.md`
-- **Pattern:** `memory-bank/systemPatterns.md` (раздел "Account Switcher и пропуск SIGNED_IN")
 
 ### Auth Hanging Fix (4 Февраля 2026) — ARCHIVED ✅
-Критический баг с зависанием при перезагрузке страницы исправлен.
 - **Archive:** `memory-bank/archive/archive-auth-hanging-fix.md`
-- **Pattern:** `memory-bank/systemPatterns.md`
 
 ### Admin Dashboard & Users Page Improvements — ARCHIVED ✅
 - **Archive:** `memory-bank/archive/archive-admin-dashboard-users-improvements.md`
@@ -25,19 +26,10 @@
 
 ## Pending Tasks
 
-### Fix Task Titles with ID-like Names — IN PROGRESS 🔄
-Некоторые задачи имеют названия, совпадающие с `item_id` вместо нормальных названий.
-
-**Next Steps:**
-- [ ] Применить миграцию `027_fix_task_titles_in_templates.sql` в базе данных
-- [ ] Проверить, что все задачи имеют нормальные названия
-- [ ] Убедиться, что новые задачи создаются с правильными названиями
-
 ### Production Migrations Pending
-- [ ] Apply migrations 018-027 to production database
-- [ ] Test task template creation with real projects
-- [ ] Test checklist creation from templates
-- [ ] Test access control for checklists with different user roles
+- [ ] Apply migrations 018-028 to production database
+- [ ] Test task creation with real projects
+- [ ] Verify task names match calculator
 
 ---
 

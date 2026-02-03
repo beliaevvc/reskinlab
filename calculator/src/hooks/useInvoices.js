@@ -363,12 +363,20 @@ export function useConfirmPayment() {
 
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['invoice', variables.invoiceId] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['project', data?.project_id] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
       queryClient.invalidateQueries({ queryKey: ['offer'] });
+      // Инвалидируем tasks и stages после подтверждения платежа (триггер создаёт их)
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['stages'] });
+      if (data?.project_id) {
+        queryClient.invalidateQueries({ queryKey: ['tasks', data.project_id] });
+        queryClient.invalidateQueries({ queryKey: ['stages', data.project_id] });
+      }
     },
   });
 }

@@ -1,5 +1,36 @@
 # Progress Log
 
+## Auto Task Names Fix — ARCHIVED ✅
+
+### Date: 2026-02-04
+
+### Summary
+Комплексное исправление системы автоматического создания задач при первой оплате проекта:
+- Названия задач не соответствовали калькулятору (сырые item_id)
+- Триггер не обрабатывал проекты в статусе 'draft'
+- UI не обновлялся после подтверждения платежа
+- Лишние UI элементы (Initialize Stages, связь со спецификацией)
+
+### Solution
+- Обновлена функция `get_item_task_name()` с правильными названиями из `categories.js`
+- Обновлён триггер `auto_create_tasks_on_first_payment()` (добавлен 'draft', создание стадий)
+- Добавлена инвалидация кэша `['tasks']` и `['stages']` в `useConfirmPayment`
+- Удалены лишние UI элементы
+
+### Files Modified
+- `calculator/src/hooks/useInvoices.js` — инвалидация кэша tasks/stages
+- `calculator/src/hooks/useProjects.js` — инвалидация при удалении
+- `calculator/src/pages/projects/ProjectPage.jsx` — удалена плашка Initialize Stages
+- `calculator/src/components/tasks/TaskDetailModal.jsx` — удалена секция связи
+- `calculator/src/components/tasks/TaskCard.jsx` — удалены бейджи spec_item
+- `calculator/supabase/migrations/028_fix_item_names_from_calculator.sql` — миграция
+
+### Archive Reference
+📄 `memory-bank/archive/archive-auto-task-names-fix.md`
+📄 `memory-bank/reflection/reflection-auto-task-names-fix.md`
+
+---
+
 ## Account Switcher Fix — ARCHIVED ✅
 
 ### Date: 2026-02-04
