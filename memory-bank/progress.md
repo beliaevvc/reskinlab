@@ -1,5 +1,26 @@
 # Progress Log
 
+## Account Switcher Fix — ARCHIVED ✅
+
+### Date: 2026-02-04
+
+### Summary
+При переключении аккаунтов через AccountSwitcher профиль не обновлялся. Root cause — пропуск `SIGNED_IN` event препятствовал вызову `fetchProfile()` для нового пользователя.
+
+### Solution
+- Явный вызов `setUser()` и `fetchProfile()` в функции `signIn()` после успешной авторизации
+- `force=true` для обхода кеша localStorage
+
+### Files Modified
+- `calculator/src/contexts/AuthContext.jsx` — добавлен явный вызов fetchProfile в signIn
+- `calculator/src/components/admin/AccountSwitcher.jsx` — исправлен warning про вложенные кнопки
+- `memory-bank/systemPatterns.md` — добавлена документация паттерна
+
+### Archive Reference
+📄 `memory-bank/archive/archive-account-switcher-fix.md`
+
+---
+
 ## Auth Hanging Fix — ARCHIVED ✅
 
 ### Date: 2026-02-04

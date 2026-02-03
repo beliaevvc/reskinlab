@@ -490,13 +490,15 @@ export function AccountSwitcher() {
                 {savedAccounts.map((account) => {
                   const isCurrent = account.email === user?.email;
                   return (
-                    <button
+                    <div
                       key={account.email}
+                      role="button"
+                      tabIndex={isSwitching ? -1 : 0}
                       onClick={() => handleSwitchAccount(account)}
-                      disabled={isSwitching}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 transition-colors ${
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSwitchAccount(account); }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 transition-colors cursor-pointer ${
                         isCurrent ? 'bg-emerald-50/50' : ''
-                      }`}
+                      } ${isSwitching ? 'opacity-50 pointer-events-none' : ''}`}
                     >
                       <div className="w-9 h-9 rounded-full bg-neutral-200 flex items-center justify-center">
                         <span className="text-sm font-medium text-neutral-600">
@@ -526,7 +528,7 @@ export function AccountSwitcher() {
                           </svg>
                         </button>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>

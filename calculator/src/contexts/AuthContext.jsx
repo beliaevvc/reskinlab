@@ -120,13 +120,10 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mountedRef.current) return;
       
-      console.log('[Auth] onAuthStateChange:', event);
-      
       // SIGNED_IN event causes hanging queries - skip profile fetch for this event
-      // Profile is already loaded from cache and via INITIAL_SESSION
+      // Profile is loaded explicitly in signIn() function instead
       if (event === 'SIGNED_IN') {
-        console.log('[Auth] Skipping SIGNED_IN event (causes hanging queries)');
-        // Just set user from session, don't fetch profile
+        // Just set user from session, don't fetch profile here
         if (session?.user) {
           setUser(session.user);
         }
@@ -229,6 +226,13 @@ export function AuthProvider({ children }) {
         password,
       });
       if (error) throw error;
+
+      // Explicitly update user and fetch profile after successful sign in
+      // This is needed because SIGNED_IN event is skipped to prevent hanging queries
+      if (data?.user) {
+        setUser(data.user);
+        await fetchProfile(data.user.id, true); // force=true to bypass cache
+      }
 
       // Log successful login
       try {

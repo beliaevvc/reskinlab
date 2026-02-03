@@ -5,6 +5,11 @@
 
 ## Recently Archived Tasks
 
+### Account Switcher Fix (4 Февраля 2026) — ARCHIVED ✅
+Переключение аккаунтов не обновляло профиль пользователя. Добавлен явный вызов `fetchProfile()` в `signIn()`.
+- **Archive:** `memory-bank/archive/archive-account-switcher-fix.md`
+- **Pattern:** `memory-bank/systemPatterns.md` (раздел "Account Switcher и пропуск SIGNED_IN")
+
 ### Auth Hanging Fix (4 Февраля 2026) — ARCHIVED ✅
 Критический баг с зависанием при перезагрузке страницы исправлен.
 - **Archive:** `memory-bank/archive/archive-auth-hanging-fix.md`
@@ -49,5 +54,5 @@
 - `calculator/src/lib/supabase.js` - Supabase client с отключенным Realtime
 
 ## Archive Documents
-- `memory-bank/archive/archive-auth-hanging-fix.md` — Latest archived task
-- `memory-bank/reflection/reflection-auth-hanging-fix.md` — Latest reflection
+- `memory-bank/archive/archive-account-switcher-fix.md` — Latest archived task
+- `memory-bank/reflection/reflection-account-switcher-fix.md` — Latest reflection

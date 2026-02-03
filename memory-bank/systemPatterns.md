@@ -117,6 +117,57 @@ supabase.realtime.disconnect();
 
 ---
 
+## КРИТИЧЕСКИ ВАЖНО: Account Switcher и пропуск SIGNED_IN
+
+### Проблема (Февраль 2026)
+При переключении аккаунтов через AccountSwitcher профиль пользователя **не обновлялся**. UI показывал старого пользователя после переключения.
+
+**Симптомы:**
+- Нажатие на другой аккаунт в свитчере
+- `signIn()` возвращает успех с новым userId
+- Но UI продолжает показывать старый профиль (имя, роль, аватар)
+- В консоли: `[Auth] Skipping SIGNED_IN event (causes hanging queries)`
+
+**Причина:**
+Поскольку `SIGNED_IN` event пропускается (для предотвращения зависающих запросов), `fetchProfile()` для нового пользователя **не вызывается**. Обработчик `onAuthStateChange` только устанавливает `setUser()`, но не загружает профиль.
+
+### Решение
+В функции `signIn()` в `AuthContext.jsx` **явно вызывать** `setUser()` и `fetchProfile()` после успешной авторизации:
+
+```javascript
+const signIn = async ({ email, password }) => {
+  setError(null);
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+
+    // КРИТИЧЕСКИ ВАЖНО: Явно обновляем user и загружаем профиль
+    // Это нужно потому что SIGNED_IN event пропускается
+    if (data?.user) {
+      setUser(data.user);
+      await fetchProfile(data.user.id, true); // force=true для обхода кеша
+    }
+
+    // ... остальной код
+    return { data, error: null };
+  } catch (err) {
+    setError(err.message);
+    return { data: null, error: err };
+  }
+};
+```
+
+### Почему это работает:
+1. `signIn()` вызывается напрямую (не через event listener)
+2. К моменту вызова `signInWithPassword()` уже вернул результат — токен готов
+3. Явный вызов `fetchProfile(userId, true)` гарантирует загрузку профиля
+4. `force=true` обходит localStorage кеш старого профиля
+
+---
+
 ## React Query Settings
 
 Рекомендуемые настройки для стабильной работы:
