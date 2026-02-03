@@ -1,5 +1,26 @@
 # Progress Log
 
+## Kanban Drag Card Fix — ARCHIVED ✅
+
+### Date: 2026-02-04
+
+### Summary
+Исправлен визуальный баг: при перетаскивании карточки задачи в Task Board она растягивалась на всю ширину. Ghost-элемент терял CSS-контекст родительской колонки.
+
+### Solution
+- Ghost получает фиксированные размеры через `getBoundingClientRect()`
+- Off-screen позиционирование (`position: fixed; top: -1000px`)
+- Центрирование drag image относительно курсора
+
+### Files Modified
+- `calculator/src/components/tasks/KanbanBoard.jsx` — функция `handleDragStart()`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-kanban-drag-card-fix.md`
+📄 `memory-bank/reflection/reflection-kanban-drag-card-fix.md`
+
+---
+
 ## Auto Task Names Fix — ARCHIVED ✅
 
 ### Date: 2026-02-04

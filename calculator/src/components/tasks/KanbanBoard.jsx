@@ -16,11 +16,24 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
   const handleDragStart = (e, task) => {
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
-    // Add drag image
+    
+    // Create ghost with fixed dimensions from original element
     const ghost = e.target.cloneNode(true);
-    ghost.style.opacity = '0.5';
+    const rect = e.target.getBoundingClientRect();
+    
+    // Fix ghost dimensions and position off-screen
+    ghost.style.width = `${rect.width}px`;
+    ghost.style.height = `${rect.height}px`;
+    ghost.style.position = 'fixed';
+    ghost.style.top = '-1000px';
+    ghost.style.left = '-1000px';
+    ghost.style.opacity = '0.8';
+    ghost.style.pointerEvents = 'none';
+    ghost.style.zIndex = '9999';
+    
     document.body.appendChild(ghost);
-    e.dataTransfer.setDragImage(ghost, 0, 0);
+    e.dataTransfer.setDragImage(ghost, rect.width / 2, rect.height / 2);
+    
     setTimeout(() => document.body.removeChild(ghost), 0);
   };
 

@@ -1,5 +1,17 @@
 # Tasks
 
+## Recent Task
+**Kanban Drag Card Fix** — ARCHIVED ✅
+
+### Summary
+Исправлен баг с растягиванием карточки при перетаскивании в Task Board. Ghost-элемент получает фиксированные размеры через `getBoundingClientRect()`.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-kanban-drag-card-fix.md`
+- **Reflection:** `memory-bank/reflection/reflection-kanban-drag-card-fix.md`
+
+---
+
 ## ⚠️ КРИТИЧЕСКИЙ ФИКС (4 Февраля 2026) — ARCHIVED ✅
 
 **Auth Hanging Fix** — ARCHIVED ✅

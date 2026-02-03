@@ -5,6 +5,11 @@
 
 ## Recently Completed Tasks
 
+### Kanban Drag Card Fix (4 Февраля 2026) — ARCHIVED ✅
+Исправлен баг растягивания карточки при перетаскивании в Task Board.
+- **Archive:** `memory-bank/archive/archive-kanban-drag-card-fix.md`
+- **Reflection:** `memory-bank/reflection/reflection-kanban-drag-card-fix.md`
+
 ### Auto Task Names Fix (4 Февраля 2026) — ARCHIVED ✅
 Комплексное исправление автоматического создания задач при первой оплате.
 - **Archive:** `memory-bank/archive/archive-auto-task-names-fix.md`
