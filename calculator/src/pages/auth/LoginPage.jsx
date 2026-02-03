@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -8,12 +8,19 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { signIn, isConfigured } = useAuth();
+  const { signIn, isConfigured, isAuthenticated, profileLoaded } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Get redirect path from location state
   const from = location.state?.from?.pathname || '/dashboard';
+
+  // Redirect when authenticated and profile loaded
+  useEffect(() => {
+    if (isAuthenticated && profileLoaded) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, profileLoaded, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,14 +32,14 @@ export function LoginPage() {
 
       if (error) {
         setError(error.message);
+        setLoading(false);
         return;
       }
 
-      // Redirect to previous page or dashboard
-      navigate(from, { replace: true });
+      // Don't navigate here - let useEffect handle it after profile loads
+      // This ensures profile is loaded before redirect
     } catch (err) {
       setError('An unexpected error occurred');
-    } finally {
       setLoading(false);
     }
   };

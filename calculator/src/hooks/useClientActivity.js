@@ -12,7 +12,9 @@ export function useClientActivity(limit = 10) {
   return useQuery({
     queryKey: ['client-activity', client?.id, limit],
     queryFn: async () => {
-      if (!client?.id) return [];
+      if (!client?.id) {
+        return [];
+      }
 
       const activities = [];
 

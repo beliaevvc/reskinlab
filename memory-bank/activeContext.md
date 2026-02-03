@@ -3,36 +3,38 @@
 ## Current Status
 **Ready for Next Task** ✅
 
-## ⚠️ КРИТИЧЕСКИЙ ФИКС (3 Февраля 2026)
+## Recently Archived Tasks
 
-**Проблема:** Приложение зависало при перезагрузке — бесконечный Loading.
+### Auth Hanging Fix (4 Февраля 2026) — ARCHIVED ✅
+Критический баг с зависанием при перезагрузке страницы исправлен.
+- **Archive:** `memory-bank/archive/archive-auth-hanging-fix.md`
+- **Pattern:** `memory-bank/systemPatterns.md`
 
-**Причина:** Supabase Realtime WebSocket блокировал HTTP запросы.
+### Admin Dashboard & Users Page Improvements — ARCHIVED ✅
+- **Archive:** `memory-bank/archive/archive-admin-dashboard-users-improvements.md`
 
-**Решение:** В `calculator/src/lib/supabase.js` добавлен `supabase.realtime.disconnect()`.
-
-**Подробности:** `memory-bank/systemPatterns.md`
+### Task Spec Item Templates Management — ARCHIVED ✅
+- **Archive:** `memory-bank/archive/archive-task-spec-item-templates-management.md`
 
 ---
 
-## Last Session Summary
-Completed Admin Dashboard & Users Page Improvements:
+## Pending Tasks
 
-### Key Deliverables
+### Fix Task Titles with ID-like Names — IN PROGRESS 🔄
+Некоторые задачи имеют названия, совпадающие с `item_id` вместо нормальных названий.
 
-1. **Admin Dashboard & Users Page Improvements** ✅ ARCHIVED
-   - Fixed critical issues with financial data display in admin dashboard
-   - Fixed revenue display in Users page
-   - Improved Users table UX with intuitive column clicks
-   - Added last_login_at tracking for users
-   - Improved UserDetailModal with fixed size and expanded Projects tab information
-   - Archive: `memory-bank/archive/archive-admin-dashboard-users-improvements.md`
+**Next Steps:**
+- [ ] Применить миграцию `027_fix_task_titles_in_templates.sql` в базе данных
+- [ ] Проверить, что все задачи имеют нормальные названия
+- [ ] Убедиться, что новые задачи создаются с правильными названиями
 
-2. **Previous Tasks**
-   - Task Spec Item Templates Management ✅ ARCHIVED
-   - Project Stages Management & Offers Filtering ✅ ARCHIVED
-   - Invoice Rejection Logic Improvement ✅ ARCHIVED
-   - Payment Confirmation System ✅ ARCHIVED
+### Production Migrations Pending
+- [ ] Apply migrations 018-027 to production database
+- [ ] Test task template creation with real projects
+- [ ] Test checklist creation from templates
+- [ ] Test access control for checklists with different user roles
+
+---
 
 ## Tech Stack
 - React 18 + Vite
@@ -41,18 +43,11 @@ Completed Admin Dashboard & Users Page Improvements:
 - React Query for data fetching
 - Zustand for calculator state
 
-## Next Steps
-- Apply migrations 018-025 to production database
-- Test task template creation with real projects
-- Test checklist creation from templates
-- Test access control for checklists with different user roles
-- Consider adding validation for template fields
-- Consider refactoring large `auto_create_tasks_on_first_payment()` function
-
 ## Important Files
-- `memory-bank/archive/archive-admin-dashboard-users-improvements.md` - Latest completed task archive
-- `memory-bank/reflection/reflection-admin-dashboard-users-improvements.md` - Latest task reflection
-- `calculator/supabase/migrations/026_add_last_login_at_to_profiles.sql` - Database migration for last_login_at
-- `calculator/src/hooks/useDashboard.js` - Dashboard statistics hooks
-- `calculator/src/hooks/useUsers.js` - Users management hooks
-- `calculator/src/components/admin/UserDetailModal.jsx` - User detail modal component
+- `memory-bank/systemPatterns.md` - **КРИТИЧЕСКИ ВАЖНО** — паттерны и фиксы проблем
+- `calculator/src/contexts/AuthContext.jsx` - Auth context с фиксом SIGNED_IN
+- `calculator/src/lib/supabase.js` - Supabase client с отключенным Realtime
+
+## Archive Documents
+- `memory-bank/archive/archive-auth-hanging-fix.md` — Latest archived task
+- `memory-bank/reflection/reflection-auth-hanging-fix.md` — Latest reflection

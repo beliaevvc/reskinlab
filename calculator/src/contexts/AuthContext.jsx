@@ -12,39 +12,70 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
   
-  const fetchingRef = useRef(false);
   const mountedRef = useRef(true);
 
   // Fetch user profile from database
-  const fetchProfile = useCallback(async (userId) => {
-    if (!userId || fetchingRef.current) return;
-    
-    fetchingRef.current = true;
+  const fetchProfile = useCallback(async (userId, force = false) => {
+    if (!userId) return null;
     
     try {
-      const { data, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      // Try cache first for instant UI
+      if (!force) {
+        try {
+          const cached = localStorage.getItem(`profile_${userId}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (mountedRef.current) {
+              setProfile(parsed);
+              setProfileLoaded(true);
+            }
+          }
+        } catch (e) { /* ignore */ }
+      }
 
-      if (!mountedRef.current) return;
+      // Query with timeout to prevent hanging
+      let data = null;
+      let profileError = null;
+      
+      try {
+        const queryPromise = supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Profile query timeout')), 3000)
+        );
+        
+        const result = await Promise.race([queryPromise, timeoutPromise]);
+        data = result.data;
+        profileError = result.error;
+      } catch (timeoutErr) {
+        console.warn('[Auth] Profile query timeout, using cached data');
+        // If we have cached profile, just return - it's already set
+        if (mountedRef.current) {
+          setProfileLoaded(true);
+        }
+        return null;
+      }
+
+      if (!mountedRef.current) return null;
 
       if (profileError || !data) {
         console.warn('Profile fetch error:', profileError?.message);
-        // Keep existing profile if we have one with staff role
         setProfile(prev => {
           if (prev?.role === 'admin' || prev?.role === 'am') return prev;
           return prev || { id: userId, role: 'client', email: '' };
         });
         setProfileLoaded(true);
-        return;
+        return null;
       }
       
-      // Cache profile in localStorage for optimistic loading
+      // Cache profile
       try {
         localStorage.setItem(`profile_${userId}`, JSON.stringify(data));
-      } catch (e) { /* ignore storage errors */ }
+      } catch (e) { /* ignore */ }
       
       setProfile(data);
       setProfileLoaded(true);
@@ -63,14 +94,15 @@ export function AuthProvider({ children }) {
           })
           .catch(() => {});
       }
+      
+      return data;
     } catch (err) {
       console.error('Profile fetch failed:', err.message);
       if (mountedRef.current) {
         setProfile(prev => prev || { id: userId, role: 'client', email: '' });
         setProfileLoaded(true);
       }
-    } finally {
-      fetchingRef.current = false;
+      return null;
     }
   }, []);
 
@@ -82,26 +114,35 @@ export function AuthProvider({ children }) {
     }
 
     mountedRef.current = true;
+    let initialized = false;
 
-    // Handle session changes
-    const handleSession = async (session) => {
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mountedRef.current) return;
       
+      console.log('[Auth] onAuthStateChange:', event);
+      
+      // SIGNED_IN event causes hanging queries - skip profile fetch for this event
+      // Profile is already loaded from cache and via INITIAL_SESSION
+      if (event === 'SIGNED_IN') {
+        console.log('[Auth] Skipping SIGNED_IN event (causes hanging queries)');
+        // Just set user from session, don't fetch profile
+        if (session?.user) {
+          setUser(session.user);
+        }
+        return;
+      }
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('[Auth] Token refreshed');
+        return;
+      }
+      
+      // Handle session for INITIAL_SESSION and SIGNED_OUT
       const currentUser = session?.user ?? null;
       setUser(currentUser);
 
       if (currentUser) {
-        // Try optimistic load from cache first
-        try {
-          const cached = localStorage.getItem(`profile_${currentUser.id}`);
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            setProfile(parsed);
-            setProfileLoaded(true);
-          }
-        } catch (e) { /* ignore */ }
-        
-        // Then fetch fresh profile
         await fetchProfile(currentUser.id);
       } else {
         setProfile(null);
@@ -109,36 +150,53 @@ export function AuthProvider({ children }) {
         setProfileLoaded(false);
       }
 
-      setLoading(false);
-    };
-
-    // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mountedRef.current) return;
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Update last_login_at
-        try {
-          await supabase
-            .from('profiles')
-            .update({ last_login_at: new Date().toISOString() })
-            .eq('id', session.user.id);
-        } catch (e) { /* ignore */ }
+      if (mountedRef.current && !initialized) {
+        initialized = true;
+        setLoading(false);
+        console.log('[Auth] Initialization completed via onAuthStateChange');
       }
-      
-      await handleSession(session);
     });
 
-    // Get initial session
+    // Get initial session as backup
     supabase.auth.getSession()
-      .then(({ data: { session } }) => handleSession(session))
+      .then(async ({ data: { session } }) => {
+        if (!mountedRef.current || initialized) return;
+        
+        console.log('[Auth] getSession:', session?.user?.id || 'no user');
+        
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+
+        if (currentUser) {
+          await fetchProfile(currentUser.id);
+        }
+
+        if (mountedRef.current && !initialized) {
+          initialized = true;
+          setLoading(false);
+          console.log('[Auth] Initialization completed via getSession');
+        }
+      })
       .catch((err) => {
-        console.error('getSession error:', err);
-        if (mountedRef.current) setLoading(false);
+        console.error('[Auth] getSession error:', err);
+        if (mountedRef.current && !initialized) {
+          initialized = true;
+          setLoading(false);
+        }
       });
+
+    // Safety timeout
+    const timeout = setTimeout(() => {
+      if (mountedRef.current && !initialized) {
+        console.warn('[Auth] Safety timeout - forcing loading=false');
+        initialized = true;
+        setLoading(false);
+      }
+    }, 5000);
 
     return () => {
       mountedRef.current = false;
+      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, [fetchProfile]);
@@ -227,7 +285,6 @@ export function AuthProvider({ children }) {
         .single();
       if (error) throw error;
       setProfile(data);
-      // Update cache
       try {
         localStorage.setItem(`profile_${user.id}`, JSON.stringify(data));
       } catch (e) { /* ignore */ }
@@ -260,8 +317,7 @@ export function AuthProvider({ children }) {
   // Refresh profile
   const refreshProfile = async () => {
     if (user) {
-      fetchingRef.current = false; // Allow re-fetch
-      await fetchProfile(user.id);
+      await fetchProfile(user.id, true);
     }
   };
 

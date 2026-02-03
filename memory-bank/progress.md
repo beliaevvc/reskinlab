@@ -1,5 +1,25 @@
 # Progress Log
 
+## Auth Hanging Fix — ARCHIVED ✅
+
+### Date: 2026-02-04
+
+### Summary
+Критический баг: приложение зависало при перезагрузке страницы. Root cause — Supabase Auth event `SIGNED_IN` срабатывает до готовности токена, запросы к базе зависали.
+
+### Solution
+- Пропуск `SIGNED_IN` event, обработка только `INITIAL_SESSION`
+- Таймаут 3 секунды на запрос профиля
+- Кэширование профиля в localStorage
+
+### Files Modified
+- `calculator/src/contexts/AuthContext.jsx` — основной фикс
+
+### Archive Reference
+📄 `memory-bank/archive/archive-auth-hanging-fix.md`
+
+---
+
 ## Admin Dashboard & Users Page Improvements — ARCHIVED ✅
 
 ### Date: 2026-02-03

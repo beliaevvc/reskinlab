@@ -1,5 +1,19 @@
 # Tasks
 
+## ⚠️ КРИТИЧЕСКИЙ ФИКС (4 Февраля 2026) — ARCHIVED ✅
+
+**Auth Hanging Fix** — ARCHIVED ✅
+
+### Summary
+Исправлено зависание приложения при перезагрузке. Root cause: Supabase Auth event `SIGNED_IN` срабатывает до готовности токена.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-auth-hanging-fix.md`
+- **Reflection:** `memory-bank/reflection/reflection-auth-hanging-fix.md`
+- **Pattern:** `memory-bank/systemPatterns.md`
+
+---
+
 ## Current Task
 **Fix Task Titles with ID-like Names** — IN PROGRESS 🔄
 
