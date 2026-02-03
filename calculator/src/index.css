@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts - Inter for Supabase-like feel */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Base Styles - Supabase Light Theme */
+body {
+  background-color: #FAFAFA;
+  color: #1C1C1C;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+
+/* Print Styles */
+@media print {
+  /* Hide no-print elements */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Page setup */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+  
+  /* Ensure colors print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Custom Scrollbar - Light theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4D4D4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A3A3A3;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
