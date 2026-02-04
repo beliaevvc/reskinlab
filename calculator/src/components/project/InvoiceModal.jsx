@@ -8,6 +8,7 @@ import { getInvoiceStatusInfo, formatInvoiceAmount, isInvoiceOverdue } from '../
 import { PaymentInfo } from '../../components/invoices';
 import { OfferModal } from './OfferModal';
 import { SpecificationModal } from './SpecificationModal';
+import { UserDetailModal } from '../admin/UserDetailModal';
 
 export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   const { isAdmin, isStaff } = useAuth();
@@ -20,6 +21,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   const [rejectReason, setRejectReason] = useState('');
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [showSpecModal, setShowSpecModal] = useState(false);
+  const [showClientModal, setShowClientModal] = useState(false);
   
   const canManagePayments = isAdmin || isStaff;
 
@@ -113,9 +115,9 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </span>
                 )}
               </div>
-              {canManagePayments && clientName && (
-                <p className="text-sm text-emerald-600 mt-0.5">
-                  Client: {clientName}
+              {canManagePayments && clientName && client?.profile?.id && (
+                <p className="text-sm text-neutral-500 mt-0.5">
+                  Client: <button onClick={() => setShowClientModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{clientName}</button>
                 </p>
               )}
               <div className="flex items-center gap-4 mt-3 text-sm text-neutral-500">
@@ -431,6 +433,15 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
           isOpen={showSpecModal}
           onClose={() => setShowSpecModal(false)}
           specificationId={offer.specification.id}
+        />
+      )}
+
+      {/* User Detail Modal (for client) */}
+      {client?.profile?.id && (
+        <UserDetailModal
+          isOpen={showClientModal}
+          onClose={() => setShowClientModal(false)}
+          userId={client.profile.id}
         />
       )}
     </div>,
