@@ -56,6 +56,24 @@ export function useTasks(projectId) {
         .eq('entity_type', 'task')
         .in('entity_id', taskIds);
 
+      // Get checklist stats for all tasks
+      const { data: checklistItems } = await supabase
+        .from('task_checklist_items')
+        .select('task_id, completed')
+        .in('task_id', taskIds);
+
+      // Calculate checklist stats per task
+      const checklistStatsMap = {};
+      (checklistItems || []).forEach(item => {
+        if (!checklistStatsMap[item.task_id]) {
+          checklistStatsMap[item.task_id] = { total: 0, completed: 0 };
+        }
+        checklistStatsMap[item.task_id].total++;
+        if (item.completed) {
+          checklistStatsMap[item.task_id].completed++;
+        }
+      });
+
       // Get read status for current user
       let readCommentIds = new Set();
       if (userId && comments?.length > 0) {
@@ -94,6 +112,8 @@ export function useTasks(projectId) {
         ...task,
         comments_count: statsMap[task.id]?.total || 0,
         unread_comments_count: statsMap[task.id]?.unread || 0,
+        checklist_total: checklistStatsMap[task.id]?.total || 0,
+        checklist_completed: checklistStatsMap[task.id]?.completed || 0,
       }));
     },
     enabled: !!projectId,

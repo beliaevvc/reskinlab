@@ -59,6 +59,31 @@ export function TaskCard({ task, onClick, isDragging }) {
         )}
       </div>
 
+      {/* Checklist progress */}
+      {task.checklist_total > 0 && (
+        <div className="mt-3">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span>{task.checklist_completed}/{task.checklist_total}</span>
+            </div>
+            {task.checklist_completed === task.checklist_total && (
+              <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <div className="h-1 bg-neutral-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full rounded-full transition-all bg-emerald-500"
+              style={{ width: `${(task.checklist_completed / task.checklist_total) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Footer - показываем только если есть контент */}
       {(task.assignee || attachmentsCount > 0 || task.comments_count > 0) && (
         <div className="flex items-center justify-between mt-3 pt-2 border-t border-neutral-100">
