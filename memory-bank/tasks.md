@@ -1,6 +1,23 @@
 # Tasks
 
 ## Recent Task
+**Favicon Creation** — ARCHIVED ✅
+
+### Summary
+Создан фавикон для ReSkin Lab: темно-серый фон (#1C1C1C), зеленая буква R с точкой (#10B981).
+
+### Files Created
+- `calculator/public/favicon.svg`
+- `calculator/public/apple-touch-icon.svg`
+- `calculator/index.html` — добавлены мета-теги
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-favicon-creation.md`
+- **Reflection:** `memory-bank/reflection/reflection-favicon-creation.md`
+
+---
+
+## Recent Task
 **Task Card Deadline UI Redesign** — ARCHIVED ✅
 
 ### Summary
