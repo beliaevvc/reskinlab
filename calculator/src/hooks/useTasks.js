@@ -299,6 +299,43 @@ export function useUpdateTaskStatus() {
 }
 
 /**
+ * Reorder tasks within a column or move to another column with position
+ */
+export function useReorderTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ taskId, status, newOrder, projectId }) => {
+      const updates = { 
+        status,
+        order: newOrder,
+      };
+
+      // Set completed_at when moving to done
+      if (status === 'done') {
+        updates.completed_at = new Date().toISOString();
+      } else {
+        updates.completed_at = null;
+      }
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .update(updates)
+        .eq('id', taskId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { ...data, projectId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['task', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['tasks', data.projectId] });
+    },
+  });
+}
+
+/**
  * Delete a task
  */
 export function useDeleteTask() {

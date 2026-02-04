@@ -2,23 +2,34 @@ import { formatDate } from '../../lib/utils';
 import { getTaskStatusInfo } from '../../hooks/useTasks';
 import { ALL_ITEMS } from '../../data/categories';
 
-export function TaskCard({ task, onClick, isDragging }) {
+export function TaskCard({ task, onClick, isDragging, canToggleComplete = false, onToggleComplete }) {
   const statusInfo = getTaskStatusInfo(task.status);
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done';
+  const isDone = task.status === 'done';
   
   // Check for pending approval
   const hasPendingApproval = task.pending_approval || task.needs_approval;
   // Count attachments
   const attachmentsCount = task.assets_count || task.attachments?.length || 0;
 
+  const handleToggleComplete = (e) => {
+    e.stopPropagation();
+    if (onToggleComplete) {
+      onToggleComplete(task);
+    }
+  };
+
   return (
     <div
       onClick={() => onClick?.(task)}
       className={`
-        bg-white rounded border p-3 cursor-pointer transition-all relative
+        rounded border p-3 cursor-pointer transition-all relative
+        ${isDone ? 'bg-neutral-50' : 'bg-white'}
         ${isDragging
           ? 'shadow-lg border-emerald-300 rotate-2'
-          : 'border-neutral-200 hover:border-neutral-300 hover:shadow-sm'}
+          : isDone 
+            ? 'border-neutral-200 hover:border-neutral-300' 
+            : 'border-neutral-200 hover:border-neutral-300 hover:shadow-sm'}
         ${hasPendingApproval ? 'ring-2 ring-blue-200' : ''}
       `}
     >
@@ -31,10 +42,33 @@ export function TaskCard({ task, onClick, isDragging }) {
         </div>
       )}
 
-      {/* Title */}
-      <h4 className="font-medium text-neutral-900 text-sm line-clamp-2">
-        {task.title}
-      </h4>
+      {/* Title with checkbox */}
+      <div className="flex items-start gap-2">
+        {/* Complete checkbox */}
+        <button
+          onClick={canToggleComplete ? handleToggleComplete : undefined}
+          disabled={!canToggleComplete}
+          className={`shrink-0 mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+            isDone
+              ? 'bg-emerald-500 border-emerald-500'
+              : 'border-neutral-300 hover:border-emerald-400'
+          } ${canToggleComplete ? 'cursor-pointer' : 'cursor-default'}`}
+        >
+          <svg 
+            className={`w-2.5 h-2.5 ${isDone ? 'text-white' : 'text-neutral-300'}`} 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            strokeWidth={3}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </button>
+        
+        <h4 className={`font-medium text-sm line-clamp-2 ${isDone ? 'text-neutral-400 line-through' : 'text-neutral-900'}`}>
+          {task.title}
+        </h4>
+      </div>
 
       {/* Meta - date */}
       {task.due_date && (

@@ -206,6 +206,7 @@ export function ProjectPage() {
               onTaskClick={(task) => setSelectedTaskId(task.id)}
               onCreateTask={effectiveIsStaff ? () => setShowCreateTask(true) : undefined}
               canDrag={effectiveIsStaff}
+              canToggleComplete={effectiveIsStaff}
             />
           </div>
         </div>

@@ -82,6 +82,8 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [deadlineEditing, setDeadlineEditing] = useState(false);
+  const [deadlineType, setDeadlineType] = useState('date'); // 'date' | 'datetime' | 'range'
   
   const commentsTopRef = useRef(null);
   
@@ -108,8 +110,22 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
       setEditingField(null);
       setStatusMenuOpen(false);
       setSelectedUserId(null);
+      setDeadlineEditing(false);
     }
   }, [isOpen]);
+
+  // Determine deadline type from task data
+  useEffect(() => {
+    if (task) {
+      if (task.due_date_end) {
+        setDeadlineType('range');
+      } else if (task.due_time) {
+        setDeadlineType('datetime');
+      } else {
+        setDeadlineType('date');
+      }
+    }
+  }, [task]);
 
   if (!isOpen) return null;
 
@@ -151,6 +167,55 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
 
   const handleCancelReply = () => {
     setReplyingTo(null);
+  };
+
+  // Format deadline for display
+  const formatDeadline = () => {
+    if (!task?.due_date) return null;
+    
+    const startDate = new Date(task.due_date);
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    let result = startDate.toLocaleDateString('ru-RU', options);
+    
+    if (task.due_time) {
+      result += ` в ${task.due_time.slice(0, 5)}`;
+    }
+    
+    if (task.due_date_end) {
+      const endDate = new Date(task.due_date_end);
+      result += ` — ${endDate.toLocaleDateString('ru-RU', options)}`;
+    }
+    
+    return result;
+  };
+
+  // Check if deadline is overdue
+  const isOverdue = () => {
+    if (!task?.due_date || task.status === 'done') return false;
+    const deadline = task.due_date_end || task.due_date;
+    return new Date(deadline) < new Date();
+  };
+
+  // Update deadline
+  const handleDeadlineUpdate = (updates) => {
+    updateTask({
+      taskId: task.id,
+      updates,
+    });
+    setDeadlineEditing(false);
+  };
+
+  // Clear deadline
+  const handleClearDeadline = () => {
+    updateTask({
+      taskId: task.id,
+      updates: {
+        due_date: null,
+        due_time: null,
+        due_date_end: null,
+      },
+    });
+    setDeadlineEditing(false);
   };
 
   const scrollToTop = () => {
@@ -280,36 +345,66 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
               <div className="p-6 space-y-4 border-b border-neutral-100">
                 {/* Title & Description */}
                 <div className="space-y-1">
-                  {/* Title - inline editable */}
-                  {editingField === 'title' && !isClient ? (
-                    <input
-                      type="text"
-                      defaultValue={task.title}
-                      autoFocus
-                      onBlur={(e) => {
-                        handleUpdateField('title', e.target.value);
-                        setEditingField(null);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.target.blur();
-                        } else if (e.key === 'Escape') {
-                          setEditingField(null);
+                  {/* Title with checkbox - inline editable */}
+                  <div className="flex items-start gap-3">
+                    {/* Complete checkbox */}
+                    <button
+                      onClick={() => {
+                        if (!isClient) {
+                          const newStatus = task.status === 'done' ? 'todo' : 'done';
+                          handleStatusChange(newStatus);
                         }
                       }}
-                      className="w-full text-xl font-semibold text-neutral-900 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -mx-1"
-                      placeholder="Название задачи"
-                    />
-                  ) : (
-                    <h3 
-                      onClick={() => !isClient && setEditingField('title')}
-                      className={`text-xl font-semibold text-neutral-900 rounded px-1 py-0.5 -mx-1 border border-transparent ${
-                        !isClient ? 'hover:bg-neutral-100 cursor-text' : ''
-                      }`}
+                      disabled={isClient}
+                      className={`shrink-0 mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        task.status === 'done'
+                          ? 'bg-emerald-500 border-emerald-500'
+                          : 'border-neutral-300 hover:border-emerald-400'
+                      } ${!isClient ? 'cursor-pointer' : 'cursor-default'}`}
                     >
-                      {task.title}
-                    </h3>
-                  )}
+                      <svg 
+                        className={`w-3.5 h-3.5 ${task.status === 'done' ? 'text-white' : 'text-neutral-300'}`} 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor" 
+                        strokeWidth={3}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      {editingField === 'title' && !isClient ? (
+                        <input
+                          type="text"
+                          defaultValue={task.title}
+                          autoFocus
+                          onBlur={(e) => {
+                            handleUpdateField('title', e.target.value);
+                            setEditingField(null);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.target.blur();
+                            } else if (e.key === 'Escape') {
+                              setEditingField(null);
+                            }
+                          }}
+                          className="w-full text-xl font-semibold text-neutral-900 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -mx-1"
+                          placeholder="Название задачи"
+                        />
+                      ) : (
+                        <h3 
+                          onClick={() => !isClient && setEditingField('title')}
+                          className={`text-xl font-semibold rounded px-1 py-0.5 -mx-1 border border-transparent ${
+                            task.status === 'done' ? 'text-neutral-400 line-through' : 'text-neutral-900'
+                          } ${!isClient ? 'hover:bg-neutral-100 cursor-text' : ''}`}
+                        >
+                          {task.title}
+                        </h3>
+                      )}
+                    </div>
+                  </div>
 
                   {/* Description - inline editable */}
                   {editingField === 'description' && !isClient ? (
@@ -344,6 +439,153 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                         ? parseTextWithLinks(task.description) 
                         : (!isClient ? 'Добавить описание...' : '')
                       }
+                    </div>
+                  )}
+                </div>
+
+                {/* Deadline Section */}
+                <div className="pt-4 border-t border-neutral-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <svg className={`w-4 h-4 ${isOverdue() ? 'text-red-500' : 'text-neutral-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm font-medium text-neutral-700">Дедлайн</span>
+                    </div>
+                    
+                    {!isClient && !deadlineEditing && (
+                      <button
+                        onClick={() => setDeadlineEditing(true)}
+                        className="text-xs text-neutral-400 hover:text-emerald-600 transition-colors"
+                      >
+                        {task.due_date ? 'Изменить' : 'Добавить'}
+                      </button>
+                    )}
+                  </div>
+
+                  {deadlineEditing && !isClient ? (
+                    <div className="mt-3 p-3 bg-neutral-50 rounded-lg space-y-3">
+                      {/* Deadline type selector */}
+                      <div className="flex gap-1 p-0.5 bg-neutral-200 rounded-lg">
+                        {[
+                          { id: 'date', label: 'Дата' },
+                          { id: 'datetime', label: 'Дата и время' },
+                          { id: 'range', label: 'Диапазон' },
+                        ].map((type) => (
+                          <button
+                            key={type.id}
+                            onClick={() => setDeadlineType(type.id)}
+                            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                              deadlineType === type.id
+                                ? 'bg-white text-neutral-900 shadow-sm'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                          >
+                            {type.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Date inputs */}
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          const formData = new FormData(e.target);
+                          const updates = {
+                            due_date: formData.get('due_date') || null,
+                            due_time: deadlineType === 'datetime' ? formData.get('due_time') || null : null,
+                            due_date_end: deadlineType === 'range' ? formData.get('due_date_end') || null : null,
+                          };
+                          handleDeadlineUpdate(updates);
+                        }}
+                        className="space-y-2"
+                      >
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <label className="block text-xs text-neutral-500 mb-1">
+                              {deadlineType === 'range' ? 'Начало' : 'Дата'}
+                            </label>
+                            <input
+                              type="date"
+                              name="due_date"
+                              defaultValue={task.due_date?.split('T')[0] || ''}
+                              className="w-full px-2 py-1.5 text-sm border border-neutral-200 rounded focus:border-emerald-500 focus:outline-none"
+                            />
+                          </div>
+                          
+                          {deadlineType === 'datetime' && (
+                            <div className="w-24">
+                              <label className="block text-xs text-neutral-500 mb-1">Время</label>
+                              <input
+                                type="time"
+                                name="due_time"
+                                defaultValue={task.due_time?.slice(0, 5) || ''}
+                                className="w-full px-2 py-1.5 text-sm border border-neutral-200 rounded focus:border-emerald-500 focus:outline-none"
+                              />
+                            </div>
+                          )}
+                          
+                          {deadlineType === 'range' && (
+                            <div className="flex-1">
+                              <label className="block text-xs text-neutral-500 mb-1">Конец</label>
+                              <input
+                                type="date"
+                                name="due_date_end"
+                                defaultValue={task.due_date_end?.split('T')[0] || ''}
+                                className="w-full px-2 py-1.5 text-sm border border-neutral-200 rounded focus:border-emerald-500 focus:outline-none"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            type="submit"
+                            className="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded transition-colors"
+                          >
+                            Сохранить
+                          </button>
+                          {task.due_date && (
+                            <button
+                              type="button"
+                              onClick={handleClearDeadline}
+                              className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded transition-colors"
+                            >
+                              Убрать
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setDeadlineEditing(false)}
+                            className="px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded transition-colors"
+                          >
+                            Отмена
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    <div className="mt-2">
+                      {task.due_date ? (
+                        <div 
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+                            isOverdue() 
+                              ? 'bg-red-50 text-red-700' 
+                              : 'bg-neutral-100 text-neutral-700'
+                          }`}
+                        >
+                          {isOverdue() && (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                          )}
+                          {formatDeadline()}
+                        </div>
+                      ) : (
+                        <span className="text-sm text-neutral-400 italic">
+                          {isClient ? 'Не установлен' : 'Нажмите "Добавить" для установки дедлайна'}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>

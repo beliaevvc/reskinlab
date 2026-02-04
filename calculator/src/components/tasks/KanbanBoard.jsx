@@ -1,15 +1,82 @@
-import { useState } from 'react';
-import { TASK_STATUSES, useUpdateTaskStatus } from '../../hooks/useTasks';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { TASK_STATUSES, useUpdateTaskStatus, useReorderTask } from '../../hooks/useTasks';
 import { TaskCard } from './TaskCard';
 
-export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDrag = true }) {
+const SCROLL_THRESHOLD = 80; // px from edge to start scrolling
+const SCROLL_SPEED = 10; // px per frame
+
+export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDrag = true, canToggleComplete = false }) {
   const [draggedTask, setDraggedTask] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
+  const [dropIndicator, setDropIndicator] = useState({ statusId: null, index: null });
   const { mutate: updateStatus } = useUpdateTaskStatus();
+  const { mutate: reorderTask } = useReorderTask();
+  const columnRefs = useRef({});
+  const scrollAnimationRef = useRef(null);
+  const scrollDirectionRef = useRef(0);
+  const scrollContainerRef = useRef(null);
 
-  // Group tasks by status
+  // Auto-scroll animation loop
+  useEffect(() => {
+    const animate = () => {
+      if (scrollContainerRef.current && scrollDirectionRef.current !== 0) {
+        scrollContainerRef.current.scrollTop += scrollDirectionRef.current * SCROLL_SPEED;
+      }
+      scrollAnimationRef.current = requestAnimationFrame(animate);
+    };
+    
+    scrollAnimationRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (scrollAnimationRef.current) {
+        cancelAnimationFrame(scrollAnimationRef.current);
+      }
+    };
+  }, []);
+
+  const checkAutoScroll = useCallback((e, statusId) => {
+    const container = columnRefs.current[statusId];
+    if (!container) {
+      scrollDirectionRef.current = 0;
+      scrollContainerRef.current = null;
+      return;
+    }
+
+    const rect = container.getBoundingClientRect();
+    const mouseY = e.clientY;
+
+    scrollContainerRef.current = container;
+
+    if (mouseY < rect.top + SCROLL_THRESHOLD && container.scrollTop > 0) {
+      // Near top - scroll up
+      scrollDirectionRef.current = -1;
+    } else if (mouseY > rect.bottom - SCROLL_THRESHOLD && 
+               container.scrollTop < container.scrollHeight - container.clientHeight) {
+      // Near bottom - scroll down
+      scrollDirectionRef.current = 1;
+    } else {
+      scrollDirectionRef.current = 0;
+    }
+  }, []);
+
+  const stopAutoScroll = useCallback(() => {
+    scrollDirectionRef.current = 0;
+    scrollContainerRef.current = null;
+  }, []);
+
+  const handleToggleComplete = (task) => {
+    const newStatus = task.status === 'done' ? 'todo' : 'done';
+    updateStatus({
+      taskId: task.id,
+      status: newStatus,
+      projectId,
+    });
+  };
+
+  // Group tasks by status and sort by order
   const tasksByStatus = TASK_STATUSES.reduce((acc, status) => {
-    acc[status.id] = tasks?.filter((t) => t.status === status.id) || [];
+    acc[status.id] = (tasks?.filter((t) => t.status === status.id) || [])
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
     return acc;
   }, {});
 
@@ -41,29 +108,94 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDragOverColumn(statusId);
+    checkAutoScroll(e, statusId);
   };
 
-  const handleDragLeave = () => {
-    setDragOverColumn(null);
+  const handleDragOverTask = (e, statusId, taskIndex, task) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!draggedTask || draggedTask.id === task.id) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const insertIndex = e.clientY < midY ? taskIndex : taskIndex + 1;
+    
+    setDropIndicator({ statusId, index: insertIndex });
+    setDragOverColumn(statusId);
+    checkAutoScroll(e, statusId);
+  };
+
+  const handleDragLeave = (e) => {
+    // Only clear if leaving the column entirely
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverColumn(null);
+      setDropIndicator({ statusId: null, index: null });
+      stopAutoScroll();
+    }
   };
 
   const handleDrop = (e, newStatus) => {
     e.preventDefault();
     setDragOverColumn(null);
+    
+    if (!draggedTask) {
+      setDropIndicator({ statusId: null, index: null });
+      return;
+    }
 
-    if (draggedTask && draggedTask.status !== newStatus) {
-      updateStatus({
+    const columnTasks = tasksByStatus[newStatus];
+    let newOrder;
+    
+    if (dropIndicator.statusId === newStatus && dropIndicator.index !== null) {
+      // Calculate new order based on drop position
+      const insertIndex = dropIndicator.index;
+      
+      // Filter out the dragged task to get accurate positions
+      const otherTasks = columnTasks.filter(t => t.id !== draggedTask.id);
+      
+      if (otherTasks.length === 0) {
+        newOrder = 1000;
+      } else if (insertIndex === 0) {
+        newOrder = (otherTasks[0]?.order || 1000) - 1000;
+      } else if (insertIndex >= otherTasks.length) {
+        newOrder = (otherTasks[otherTasks.length - 1]?.order || 0) + 1000;
+      } else {
+        const prevOrder = otherTasks[insertIndex - 1]?.order || 0;
+        const nextOrder = otherTasks[insertIndex]?.order || prevOrder + 2000;
+        newOrder = Math.floor((prevOrder + nextOrder) / 2);
+      }
+      
+      reorderTask({
         taskId: draggedTask.id,
         status: newStatus,
+        newOrder,
+        projectId,
+      });
+    } else if (draggedTask.status !== newStatus) {
+      // Moving to a different column without specific position
+      const maxOrder = columnTasks.length > 0 
+        ? Math.max(...columnTasks.map(t => t.order || 0)) 
+        : 0;
+      
+      reorderTask({
+        taskId: draggedTask.id,
+        status: newStatus,
+        newOrder: maxOrder + 1000,
         projectId,
       });
     }
+    
     setDraggedTask(null);
+    setDropIndicator({ statusId: null, index: null });
+    stopAutoScroll();
   };
 
   const handleDragEnd = () => {
     setDraggedTask(null);
     setDragOverColumn(null);
+    setDropIndicator({ statusId: null, index: null });
+    stopAutoScroll();
   };
 
   const getColumnColor = (statusId) => {
@@ -89,14 +221,18 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
         <div
           key={status.id}
           className={`
-            flex-shrink-0 w-72 bg-neutral-50 rounded border-t-4
+            flex-shrink-0 w-72 bg-neutral-50 rounded border-t-4 relative
             ${getColumnColor(status.id)}
-            ${dragOverColumn === status.id ? 'ring-2 ring-emerald-500 ring-inset' : ''}
           `}
           onDragOver={(e) => handleDragOver(e, status.id)}
           onDragLeave={handleDragLeave}
           onDrop={(e) => handleDrop(e, status.id)}
         >
+          {/* Drag overlay border */}
+          {dragOverColumn === status.id && (
+            <div className="absolute inset-0 border-2 border-emerald-500 rounded pointer-events-none z-10" />
+          )}
+          
           {/* Column header */}
           <div className="p-3 border-b border-neutral-200">
             <div className="flex items-center justify-between">
@@ -110,24 +246,45 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
           </div>
 
           {/* Tasks */}
-          <div className="p-2 space-y-2 min-h-[200px]">
-            {tasksByStatus[status.id].map((task) => (
-              <div
-                key={task.id}
-                draggable={canDrag}
-                onDragStart={canDrag ? (e) => handleDragStart(e, task) : undefined}
-                onDragEnd={canDrag ? handleDragEnd : undefined}
-              >
-                <TaskCard
-                  task={task}
-                  onClick={onTaskClick}
-                  isDragging={canDrag && draggedTask?.id === task.id}
-                />
+          <div 
+            ref={(el) => columnRefs.current[status.id] = el}
+            className="p-2 min-h-[200px] max-h-[60vh] overflow-y-auto"
+            onDragOver={(e) => {
+              e.preventDefault();
+              checkAutoScroll(e, status.id);
+            }}
+          >
+            {tasksByStatus[status.id].map((task, index) => (
+              <div key={task.id}>
+                {/* Drop indicator before task */}
+                {dropIndicator.statusId === status.id && dropIndicator.index === index && (
+                  <div className="h-1 bg-emerald-500 rounded-full mx-1 mb-2" />
+                )}
+                <div
+                  className="mb-2"
+                  draggable={canDrag}
+                  onDragStart={canDrag ? (e) => handleDragStart(e, task) : undefined}
+                  onDragOver={canDrag ? (e) => handleDragOverTask(e, status.id, index, task) : undefined}
+                  onDragEnd={canDrag ? handleDragEnd : undefined}
+                >
+                  <TaskCard
+                    task={task}
+                    onClick={onTaskClick}
+                    isDragging={canDrag && draggedTask?.id === task.id}
+                    canToggleComplete={canToggleComplete}
+                    onToggleComplete={handleToggleComplete}
+                  />
+                </div>
               </div>
             ))}
+            
+            {/* Drop indicator at the end */}
+            {dropIndicator.statusId === status.id && dropIndicator.index === tasksByStatus[status.id].length && (
+              <div className="h-1 bg-emerald-500 rounded-full mx-1 mb-2" />
+            )}
 
             {/* Empty state */}
-            {tasksByStatus[status.id].length === 0 && (
+            {tasksByStatus[status.id].length === 0 && !dragOverColumn && (
               <div className="text-center py-8 text-neutral-400 text-sm">
                 No tasks
               </div>

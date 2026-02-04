@@ -5,6 +5,14 @@
 
 ## Recently Completed Tasks
 
+### Task Card Completion & Reorder (4 Февраля 2026) — ARCHIVED ✅
+Улучшения карточек задач на Kanban доске:
+- Галочка завершения задачи (для админа и AM)
+- Перетаскивание задач внутри колонок для изменения порядка
+- Автоскролл при перетаскивании к краям колонки
+- **Archive:** `memory-bank/archive/archive-task-card-completion-reorder.md`
+- **Reflection:** `memory-bank/reflection/reflection-task-card-completion-reorder.md`
+
 ### Kanban Drag Card Fix (4 Февраля 2026) — ARCHIVED ✅
 Исправлен баг растягивания карточки при перетаскивании в Task Board.
 - **Archive:** `memory-bank/archive/archive-kanban-drag-card-fix.md`

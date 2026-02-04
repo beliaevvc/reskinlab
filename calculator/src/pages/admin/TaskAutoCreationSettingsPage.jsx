@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useTaskAutoCreationSettings, useUpdateTaskAutoCreationSettings } from '../../hooks/useTaskAutoCreationSettings';
 import { useTaskAutoTemplates, useCreateTaskAutoTemplate, useUpdateTaskAutoTemplate, useDeleteTaskAutoTemplate } from '../../hooks/useTaskAutoTemplates';
 import { useTaskSpecItemTemplates, useUpdateTaskSpecItemTemplate, useCreateTaskSpecItemTemplate } from '../../hooks/useTaskSpecItemTemplates';
-import { useUsers } from '../../hooks/useUsers';
 import { ALL_ITEMS } from '../../data/categories';
 import { TemplateChecklistEditor } from '../../components/admin/TemplateChecklistEditor';
 
@@ -20,7 +19,6 @@ export function TaskAutoCreationSettingsPage() {
   const { data: settings, isLoading: settingsLoading } = useTaskAutoCreationSettings();
   const { data: templates, isLoading: templatesLoading } = useTaskAutoTemplates();
   const { data: specTemplates, isLoading: specTemplatesLoading } = useTaskSpecItemTemplates();
-  const { data: users } = useUsers();
   const updateSettings = useUpdateTaskAutoCreationSettings();
   const createTemplate = useCreateTaskAutoTemplate();
   const updateTemplate = useUpdateTaskAutoTemplate();
@@ -31,7 +29,6 @@ export function TaskAutoCreationSettingsPage() {
   const [formData, setFormData] = useState({
     spec_tasks_enabled: true,
     animation_tasks_separate: true,
-    default_assignee_id: null,
     default_due_days: 7,
   });
 
@@ -42,7 +39,6 @@ export function TaskAutoCreationSettingsPage() {
     description: '',
     stage_key: 'briefing',
     order: 0,
-    assignee_id: null,
     due_days_offset: 7,
     is_enabled: true,
     checklist_items: [],
@@ -57,7 +53,6 @@ export function TaskAutoCreationSettingsPage() {
       setFormData({
         spec_tasks_enabled: settings.spec_tasks_enabled ?? true,
         animation_tasks_separate: settings.animation_tasks_separate ?? true,
-        default_assignee_id: settings.default_assignee_id || null,
         default_due_days: settings.default_due_days || 7,
       });
     }
@@ -96,9 +91,9 @@ export function TaskAutoCreationSettingsPage() {
           description: '',
           stage_key: 'briefing',
           order: 0,
-          assignee_id: null,
           due_days_offset: 7,
           is_enabled: true,
+          checklist_items: [],
         });
         setShowNewTemplateForm(false);
       }
@@ -150,10 +145,6 @@ export function TaskAutoCreationSettingsPage() {
     );
   }
 
-  // Фильтруем пользователей для назначения (только AM и админы)
-  const assignableUsers = users?.filter(
-    (u) => u.role === 'am' || u.role === 'admin'
-  ) || [];
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -234,7 +225,7 @@ export function TaskAutoCreationSettingsPage() {
                   checklistItems={newTemplate.checklist_items || []}
                   onChange={(items) => setNewTemplate({ ...newTemplate, checklist_items: items })}
                 />
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
                       Порядок создания
@@ -257,23 +248,6 @@ export function TaskAutoCreationSettingsPage() {
                       onChange={(e) => setNewTemplate({ ...newTemplate, due_days_offset: parseInt(e.target.value) || 7 })}
                       className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Назначить исполнителя
-                    </label>
-                    <select
-                      value={newTemplate.assignee_id || ''}
-                      onChange={(e) => setNewTemplate({ ...newTemplate, assignee_id: e.target.value || null })}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">Не назначать</option>
-                      {assignableUsers.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.full_name || user.email}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -298,7 +272,6 @@ export function TaskAutoCreationSettingsPage() {
                         description: '',
                         stage_key: 'briefing',
                         order: 0,
-                        assignee_id: null,
                         due_days_offset: 7,
                         is_enabled: true,
                         checklist_items: [],
@@ -387,7 +360,7 @@ export function TaskAutoCreationSettingsPage() {
                           handleSaveTemplate(updated);
                         }}
                       />
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
                             Порядок создания
@@ -416,26 +389,6 @@ export function TaskAutoCreationSettingsPage() {
                             }}
                             className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Назначить исполнителя
-                          </label>
-                          <select
-                            value={template.assignee_id || ''}
-                            onChange={(e) => {
-                              const updated = { ...template, assignee_id: e.target.value || null };
-                              handleSaveTemplate(updated);
-                            }}
-                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                          >
-                            <option value="">Не назначать</option>
-                            {assignableUsers.map((user) => (
-                              <option key={user.id} value={user.id}>
-                                {user.full_name || user.email}
-                              </option>
-                            ))}
-                          </select>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -480,11 +433,6 @@ export function TaskAutoCreationSettingsPage() {
                         <div className="flex items-center gap-4 text-xs text-neutral-500">
                           <span>Порядок: {template.order}</span>
                           <span>Дедлайн: +{template.due_days_offset} дней</span>
-                          {template.assignee_id && (
-                            <span>
-                              Исполнитель: {assignableUsers.find((u) => u.id === template.assignee_id)?.full_name || 'Не назначен'}
-                            </span>
-                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -768,6 +716,21 @@ export function TaskAutoCreationSettingsPage() {
           {formData.spec_tasks_enabled && (
             <div className="space-y-4">
               <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Дней до дедлайна
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.default_due_days}
+                  onChange={(e) => handleChange('default_due_days', parseInt(e.target.value) || 7)}
+                  className="w-48 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
+                <p className="text-xs text-neutral-500 mt-1">
+                  Применяется ко всем задачам из спецификации
+                </p>
+              </div>
+              <div>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -787,43 +750,6 @@ export function TaskAutoCreationSettingsPage() {
           )}
         </div>
 
-        {/* Общие настройки */}
-        <div className="bg-white rounded-lg border border-neutral-200 p-6">
-          <h2 className="text-lg font-semibold text-neutral-900 mb-4">Общие настройки</h2>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Назначить по умолчанию
-              </label>
-              <select
-                value={formData.default_assignee_id || ''}
-                onChange={(e) => handleChange('default_assignee_id', e.target.value || null)}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              >
-                <option value="">Не назначать</option>
-                {assignableUsers.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.full_name || user.email} ({user.role})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Дней до дедлайна по умолчанию
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={formData.default_due_days}
-                onChange={(e) => handleChange('default_due_days', parseInt(e.target.value) || 7)}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Кнопки действий */}
         <div className="flex justify-end gap-3">
@@ -834,7 +760,6 @@ export function TaskAutoCreationSettingsPage() {
                 setFormData({
                   spec_tasks_enabled: settings.spec_tasks_enabled ?? true,
                   animation_tasks_separate: settings.animation_tasks_separate ?? true,
-                  default_assignee_id: settings.default_assignee_id || null,
                   default_due_days: settings.default_due_days || 7,
                 });
               }
