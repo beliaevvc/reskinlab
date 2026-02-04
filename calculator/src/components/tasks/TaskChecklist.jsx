@@ -101,21 +101,30 @@ export function TaskChecklist({ taskId, canEdit = true }) {
       )}
 
       {/* Items list */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-start gap-2 group hover:bg-neutral-50 rounded p-2 -mx-2 transition-colors"
+            className="flex items-center gap-3 group hover:bg-neutral-50 rounded-lg py-1.5 px-2 -mx-2 transition-colors"
           >
-            <input
-              type="checkbox"
-              checked={item.completed}
-              onChange={() => canEdit && handleToggleComplete(item)}
+            {/* Custom circle checkbox */}
+            <button
+              onClick={() => canEdit && handleToggleComplete(item)}
               disabled={!canEdit}
-              className={`mt-0.5 w-4 h-4 text-emerald-600 border-neutral-300 rounded focus:ring-emerald-500 ${
-                canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-              }`}
-            />
+              className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                item.completed 
+                  ? 'bg-emerald-500 border-emerald-500' 
+                  : 'border-neutral-300 hover:border-emerald-400'
+              } ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+            >
+              {item.completed && (
+                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+            
+            {/* Title */}
             {canEdit ? (
               <input
                 type="text"
@@ -126,31 +135,28 @@ export function TaskChecklist({ taskId, canEdit = true }) {
                     e.target.blur();
                   }
                 }}
-                className={`flex-1 text-sm border-none bg-transparent focus:bg-white focus:border focus:border-emerald-300 focus:ring-1 focus:ring-emerald-500 rounded px-2 py-1 ${
+                className={`flex-1 text-sm bg-transparent border border-transparent focus:bg-neutral-50 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -ml-1 ${
                   item.completed ? 'line-through text-neutral-400' : 'text-neutral-700'
                 }`}
               />
             ) : (
-              <span className={`flex-1 text-sm px-2 py-1 ${
+              <span className={`flex-1 text-sm ${
                 item.completed ? 'line-through text-neutral-400' : 'text-neutral-700'
               }`}>
                 {item.title}
               </span>
             )}
+            
+            {/* Delete button */}
             {canEdit && (
               <button
                 onClick={() => handleDeleteItem(item.id)}
-                className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 transition-opacity"
+                className="shrink-0 opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 p-1 transition-all"
                 title="Удалить пункт"
               >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             )}
           </div>
@@ -158,7 +164,10 @@ export function TaskChecklist({ taskId, canEdit = true }) {
 
         {/* Add new item */}
         {isAdding && (
-          <div className="flex items-center gap-2 p-2 -mx-2">
+          <div className="flex items-center gap-3 py-1.5 px-2 -mx-2">
+            {/* Empty circle placeholder */}
+            <div className="shrink-0 w-5 h-5 rounded-full border-2 border-dashed border-neutral-300" />
+            
             <input
               type="text"
               value={newItemTitle}
@@ -173,23 +182,25 @@ export function TaskChecklist({ taskId, canEdit = true }) {
               }}
               placeholder="Введите название пункта..."
               autoFocus
-              className="flex-1 text-sm border border-neutral-300 rounded px-2 py-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="flex-1 text-sm border border-neutral-200 rounded px-2 py-1 focus:border-emerald-500 focus:outline-none"
             />
             <button
               onClick={handleAddItem}
               disabled={!newItemTitle.trim() || createItem.isPending}
-              className="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="shrink-0 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Добавить
+              {createItem.isPending ? '...' : 'OK'}
             </button>
             <button
               onClick={() => {
                 setIsAdding(false);
                 setNewItemTitle('');
               }}
-              className="px-3 py-1 text-neutral-600 hover:bg-neutral-100 text-sm rounded"
+              className="shrink-0 p-1.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg"
             >
-              Отмена
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         )}

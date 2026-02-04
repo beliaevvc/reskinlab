@@ -5,6 +5,16 @@ import { TaskChecklist } from './TaskChecklist';
 import { formatDate } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 
+const STATUS_COLORS = {
+  backlog: { bg: '#f1f5f9', text: '#475569', dot: '#64748b' },
+  todo: { bg: '#f5f5f5', text: '#525252', dot: '#737373' },
+  in_progress: { bg: '#dbeafe', text: '#1d4ed8', dot: '#3b82f6' },
+  review: { bg: '#fef3c7', text: '#b45309', dot: '#f59e0b' },
+  done: { bg: '#d1fae5', text: '#047857', dot: '#10b981' },
+};
+
+const getStatusColor = (statusId) => STATUS_COLORS[statusId] || STATUS_COLORS.todo;
+
 export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
   const { data: task, isLoading } = useTask(taskId);
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
@@ -12,9 +22,8 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
   const { mutate: markCommentsAsRead } = useMarkCommentsAsRead();
   const { isClient, isAdmin, isAM } = useAuth();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
+  const [editingField, setEditingField] = useState(null); // 'title' | 'description' | null
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   
   const commentsTopRef = useRef(null);
@@ -30,31 +39,24 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
   useEffect(() => {
     if (!isOpen) {
       setReplyingTo(null);
-      setIsEditing(false);
+      setEditingField(null);
+      setStatusMenuOpen(false);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleStartEdit = () => {
-    setEditTitle(task?.title || '');
-    setEditDescription(task?.description || '');
-    setIsEditing(true);
-  };
-
-  const handleSaveEdit = () => {
-    updateTask(
-      {
-        taskId: task.id,
-        updates: {
-          title: editTitle,
-          description: editDescription,
-        },
-      },
-      {
-        onSuccess: () => setIsEditing(false),
-      }
-    );
+  const handleUpdateField = (field, value) => {
+    const trimmedValue = value.trim();
+    // Don't save empty title
+    if (field === 'title' && !trimmedValue) return;
+    // Only update if value changed
+    if (task[field] === trimmedValue) return;
+    
+    updateTask({
+      taskId: task.id,
+      updates: { [field]: trimmedValue || null },
+    });
   };
 
   const handleStatusChange = (newStatus) => {
@@ -98,10 +100,62 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
       {/* Modal */}
       <div className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between shrink-0">
-          <h2 className="text-lg font-semibold text-neutral-900">
-            Task Details
-          </h2>
+        <div className="px-6 py-3 border-b border-neutral-200 flex items-center justify-between shrink-0">
+          <div>
+            <h2 className="text-lg font-semibold text-neutral-900">
+              Task Details
+            </h2>
+            {task && (
+              <div className="flex items-center gap-2 text-xs text-neutral-400">
+                <span>{formatDate(task.created_at)}</span>
+                <span>•</span>
+                {/* Status inline */}
+                <div className="relative">
+                  <button
+                    onClick={() => setStatusMenuOpen(!statusMenuOpen)}
+                    className="inline-flex items-center gap-1.5 hover:text-neutral-600 transition-colors"
+                  >
+                    <span 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: getStatusColor(task.status).dot }}
+                    />
+                    <span style={{ color: getStatusColor(task.status).text }}>
+                      {TASK_STATUSES.find(s => s.id === task.status)?.label || task.status}
+                    </span>
+                    <svg className="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {statusMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setStatusMenuOpen(false)} />
+                      <div className="absolute left-0 top-full mt-1 z-20 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 min-w-[140px]">
+                        {TASK_STATUSES.map((status) => (
+                          <button
+                            key={status.id}
+                            onClick={() => {
+                              handleStatusChange(status.id);
+                              setStatusMenuOpen(false);
+                            }}
+                            className={`w-full px-3 py-1.5 text-left text-sm flex items-center gap-2 hover:bg-neutral-50 ${
+                              task.status === status.id ? 'bg-neutral-50' : ''
+                            }`}
+                          >
+                            <span 
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ backgroundColor: getStatusColor(status.id).dot }}
+                            />
+                            {status.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-1">
             {/* Delete button for staff */}
             {!isClient && task && (
@@ -136,90 +190,67 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
           ) : task ? (
             <div className="flex flex-col">
               {/* Task Info Section */}
-              <div className="p-6 space-y-6 border-b border-neutral-100">
+              <div className="p-6 space-y-4 border-b border-neutral-100">
                 {/* Title & Description */}
-                {isEditing ? (
-                  <div className="space-y-4">
+                <div className="space-y-1">
+                  {/* Title - inline editable */}
+                  {editingField === 'title' && !isClient ? (
                     <input
                       type="text"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-lg font-medium"
-                      placeholder="Task title"
+                      defaultValue={task.title}
+                      autoFocus
+                      onBlur={(e) => {
+                        handleUpdateField('title', e.target.value);
+                        setEditingField(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.target.blur();
+                        } else if (e.key === 'Escape') {
+                          setEditingField(null);
+                        }
+                      }}
+                      className="w-full text-xl font-semibold text-neutral-900 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -mx-1"
+                      placeholder="Название задачи"
                     />
+                  ) : (
+                    <h3 
+                      onClick={() => !isClient && setEditingField('title')}
+                      className={`text-xl font-semibold text-neutral-900 rounded px-1 py-0.5 -mx-1 border border-transparent ${
+                        !isClient ? 'hover:bg-neutral-100 cursor-text' : ''
+                      }`}
+                    >
+                      {task.title}
+                    </h3>
+                  )}
+
+                  {/* Description - inline editable */}
+                  {editingField === 'description' && !isClient ? (
                     <textarea
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      rows={4}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
-                      placeholder="Description (optional)"
+                      defaultValue={task.description || ''}
+                      autoFocus
+                      rows={2}
+                      onBlur={(e) => {
+                        handleUpdateField('description', e.target.value);
+                        setEditingField(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          setEditingField(null);
+                        }
+                      }}
+                      className="w-full text-sm text-neutral-600 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -mx-1 resize-none"
+                      placeholder="Добавить описание..."
                     />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleSaveEdit}
-                        disabled={isUpdating || !editTitle.trim()}
-                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium disabled:opacity-50"
-                      >
-                        {isUpdating ? 'Saving...' : 'Save'}
-                      </button>
-                      <button
-                        onClick={() => setIsEditing(false)}
-                        className="px-4 py-2 text-neutral-700 hover:bg-neutral-100 rounded-lg"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-xl font-semibold text-neutral-900">
-                        {task.title}
-                      </h3>
-                      {!isClient && (
-                        <button
-                          onClick={handleStartEdit}
-                          className="p-2 hover:bg-neutral-100 rounded-lg transition-colors shrink-0"
-                        >
-                          <svg className="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                    {task.description && (
-                      <p className="mt-2 text-neutral-600 whitespace-pre-wrap">
-                        {task.description}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {/* Status */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    value={task.status}
-                    onChange={(e) => handleStatusChange(e.target.value)}
-                    className="w-full max-w-xs px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  >
-                    {TASK_STATUSES.map((status) => (
-                      <option key={status.id} value={status.id}>
-                        {status.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Dates */}
-                <div className="flex items-center gap-6 text-sm text-neutral-500">
-                  <span>Created {formatDate(task.created_at)}</span>
-                  {task.completed_at && (
-                    <span className="text-emerald-600">
-                      Completed {formatDate(task.completed_at)}
-                    </span>
+                  ) : (
+                    <p 
+                      onClick={() => !isClient && setEditingField('description')}
+                      className={`text-sm text-neutral-600 whitespace-pre-wrap rounded px-1 py-0.5 -mx-1 border border-transparent ${
+                        !isClient ? 'hover:bg-neutral-100 cursor-text' : ''
+                      } ${!task.description ? 'text-neutral-400 italic' : ''}`}
+                    >
+                      {task.description || (!isClient ? 'Добавить описание...' : '')}
+                    </p>
                   )}
                 </div>
 
