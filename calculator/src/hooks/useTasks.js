@@ -36,6 +36,10 @@ export function useTasks(projectId) {
             id,
             full_name,
             avatar_url
+          ),
+          source_specification:specifications (
+            id,
+            version_number
           )
         `)
         .eq('project_id', projectId)

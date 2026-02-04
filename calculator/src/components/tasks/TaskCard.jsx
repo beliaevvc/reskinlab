@@ -65,17 +65,29 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
           </svg>
         </button>
         
-        <h4 className={`font-medium text-sm line-clamp-2 ${isDone ? 'text-neutral-400 line-through' : 'text-neutral-900'}`}>
+        <h4 className={`flex-1 min-w-0 font-medium text-sm line-clamp-2 ${isDone ? 'text-neutral-400 line-through' : 'text-neutral-900'}`}>
           {task.title}
         </h4>
       </div>
 
-      {/* Meta - date */}
-      {task.due_date && (
-        <p className={`text-xs mt-1 ${isOverdue ? 'text-red-600 font-medium' : 'text-neutral-400'}`}>
-          {isOverdue && '⚠ '}
-          {formatDate(task.due_date)}
-        </p>
+      {/* Meta row - spec badge & date */}
+      {(task.source_specification?.version_number || task.due_date) && (
+        <div className="flex items-center justify-between mt-1.5">
+          {/* Spec version badge */}
+          {task.source_specification?.version_number ? (
+            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-100 text-violet-700 rounded">
+              Spec v{task.source_specification.version_number}
+            </span>
+          ) : <span />}
+          
+          {/* Date */}
+          {task.due_date && (
+            <span className={`text-xs ${isOverdue ? 'text-red-600 font-medium' : 'text-neutral-400'}`}>
+              {isOverdue && '⚠ '}
+              {formatDate(task.due_date)}
+            </span>
+          )}
+        </div>
       )}
 
       {/* Checklist progress */}
