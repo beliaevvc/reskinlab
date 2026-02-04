@@ -15,6 +15,34 @@ const STATUS_COLORS = {
 
 const getStatusColor = (statusId) => STATUS_COLORS[statusId] || STATUS_COLORS.todo;
 
+// Parse text and convert URLs to clickable links
+const parseTextWithLinks = (text) => {
+  if (!text) return null;
+  
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      // Reset regex lastIndex
+      urlRegex.lastIndex = 0;
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-emerald-600 hover:text-emerald-700 hover:underline break-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
   const { data: task, isLoading } = useTask(taskId);
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
@@ -229,7 +257,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
                     <textarea
                       defaultValue={task.description || ''}
                       autoFocus
-                      rows={2}
+                      rows={4}
                       onBlur={(e) => {
                         handleUpdateField('description', e.target.value);
                         setEditingField(null);
@@ -239,18 +267,25 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
                           setEditingField(null);
                         }
                       }}
-                      className="w-full text-sm text-neutral-600 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -mx-1 resize-none"
+                      onInput={(e) => {
+                        e.target.style.height = 'auto';
+                        e.target.style.height = e.target.scrollHeight + 'px';
+                      }}
+                      className="w-full text-sm text-neutral-600 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-2 py-1.5 -mx-1 resize-none min-h-[80px]"
                       placeholder="Добавить описание..."
                     />
                   ) : (
-                    <p 
+                    <div 
                       onClick={() => !isClient && setEditingField('description')}
-                      className={`text-sm text-neutral-600 whitespace-pre-wrap rounded px-1 py-0.5 -mx-1 border border-transparent ${
+                      className={`text-sm text-neutral-600 whitespace-pre-wrap break-words rounded px-1 py-0.5 -mx-1 border border-transparent ${
                         !isClient ? 'hover:bg-neutral-100 cursor-text' : ''
                       } ${!task.description ? 'text-neutral-400 italic' : ''}`}
                     >
-                      {task.description || (!isClient ? 'Добавить описание...' : '')}
-                    </p>
+                      {task.description 
+                        ? parseTextWithLinks(task.description) 
+                        : (!isClient ? 'Добавить описание...' : '')
+                      }
+                    </div>
                   )}
                 </div>
 

@@ -6,26 +6,23 @@ export function CommentThread({ entityType, entityId, onReply }) {
 
   if (isLoading) {
     return (
-      <div className="text-center py-8 text-neutral-400 text-sm">
-        <div className="animate-spin rounded-full h-6 w-6 border-2 border-neutral-300 border-t-emerald-500 mx-auto mb-2" />
-        Loading comments...
+      <div className="flex items-center justify-center py-10">
+        <div className="w-6 h-6 border-2 border-neutral-200 border-t-neutral-600 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!comments || comments.length === 0) {
     return (
-      <div className="text-center py-8 text-neutral-400 text-sm">
-        <svg className="w-12 h-12 mx-auto mb-2 text-neutral-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-        No messages yet. Start the conversation!
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <p className="text-sm text-neutral-500">No messages yet</p>
+        <p className="text-xs text-neutral-400 mt-1">Be the first to comment</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0">
       {comments.map((comment) => (
         <CommentItem
           key={comment.id}

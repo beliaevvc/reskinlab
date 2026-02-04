@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 import { getFileIcon, formatFileSize } from '../../hooks/useFiles';
@@ -35,24 +36,64 @@ function useSignedUrl(bucket, path) {
   });
 }
 
-function ImageAttachment({ file }) {
+// Image preview modal
+function ImageModal({ url, filename, onClose }) {
+  // Close on Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80"
+      onClick={onClose}
+    >
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      {/* Image */}
+      <img
+        src={url}
+        alt={filename}
+        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      />
+
+      {/* Filename */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 rounded-full">
+        <p className="text-sm text-white/90">{filename}</p>
+      </div>
+    </div>
+  );
+}
+
+function ImageAttachment({ file, onPreview }) {
   const { data: url } = useSignedUrl(file.bucket, file.path);
   
   if (!url) return <div className="w-48 h-32 bg-neutral-100 rounded animate-pulse" />;
   
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      onClick={() => onPreview({ url, filename: file.filename })}
       className="block"
     >
       <img
         src={url}
         alt={file.filename}
-        className="max-w-[240px] max-h-[180px] rounded-lg border border-neutral-200 hover:border-emerald-300 transition-colors object-cover"
+        className="max-w-[240px] max-h-[180px] rounded-lg border border-neutral-200 hover:border-emerald-400 hover:shadow-md transition-all object-cover cursor-zoom-in"
       />
-    </a>
+    </button>
   );
 }
 
@@ -77,6 +118,7 @@ function FileAttachment({ file }) {
 
 export function CommentAttachments({ commentId, attachments }) {
   const { data: files, isLoading } = useCommentFiles(commentId, attachments);
+  const [previewImage, setPreviewImage] = useState(null);
   
   if (!attachments || attachments.length === 0) return null;
   if (isLoading) return <div className="text-[10px] text-neutral-400">Loading...</div>;
@@ -86,25 +128,40 @@ export function CommentAttachments({ commentId, attachments }) {
   const otherFiles = files.filter(f => !f.mime_type?.startsWith('image/'));
   
   return (
-    <div className="mt-1.5 space-y-1.5">
-      {/* Images */}
-      {images.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {images.map((file) => (
-            <ImageAttachment key={file.id} file={file} />
-          ))}
-        </div>
+    <>
+      <div className="mt-1.5 space-y-1.5">
+        {/* Images */}
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {images.map((file) => (
+              <ImageAttachment 
+                key={file.id} 
+                file={file} 
+                onPreview={setPreviewImage}
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Other files */}
+        {otherFiles.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {otherFiles.map((file) => (
+              <FileAttachment key={file.id} file={file} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Image preview modal */}
+      {previewImage && (
+        <ImageModal
+          url={previewImage.url}
+          filename={previewImage.filename}
+          onClose={() => setPreviewImage(null)}
+        />
       )}
-      
-      {/* Other files */}
-      {otherFiles.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {otherFiles.map((file) => (
-            <FileAttachment key={file.id} file={file} />
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 

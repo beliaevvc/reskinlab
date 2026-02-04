@@ -3,6 +3,52 @@ import { formatDate } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDeleteComment } from '../../hooks/useComments';
 import { CommentAttachments } from './CommentAttachments';
+import { CommentReactions } from './CommentReactions';
+
+// Generate consistent color from name
+const getAvatarColor = (name) => {
+  const colors = [
+    'bg-rose-500',
+    'bg-orange-500',
+    'bg-amber-500',
+    'bg-emerald-500',
+    'bg-teal-500',
+    'bg-cyan-500',
+    'bg-blue-500',
+    'bg-indigo-500',
+    'bg-violet-500',
+    'bg-slate-500',
+  ];
+  const hash = (name || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+};
+
+// Parse text and convert URLs to clickable links
+const parseTextWithLinks = (text) => {
+  if (!text) return null;
+  
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      urlRegex.lastIndex = 0;
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-emerald-600 hover:text-emerald-700 hover:underline break-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
 
 export function CommentItem({ comment, entityType, entityId, onReply, isReply = false }) {
   const { user, isAdmin } = useAuth();
@@ -11,6 +57,7 @@ export function CommentItem({ comment, entityType, entityId, onReply, isReply = 
 
   const isOwn = user?.id === comment.author_id;
   const canDelete = isOwn || isAdmin;
+  const hasReplies = comment.replies?.length > 0;
 
   const handleDelete = () => {
     deleteComment({
@@ -25,75 +72,65 @@ export function CommentItem({ comment, entityType, entityId, onReply, isReply = 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-    
-    if (isToday) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
     return formatDate(dateString);
   };
 
+  const avatarColor = getAvatarColor(comment.author?.full_name);
+
   return (
-    <div className={`group ${isReply ? 'ml-8' : ''}`}>
-      <div className="flex gap-2 py-0.5 px-1 -mx-1 rounded hover:bg-neutral-50 transition-colors">
-        {/* Avatar */}
-        <div className="shrink-0">
+    <div className="group">
+      <div className="flex gap-3">
+        {/* Avatar column with thread line */}
+        <div className="flex flex-col items-center">
           <div className={`
-            ${isReply ? 'w-5 h-5 text-[10px]' : 'w-7 h-7 text-xs'}
-            rounded-full bg-emerald-500 
-            flex items-center justify-center font-medium text-white
+            shrink-0 ${isReply ? 'w-7 h-7 text-[11px]' : 'w-9 h-9 text-xs'}
+            rounded-full ${avatarColor}
+            flex items-center justify-center font-semibold text-white shadow-sm
           `}>
             {comment.author?.full_name?.charAt(0)?.toUpperCase() || '?'}
           </div>
+          {/* Thread line */}
+          {hasReplies && (
+            <div className="w-0.5 flex-1 bg-neutral-200 mt-2 rounded-full" />
+          )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Header: Name + Time + Content inline for short messages */}
-          <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className={`font-medium text-neutral-900 ${isReply ? 'text-xs' : 'text-sm'}`}>
+        <div className="flex-1 min-w-0 pb-4">
+          {/* Header */}
+          <div className="flex items-center gap-2">
+            <span className={`font-semibold text-neutral-900 ${isReply ? 'text-[13px]' : 'text-sm'}`}>
               {comment.author?.full_name || 'Unknown'}
             </span>
-            <span className="text-[10px] text-neutral-400">
+            <span className="text-neutral-400">·</span>
+            <span className="text-xs text-neutral-400">
               {formatTime(comment.created_at)}
             </span>
-          </div>
-
-          {/* Message content */}
-          {comment.content && comment.content.trim() && (
-            <div className={`text-neutral-700 whitespace-pre-wrap break-words ${isReply ? 'text-xs' : 'text-sm'}`}>
-              {comment.content}
-            </div>
-          )}
-
-          {/* Attachments */}
-          <CommentAttachments commentId={comment.id} attachments={comment.attachments} />
-
-          {/* Actions - appear on hover */}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity h-4">
-            {onReply && (
-              <button
-                onClick={() => onReply(comment)}
-                className="text-[10px] text-neutral-400 hover:text-emerald-600 font-medium"
-              >
-                Reply
-              </button>
-            )}
-            {canDelete && onReply && <span className="text-neutral-300 text-[10px]">·</span>}
+            
+            {/* Delete button - far right on hover */}
             {canDelete && (
-              <>
+              <div className="flex-1 flex justify-end">
                 {showDeleteConfirm ? (
                   <div className="flex items-center gap-1">
                     <button
                       onClick={handleDelete}
                       disabled={isDeleting}
-                      className="text-[10px] text-red-500 hover:text-red-600 font-medium"
+                      className="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-0.5 rounded hover:bg-red-50"
                     >
                       {isDeleting ? '...' : 'Delete'}
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="text-[10px] text-neutral-400 hover:text-neutral-600"
+                      className="text-xs text-neutral-400 hover:text-neutral-600 px-2 py-0.5 rounded hover:bg-neutral-100"
                     >
                       Cancel
                     </button>
@@ -101,32 +138,57 @@ export function CommentItem({ comment, entityType, entityId, onReply, isReply = 
                 ) : (
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="text-[10px] text-neutral-400 hover:text-red-500 font-medium"
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded text-neutral-300 hover:text-red-500 hover:bg-red-50 transition-all"
                   >
-                    Delete
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 )}
-              </>
+              </div>
             )}
           </div>
+
+          {/* Message content */}
+          {comment.content && comment.content.trim() && (
+            <div className={`text-neutral-800 mt-0.5 leading-snug break-words ${isReply ? 'text-[13px]' : 'text-sm'}`}>
+              {parseTextWithLinks(comment.content)}
+            </div>
+          )}
+
+          {/* Attachments */}
+          <CommentAttachments commentId={comment.id} attachments={comment.attachments} />
+
+          {/* Reactions + Reply */}
+          <div className="flex items-center gap-3 mt-2">
+            <CommentReactions commentId={comment.id} />
+            {onReply && (
+              <button
+                onClick={() => onReply(comment)}
+                className="text-xs text-neutral-400 hover:text-neutral-600"
+              >
+                Reply
+              </button>
+            )}
+          </div>
+
+          {/* Replies */}
+          {hasReplies && (
+            <div className="mt-3 space-y-0">
+              {comment.replies.map((reply) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  entityType={entityType}
+                  entityId={entityId}
+                  onReply={onReply}
+                  isReply={true}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Replies */}
-      {comment.replies?.length > 0 && (
-        <div className="mt-0.5 space-y-0.5">
-          {comment.replies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              entityType={entityType}
-              entityId={entityId}
-              onReply={onReply}
-              isReply={true}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
