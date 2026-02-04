@@ -1,7 +1,7 @@
 import { useComments } from '../../hooks/useComments';
 import { CommentItem } from './CommentItem';
 
-export function CommentThread({ entityType, entityId, onReply }) {
+export function CommentThread({ entityType, entityId, onReply, onUserClick }) {
   const { data: comments, isLoading } = useComments(entityType, entityId);
 
   if (isLoading) {
@@ -30,6 +30,7 @@ export function CommentThread({ entityType, entityId, onReply }) {
           entityType={entityType}
           entityId={entityId}
           onReply={onReply}
+          onUserClick={onUserClick}
         />
       ))}
     </div>

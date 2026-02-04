@@ -28,6 +28,7 @@ export function ProjectPage() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showFilesGallery, setShowFilesGallery] = useState(false);
   const [selectedSpecId, setSelectedSpecId] = useState(null);
+  const [returnToTaskId, setReturnToTaskId] = useState(null); // Task to return to after closing spec modal
   const [showCalculator, setShowCalculator] = useState(false);
   const [editingSpecId, setEditingSpecId] = useState(null);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
@@ -216,6 +217,16 @@ export function ProjectPage() {
         onClose={() => setSelectedTaskId(null)}
         taskId={selectedTaskId}
         projectId={projectId}
+        onOpenSpecification={(specId) => {
+          setReturnToTaskId(selectedTaskId);
+          setSelectedTaskId(null);
+          setSelectedSpecId(specId);
+        }}
+        onOpenOffer={(offerId) => {
+          setReturnToTaskId(selectedTaskId);
+          setSelectedTaskId(null);
+          setSelectedOfferId(offerId);
+        }}
       />
 
       <CreateTaskModal
@@ -227,7 +238,14 @@ export function ProjectPage() {
       {/* Specification Modal */}
       <SpecificationModal
         isOpen={!!selectedSpecId}
-        onClose={() => setSelectedSpecId(null)}
+        onClose={() => {
+          setSelectedSpecId(null);
+          // Return to task if opened from task modal
+          if (returnToTaskId) {
+            setSelectedTaskId(returnToTaskId);
+            setReturnToTaskId(null);
+          }
+        }}
         specificationId={selectedSpecId}
         onEdit={handleEditSpecification}
         onViewOffer={(offer) => setSelectedOfferId(offer.id)}
@@ -260,7 +278,14 @@ export function ProjectPage() {
       {/* Offer Modal */}
       <OfferModal
         isOpen={!!selectedOfferId}
-        onClose={() => setSelectedOfferId(null)}
+        onClose={() => {
+          setSelectedOfferId(null);
+          // Return to task if opened from task modal
+          if (returnToTaskId) {
+            setSelectedTaskId(returnToTaskId);
+            setReturnToTaskId(null);
+          }
+        }}
         offerId={selectedOfferId}
       />
 

@@ -1,9 +1,36 @@
 import { useState, useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTask, useUpdateTask, useDeleteTask, useMarkCommentsAsRead, TASK_STATUSES } from '../../hooks/useTasks';
+import { useSpecifications } from '../../hooks/useSpecifications';
+import { supabase } from '../../lib/supabase';
 import { CommentThread, CommentInput } from '../comments';
 import { TaskChecklist } from './TaskChecklist';
+import { UserDetailModal } from '../admin/UserDetailModal';
 import { formatDate } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
+
+// Hook to get offers for project specifications
+function useProjectOffers(projectId, specificationId) {
+  return useQuery({
+    queryKey: ['project-offers', projectId, specificationId],
+    queryFn: async () => {
+      if (!specificationId) return null;
+      
+      const { data, error } = await supabase
+        .from('offers')
+        .select('id, number, status')
+        .eq('specification_id', specificationId)
+        .limit(1);
+      
+      if (error) {
+        console.error('Error fetching offer:', error);
+        return null;
+      }
+      return data?.[0] || null;
+    },
+    enabled: !!projectId && !!specificationId,
+  });
+}
 
 const STATUS_COLORS = {
   backlog: { bg: '#f1f5f9', text: '#475569', dot: '#64748b' },
@@ -43,8 +70,9 @@ const parseTextWithLinks = (text) => {
   });
 };
 
-export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
+export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpecification, onOpenOffer }) {
   const { data: task, isLoading } = useTask(taskId);
+  const { data: specifications } = useSpecifications(projectId);
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
   const { mutate: markCommentsAsRead } = useMarkCommentsAsRead();
@@ -53,8 +81,18 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
   const [editingField, setEditingField] = useState(null); // 'title' | 'description' | null
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   
   const commentsTopRef = useRef(null);
+  
+  // Check if user can view user profiles (admin or AM)
+  const canViewUsers = isAdmin || isAM;
+  
+  // Get the active specification (first non-draft or latest)
+  const activeSpec = specifications?.find(s => s.status !== 'draft') || specifications?.[0];
+  
+  // Get offer for the active specification
+  const { data: activeOffer } = useProjectOffers(projectId, activeSpec?.id);
 
   // Mark comments as read when task is loaded
   useEffect(() => {
@@ -69,6 +107,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
       setReplyingTo(null);
       setEditingField(null);
       setStatusMenuOpen(false);
+      setSelectedUserId(null);
     }
   }, [isOpen]);
 
@@ -130,15 +169,35 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
         {/* Header */}
         <div className="px-6 py-3 border-b border-neutral-200 flex items-center justify-between shrink-0">
           <div>
-            <h2 className="text-lg font-semibold text-neutral-900">
-              Task Details
-            </h2>
             {task && (
-              <div className="flex items-center gap-2 text-xs text-neutral-400">
+              <div className="flex items-center gap-3 text-sm text-neutral-500">
                 <span>{formatDate(task.created_at)}</span>
-                <span>•</span>
-                {/* Status inline */}
-                <div className="relative">
+                {/* Link to specification */}
+                {activeSpec && onOpenSpecification && (
+                  <button
+                    onClick={() => onOpenSpecification(activeSpec.id)}
+                    className="hover:text-emerald-600 transition-colors flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Spec v{activeSpec.version_number}
+                  </button>
+                )}
+                {/* Link to offer */}
+                {activeOffer && onOpenOffer && (
+                  <button
+                    onClick={() => onOpenOffer(activeOffer.id)}
+                    className="hover:text-emerald-600 transition-colors flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Offer
+                  </button>
+                )}
+                {/* Status - last */}
+                <div className="relative inline-flex">
                   <button
                     onClick={() => setStatusMenuOpen(!statusMenuOpen)}
                     className="inline-flex items-center gap-1.5 hover:text-neutral-600 transition-colors"
@@ -308,6 +367,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
                   entityType="task" 
                   entityId={task.id} 
                   onReply={handleReply}
+                  onUserClick={canViewUsers ? setSelectedUserId : undefined}
                 />
               </div>
             </div>
@@ -333,6 +393,15 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId }) {
           </div>
         )}
       </div>
+
+      {/* User Detail Modal */}
+      {selectedUserId && (
+        <UserDetailModal
+          userId={selectedUserId}
+          isOpen={!!selectedUserId}
+          onClose={() => setSelectedUserId(null)}
+        />
+      )}
     </div>
   );
 }

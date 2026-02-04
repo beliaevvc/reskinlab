@@ -50,7 +50,7 @@ const parseTextWithLinks = (text) => {
   });
 };
 
-export function CommentItem({ comment, entityType, entityId, onReply, isReply = false }) {
+export function CommentItem({ comment, entityType, entityId, onReply, onUserClick, isReply = false }) {
   const { user, isAdmin } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment();
@@ -108,9 +108,18 @@ export function CommentItem({ comment, entityType, entityId, onReply, isReply = 
         <div className="flex-1 min-w-0 pb-4">
           {/* Header */}
           <div className="flex items-center gap-2">
-            <span className={`font-semibold text-neutral-900 ${isReply ? 'text-[13px]' : 'text-sm'}`}>
-              {comment.author?.full_name || 'Unknown'}
-            </span>
+            {onUserClick ? (
+              <button
+                onClick={() => onUserClick(comment.author_id)}
+                className={`font-semibold text-neutral-900 hover:text-emerald-600 transition-colors ${isReply ? 'text-[13px]' : 'text-sm'}`}
+              >
+                {comment.author?.full_name || 'Unknown'}
+              </button>
+            ) : (
+              <span className={`font-semibold text-neutral-900 ${isReply ? 'text-[13px]' : 'text-sm'}`}>
+                {comment.author?.full_name || 'Unknown'}
+              </span>
+            )}
             <span className="text-neutral-400">·</span>
             <span className="text-xs text-neutral-400">
               {formatTime(comment.created_at)}
@@ -182,6 +191,7 @@ export function CommentItem({ comment, entityType, entityId, onReply, isReply = 
                   entityType={entityType}
                   entityId={entityId}
                   onReply={onReply}
+                  onUserClick={onUserClick}
                   isReply={true}
                 />
               ))}
