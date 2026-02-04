@@ -66,7 +66,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
 
   return createPortal(
     <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-lg w-full max-w-[720px] max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
           <div className="flex items-center gap-3">
@@ -188,70 +188,6 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
           {/* Payment Info (only for clients with pending & accepted offer) */}
           {isPending && isOfferAccepted && !canManagePayments && (
             <PaymentInfo invoice={invoice} />
-          )}
-
-          {/* Transaction Hash Input - only for clients with pending invoices */}
-          {isPending && isOfferAccepted && !canManagePayments && (
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-neutral-700 mb-3">
-                Confirm Payment
-              </h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm text-neutral-600 mb-1.5">
-                    Transaction Hash
-                  </label>
-                  <input
-                    type="text"
-                    value={txHash}
-                    onChange={(e) => setTxHash(e.target.value)}
-                    placeholder="0x... or TRX hash"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono text-sm"
-                  />
-                  <p className="text-xs text-neutral-500 mt-1">
-                    Enter the transaction hash after completing the payment
-                  </p>
-                </div>
-                
-                {txHash.trim().length > 0 && (
-                  <button
-                    onClick={() => {
-                      submitPayment(
-                        { invoiceId: invoice.id, txHash },
-                        {
-                          onSuccess: () => {
-                            setTxHash('');
-                            refetch();
-                          },
-                        }
-                      );
-                    }}
-                    disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-400 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition-colors"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        Payment Completed
-                      </>
-                    )}
-                  </button>
-                )}
-
-                {submitError && (
-                  <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
-                    Error: {submitError.message}
-                  </div>
-                )}
-              </div>
-            </div>
           )}
 
           {/* Awaiting confirmation - Client view */}
@@ -408,6 +344,59 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
             </div>
           )}
         </div>
+
+        {/* Sticky Footer - Confirm Payment (only for clients with pending invoices) */}
+        {isPending && isOfferAccepted && !canManagePayments && (
+          <div className="border-t border-neutral-200 bg-neutral-50 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={txHash}
+                  onChange={(e) => setTxHash(e.target.value)}
+                  placeholder="Enter transaction hash (0x... or TRX)"
+                  className="w-full px-3 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono text-sm"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  if (txHash.trim()) {
+                    submitPayment(
+                      { invoiceId: invoice.id, txHash },
+                      {
+                        onSuccess: () => {
+                          setTxHash('');
+                          refetch();
+                        },
+                      }
+                    );
+                  }
+                }}
+                disabled={isSubmitting || !txHash.trim()}
+                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-neutral-300 disabled:text-neutral-500 text-white font-medium px-5 py-2.5 rounded-lg text-sm transition-colors whitespace-nowrap"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirm Payment
+                  </>
+                )}
+              </button>
+            </div>
+            {submitError && (
+              <div className="mt-2 text-sm text-red-600">
+                Error: {submitError.message}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>,
     document.body

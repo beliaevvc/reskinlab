@@ -11,7 +11,6 @@ import {
   generateInvoiceNumber,
   calculatePaymentMilestones,
   getInvoiceDueDate,
-  WALLET_ADDRESSES,
 } from '../lib/invoiceUtils';
 
 /**
@@ -263,8 +262,7 @@ export function useCreateOffer() {
             currency: 'USDT',
             status: 'pending',
             due_date: getInvoiceDueDate(milestone.order),
-            wallet_address: WALLET_ADDRESSES.TRC20,
-            network: 'TRC20',
+            // wallet_address and network are selected by client from active wallets
           });
       }
 

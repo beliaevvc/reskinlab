@@ -34,6 +34,7 @@ import AuditLogsPage from './pages/admin/AuditLogsPage';
 import PromoCodesPage from './pages/admin/PromoCodesPage';
 import PricingPage from './pages/admin/PricingPage';
 import { TaskAutoCreationSettingsPage } from './pages/admin/TaskAutoCreationSettingsPage';
+import CryptoWalletsPage from './pages/admin/CryptoWalletsPage';
 
 // Placeholder pages for future implementation
 function PlaceholderPage({ title }) {
@@ -124,6 +125,7 @@ function AppContent() {
                 <Route path="/admin/promo-codes" element={<PromoCodesPage />} />
                 <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
                 <Route path="/admin/task-settings" element={<TaskAutoCreationSettingsPage />} />
+                <Route path="/admin/wallets" element={<CryptoWalletsPage />} />
                 <Route path="/admin/profile" element={<ProfilePage />} />
               </Route>
             </Route>

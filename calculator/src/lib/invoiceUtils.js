@@ -171,15 +171,6 @@ export function getInvoiceDueDate(milestoneOrder) {
 }
 
 /**
- * Wallet addresses for payments
- * In production, these would come from database or admin config
- */
-export const WALLET_ADDRESSES = {
-  TRC20: 'TYDzsYUEpvnYmQk4zGP9sWWcTEd2MiAtW7',  // Example Tron address
-  ERC20: '0x742d35Cc6634C0532925a3b844Bc9e7595f0aB1d', // Example Ethereum address
-};
-
-/**
  * Get invoice status display info
  */
 export function getInvoiceStatusInfo(status) {

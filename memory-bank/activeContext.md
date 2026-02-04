@@ -5,6 +5,24 @@
 
 ## Recently Completed Tasks
 
+### Crypto Wallets Admin (4 Февраля 2026) — COMPLETED ✅
+Добавлена страница управления криптокошельками в админке для оплаты инвойсов.
+- Поддержка USDT/USDC
+- Сети: TRC20, ERC20, BSC, Polygon, Arbitrum, Base, Optimism
+- Флаг активности для показа клиентам
+- Динамическая загрузка кошельков в PaymentInfo
+
+**Files Created:**
+- `calculator/supabase/migrations/037_crypto_wallets.sql`
+- `calculator/src/hooks/useCryptoWallets.js`
+- `calculator/src/pages/admin/CryptoWalletsPage.jsx`
+
+**Files Modified:**
+- `calculator/src/App.jsx` — добавлен роут
+- `calculator/src/components/layout/AppSidebar.jsx` — добавлен пункт меню
+- `calculator/src/components/invoices/PaymentInfo.jsx` — загрузка из БД
+- `calculator/src/lib/invoiceUtils.js` — удалены хардкоженные адреса
+
 ### Task Card Deadline UI Redesign (4 Февраля 2026) — ARCHIVED ✅
 Редизайн секции настройки дедлайна в карточке задачи.
 - **Archive:** `memory-bank/archive/archive-task-deadline-ui-redesign.md`
