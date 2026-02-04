@@ -36,28 +36,13 @@ export function TaskCard({ task, onClick, isDragging }) {
         {task.title}
       </h4>
 
-      {/* Meta */}
-      <div className="flex items-center gap-2 mt-2 flex-wrap">
-        
-        {/* Stage badge */}
-        {task.stage && (
-          <span className="px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-600">
-            {task.stage.name}
-          </span>
-        )}
-
-        {/* Due date */}
-        {task.due_date && (
-          <span
-            className={`text-xs ${
-              isOverdue ? 'text-red-600 font-medium' : 'text-neutral-500'
-            }`}
-          >
-            {isOverdue && '⚠ '}
-            {formatDate(task.due_date)}
-          </span>
-        )}
-      </div>
+      {/* Meta - date */}
+      {task.due_date && (
+        <p className={`text-xs mt-1 ${isOverdue ? 'text-red-600 font-medium' : 'text-neutral-400'}`}>
+          {isOverdue && '⚠ '}
+          {formatDate(task.due_date)}
+        </p>
+      )}
 
       {/* Checklist progress */}
       {task.checklist_total > 0 && (
