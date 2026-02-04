@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import { useInvoice, useSubmitPayment, useConfirmPayment, useRejectPayment } from '../../hooks/useInvoices';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatDate } from '../../lib/utils';
 import { getInvoiceStatusInfo, formatInvoiceAmount, isInvoiceOverdue } from '../../lib/invoiceUtils';
 import { PaymentInfo } from '../../components/invoices';
+import { OfferModal } from './OfferModal';
+import { SpecificationModal } from './SpecificationModal';
 
 export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   const { isAdmin, isStaff } = useAuth();
@@ -15,6 +18,8 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   const [txHash, setTxHash] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [showSpecModal, setShowSpecModal] = useState(false);
   
   const canManagePayments = isAdmin || isStaff;
 
@@ -93,9 +98,21 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-neutral-600 font-medium">{invoice.milestone_name}</p>
-              <p className="text-sm text-neutral-500 mt-1">
-                Project: {project?.name || 'Unknown'}
-              </p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm">
+                <span className="text-neutral-500">
+                  Project: <Link to={`/projects/${project?.id}`} onClick={onClose} className="text-emerald-600 hover:text-emerald-700 hover:underline">{project?.name || 'Unknown'}</Link>
+                </span>
+                {offer && (
+                  <span className="text-neutral-500">
+                    Offer: <button onClick={() => setShowOfferModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{offer.number}</button>
+                  </span>
+                )}
+                {offer?.specification && (
+                  <span className="text-neutral-500">
+                    Spec: <button onClick={() => setShowSpecModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{offer.specification.version}</button>
+                  </span>
+                )}
+              </div>
               {canManagePayments && clientName && (
                 <p className="text-sm text-emerald-600 mt-0.5">
                   Client: {clientName}
@@ -398,6 +415,24 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
           </div>
         )}
       </div>
+
+      {/* Offer Modal */}
+      {offer && (
+        <OfferModal
+          isOpen={showOfferModal}
+          onClose={() => setShowOfferModal(false)}
+          offerId={offer.id}
+        />
+      )}
+
+      {/* Specification Modal */}
+      {offer?.specification && (
+        <SpecificationModal
+          isOpen={showSpecModal}
+          onClose={() => setShowSpecModal(false)}
+          specificationId={offer.specification.id}
+        />
+      )}
     </div>,
     document.body
   );
