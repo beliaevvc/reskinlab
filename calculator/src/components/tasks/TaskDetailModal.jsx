@@ -446,47 +446,80 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                   )}
                 </div>
 
-                {/* Deadline Section */}
+                {/* Deadline Section - Redesigned */}
                 <div className="pt-4 border-t border-neutral-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <svg className={`w-4 h-4 ${isOverdue() ? 'text-red-500' : 'text-neutral-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {/* Header */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className={`p-1.5 rounded-lg ${isOverdue() ? 'bg-red-100' : 'bg-emerald-50'}`}>
+                      <svg className={`w-4 h-4 ${isOverdue() ? 'text-red-600' : 'text-emerald-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-sm font-medium text-neutral-700">Дедлайн</span>
                     </div>
-                    
-                    {!isClient && !deadlineEditing && (
-                      <button
-                        onClick={() => setDeadlineEditing(true)}
-                        className="text-xs text-neutral-400 hover:text-emerald-600 transition-colors"
-                      >
-                        {task.due_date ? 'Изменить' : 'Добавить'}
-                      </button>
-                    )}
+                    <span className="text-sm font-medium text-neutral-900">Дедлайн</span>
                   </div>
 
                   {deadlineEditing && !isClient ? (
-                    <div className="mt-3 p-3 bg-neutral-50 rounded-lg space-y-3">
-                      {/* Deadline type selector */}
-                      <div className="flex gap-1 p-0.5 bg-neutral-200 rounded-lg">
+                    <div className="space-y-4">
+                      {/* Type selector with icons */}
+                      <div className="flex gap-2">
                         {[
-                          { id: 'date', label: 'Дата' },
-                          { id: 'datetime', label: 'Дата и время' },
-                          { id: 'range', label: 'Диапазон' },
+                          { id: 'date', label: 'Дата', icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          )},
+                          { id: 'datetime', label: 'Дата и время', icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )},
+                          { id: 'range', label: 'Период', icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                          )},
                         ].map((type) => (
                           <button
                             key={type.id}
                             onClick={() => setDeadlineType(type.id)}
-                            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border-2 transition-all ${
                               deadlineType === type.id
-                                ? 'bg-white text-neutral-900 shadow-sm'
-                                : 'text-neutral-600 hover:text-neutral-900'
+                                ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                                : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
                             }`}
                           >
+                            {type.icon}
                             {type.label}
                           </button>
                         ))}
+                      </div>
+
+                      {/* Quick actions */}
+                      <div className="flex gap-2">
+                        <span className="text-xs text-neutral-400 py-1">Быстрый выбор:</span>
+                        {[
+                          { label: 'Сегодня', days: 0 },
+                          { label: 'Завтра', days: 1 },
+                          { label: 'Через неделю', days: 7 },
+                          { label: 'Через месяц', days: 30 },
+                        ].map((quick) => {
+                          const targetDate = new Date();
+                          targetDate.setDate(targetDate.getDate() + quick.days);
+                          const dateStr = targetDate.toISOString().split('T')[0];
+                          return (
+                            <button
+                              key={quick.days}
+                              onClick={() => handleDeadlineUpdate({ 
+                                due_date: dateStr,
+                                due_time: null,
+                                due_date_end: null,
+                              })}
+                              className="px-2 py-1 text-xs text-neutral-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                            >
+                              {quick.label}
+                            </button>
+                          );
+                        })}
                       </div>
 
                       {/* Date inputs */}
@@ -501,93 +534,181 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                           };
                           handleDeadlineUpdate(updates);
                         }}
-                        className="space-y-2"
+                        className="space-y-3"
                       >
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                           <div className="flex-1">
-                            <label className="block text-xs text-neutral-500 mb-1">
+                            <label className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 mb-1.5">
+                              <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
                               {deadlineType === 'range' ? 'Начало' : 'Дата'}
                             </label>
                             <input
                               type="date"
                               name="due_date"
                               defaultValue={task.due_date?.split('T')[0] || ''}
-                              className="w-full px-2 py-1.5 text-sm border border-neutral-200 rounded focus:border-emerald-500 focus:outline-none"
+                              className="w-full px-3 py-2 text-sm bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
                             />
                           </div>
                           
                           {deadlineType === 'datetime' && (
-                            <div className="w-24">
-                              <label className="block text-xs text-neutral-500 mb-1">Время</label>
+                            <div className="w-28">
+                              <label className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 mb-1.5">
+                                <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Время
+                              </label>
                               <input
                                 type="time"
                                 name="due_time"
                                 defaultValue={task.due_time?.slice(0, 5) || ''}
-                                className="w-full px-2 py-1.5 text-sm border border-neutral-200 rounded focus:border-emerald-500 focus:outline-none"
+                                className="w-full px-3 py-2 text-sm bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
                               />
                             </div>
                           )}
                           
                           {deadlineType === 'range' && (
                             <div className="flex-1">
-                              <label className="block text-xs text-neutral-500 mb-1">Конец</label>
+                              <label className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 mb-1.5">
+                                <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                                Окончание
+                              </label>
                               <input
                                 type="date"
                                 name="due_date_end"
                                 defaultValue={task.due_date_end?.split('T')[0] || ''}
-                                className="w-full px-2 py-1.5 text-sm border border-neutral-200 rounded focus:border-emerald-500 focus:outline-none"
+                                className="w-full px-3 py-2 text-sm bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
                               />
                             </div>
                           )}
                         </div>
 
-                        <div className="flex gap-2 pt-1">
+                        {/* Action buttons */}
+                        <div className="flex items-center gap-2 pt-1">
                           <button
                             type="submit"
-                            className="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded transition-colors"
+                            className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm shadow-emerald-500/25 transition-all"
                           >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
                             Сохранить
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeadlineEditing(false)}
+                            className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors"
+                          >
+                            Отмена
                           </button>
                           {task.due_date && (
                             <button
                               type="button"
                               onClick={handleClearDeadline}
-                              className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded transition-colors"
+                              className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
                               Убрать
                             </button>
                           )}
-                          <button
-                            type="button"
-                            onClick={() => setDeadlineEditing(false)}
-                            className="px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded transition-colors"
-                          >
-                            Отмена
-                          </button>
                         </div>
                       </form>
                     </div>
                   ) : (
-                    <div className="mt-2">
+                    <div>
                       {task.due_date ? (
-                        <div 
-                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+                        <button 
+                          onClick={() => !isClient && setDeadlineEditing(true)}
+                          disabled={isClient}
+                          className={`group flex items-center gap-3 w-full p-3 rounded-xl border-2 transition-all ${
                             isOverdue() 
-                              ? 'bg-red-50 text-red-700' 
-                              : 'bg-neutral-100 text-neutral-700'
-                          }`}
+                              ? 'bg-red-50 border-red-200 hover:border-red-300' 
+                              : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 hover:border-emerald-300'
+                          } ${!isClient ? 'cursor-pointer' : 'cursor-default'}`}
                         >
-                          {isOverdue() && (
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          {/* Calendar icon with date */}
+                          <div className={`shrink-0 w-12 h-12 rounded-lg flex flex-col items-center justify-center ${
+                            isOverdue() ? 'bg-red-100' : 'bg-white shadow-sm'
+                          }`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-wide ${
+                              isOverdue() ? 'text-red-600' : 'text-emerald-600'
+                            }`}>
+                              {new Date(task.due_date).toLocaleDateString('ru-RU', { month: 'short' })}
+                            </span>
+                            <span className={`text-lg font-bold leading-none ${
+                              isOverdue() ? 'text-red-700' : 'text-neutral-900'
+                            }`}>
+                              {new Date(task.due_date).getDate()}
+                            </span>
+                          </div>
+                          
+                          {/* Date info */}
+                          <div className="flex-1 text-left">
+                            <div className={`text-sm font-medium ${isOverdue() ? 'text-red-700' : 'text-neutral-900'}`}>
+                              {formatDeadline()}
+                            </div>
+                            <div className={`text-xs ${isOverdue() ? 'text-red-600' : 'text-neutral-500'}`}>
+                              {isOverdue() ? (
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                  </svg>
+                                  Просрочено
+                                </span>
+                              ) : (
+                                (() => {
+                                  const daysLeft = Math.ceil((new Date(task.due_date_end || task.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+                                  if (daysLeft === 0) return 'Сегодня';
+                                  if (daysLeft === 1) return 'Завтра';
+                                  if (daysLeft < 7) return `Через ${daysLeft} дн.`;
+                                  return `Через ${Math.ceil(daysLeft / 7)} нед.`;
+                                })()
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Edit hint */}
+                          {!isClient && (
+                            <svg className="w-4 h-4 text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                           )}
-                          {formatDeadline()}
-                        </div>
+                        </button>
                       ) : (
-                        <span className="text-sm text-neutral-400 italic">
-                          {isClient ? 'Не установлен' : 'Нажмите "Добавить" для установки дедлайна'}
-                        </span>
+                        !isClient && (
+                          <button
+                            onClick={() => setDeadlineEditing(true)}
+                            className="group flex items-center gap-3 w-full p-3 rounded-xl border-2 border-dashed border-neutral-200 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all"
+                          >
+                            <div className="shrink-0 w-10 h-10 rounded-lg bg-neutral-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+                              <svg className="w-5 h-5 text-neutral-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                            </div>
+                            <div className="text-left">
+                              <div className="text-sm font-medium text-neutral-600 group-hover:text-emerald-700 transition-colors">
+                                Добавить дедлайн
+                              </div>
+                              <div className="text-xs text-neutral-400">
+                                Нажмите для установки срока
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      )}
+                      {isClient && !task.due_date && (
+                        <div className="flex items-center gap-2 text-sm text-neutral-400 italic py-2">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          Дедлайн не установлен
+                        </div>
                       )}
                     </div>
                   )}

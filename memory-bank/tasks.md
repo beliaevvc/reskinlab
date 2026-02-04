@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Task Card Deadline UI Redesign** — ARCHIVED ✅
+
+### Summary
+Редизайн секции настройки дедлайна в карточке задачи. Улучшен визуальный стиль в соответствии с дизайн-системой проекта: emerald акценты, красивые карточки с мини-календарём, быстрые действия для установки дедлайна.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-task-deadline-ui-redesign.md`
+- **Reflection:** `memory-bank/reflection/reflection-task-deadline-ui-redesign.md`
+
+---
+
+## Recent Task
 **Fix Tasks Creation for Multiple Specifications** — ARCHIVED ✅
 
 ### Summary

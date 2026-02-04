@@ -5,6 +5,11 @@
 
 ## Recently Completed Tasks
 
+### Task Card Deadline UI Redesign (4 Февраля 2026) — ARCHIVED ✅
+Редизайн секции настройки дедлайна в карточке задачи.
+- **Archive:** `memory-bank/archive/archive-task-deadline-ui-redesign.md`
+- **Reflection:** `memory-bank/reflection/reflection-task-deadline-ui-redesign.md`
+
 ### Multiple Specifications Fix (4 Февраля 2026) — ARCHIVED ✅
 Исправлен баг: при дозаказе работ в проекте задачи не создавались для новых спецификаций.
 - **Archive:** `memory-bank/archive/archive-multiple-specifications-fix.md`
