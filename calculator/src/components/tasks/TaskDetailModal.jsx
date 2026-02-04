@@ -90,10 +90,13 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
   // Check if user can view user profiles (admin or AM)
   const canViewUsers = isAdmin || isAM;
   
-  // Get the active specification (first non-draft or latest)
-  const activeSpec = specifications?.find(s => s.status !== 'draft') || specifications?.[0];
+  // Get the specification linked to this task (via source_specification_id)
+  // Fall back to first non-draft specification for old tasks without the link
+  const activeSpec = task?.source_specification_id 
+    ? specifications?.find(s => s.id === task.source_specification_id)
+    : (specifications?.find(s => s.status !== 'draft') || specifications?.[0]);
   
-  // Get offer for the active specification
+  // Get offer for the task's specification
   const { data: activeOffer } = useProjectOffers(projectId, activeSpec?.id);
 
   // Mark comments as read when task is loaded

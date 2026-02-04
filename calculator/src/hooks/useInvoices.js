@@ -370,6 +370,8 @@ export function useConfirmPayment() {
       queryClient.invalidateQueries({ queryKey: ['project', data?.project_id] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
       queryClient.invalidateQueries({ queryKey: ['offer'] });
+      // Инвалидируем project-offers (используется в TaskDetailModal)
+      queryClient.invalidateQueries({ queryKey: ['project-offers'] });
       // Инвалидируем tasks и stages после подтверждения платежа (триггер создаёт их)
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['stages'] });

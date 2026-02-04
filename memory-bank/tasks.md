@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Fix Tasks Creation for Multiple Specifications** — ARCHIVED ✅
+
+### Summary
+Исправлен баг: при дозаказе работ в проекте задачи не создавались для новых спецификаций. Добавлено поле `source_specification_id` в таблицу tasks для отслеживания источника задачи.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-multiple-specifications-fix.md`
+- **Reflection:** `memory-bank/reflection/reflection-multiple-specifications-fix.md`
+
+---
+
+## Recent Task
 **Task Card Completion & Reorder** — ARCHIVED ✅
 
 ### Summary

@@ -5,6 +5,11 @@
 
 ## Recently Completed Tasks
 
+### Multiple Specifications Fix (4 Февраля 2026) — ARCHIVED ✅
+Исправлен баг: при дозаказе работ в проекте задачи не создавались для новых спецификаций.
+- **Archive:** `memory-bank/archive/archive-multiple-specifications-fix.md`
+- **Reflection:** `memory-bank/reflection/reflection-multiple-specifications-fix.md`
+
 ### Task Card Completion & Reorder (4 Февраля 2026) — ARCHIVED ✅
 Улучшения карточек задач на Kanban доске:
 - Галочка завершения задачи (для админа и AM)
@@ -59,5 +64,5 @@
 - `calculator/src/lib/supabase.js` - Supabase client с отключенным Realtime
 
 ## Archive Documents
-- `memory-bank/archive/archive-account-switcher-fix.md` — Latest archived task
-- `memory-bank/reflection/reflection-account-switcher-fix.md` — Latest reflection
+- `memory-bank/archive/archive-multiple-specifications-fix.md` — Latest archived task
+- `memory-bank/reflection/reflection-multiple-specifications-fix.md` — Latest reflection

@@ -1,5 +1,29 @@
 # Progress Log
 
+## Multiple Specifications Fix — ARCHIVED ✅
+
+### Date: 2026-02-04
+
+### Summary
+Исправлен критический баг: при дозаказе работ в проекте задачи не создавались для новых спецификаций. Функция `auto_create_tasks_on_first_payment()` проверяла "есть ли задачи в проекте" вместо "есть ли задачи для ЭТОЙ спецификации".
+
+### Solution
+- Добавлено поле `source_specification_id` в таблицу `tasks`
+- Изменена логика проверки триггера на per-specification
+- Исправлено отображение спецификации в `TaskDetailModal.jsx`
+- Добавлена инвалидация кеша `['project-offers']`
+
+### Files Modified
+- `calculator/supabase/migrations/036_fix_tasks_for_multiple_specifications.sql` — миграция БД
+- `calculator/src/components/tasks/TaskDetailModal.jsx` — логика определения спецификации
+- `calculator/src/hooks/useInvoices.js` — инвалидация project-offers
+
+### Archive Reference
+📄 `memory-bank/archive/archive-multiple-specifications-fix.md`
+📄 `memory-bank/reflection/reflection-multiple-specifications-fix.md`
+
+---
+
 ## Kanban Drag Card Fix — ARCHIVED ✅
 
 ### Date: 2026-02-04
