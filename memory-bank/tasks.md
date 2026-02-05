@@ -1,6 +1,22 @@
 # Tasks
 
 ## Recent Task
+**Admin Dashboard & Specifications Page** — ARCHIVED ✅
+
+### Summary
+Исправление багов в дашборде админа и создание новой страницы спецификаций:
+- Фикс "Active Projects" (неверный статус в фильтре)
+- Разделение "Pending Approvals" на "Awaiting Offer" и "Pending Offers" с суммами
+- Создание страницы спецификаций для админа (`/admin/specifications`)
+- Добавление раздела спецификаций для AM (`/am/specifications`)
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-admin-specifications-page.md`
+- **Reflection:** `memory-bank/reflection/reflection-admin-specifications-page.md`
+
+---
+
+## Recent Task
 **Projects & Invoices UI Improvements** — ARCHIVED ✅
 
 ### Summary

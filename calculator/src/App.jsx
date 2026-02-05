@@ -20,6 +20,7 @@ import ProfilePage from './pages/profile/ProfilePage';
 import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectPage from './pages/projects/ProjectPage';
 import SpecificationDetailPage from './pages/specifications/SpecificationDetailPage';
+import SpecificationsPage from './pages/specifications/SpecificationsPage';
 
 // Phase 3: Offers & Invoices
 import OffersPage from './pages/offers/OffersPage';
@@ -97,6 +98,7 @@ function AppContent() {
                 <Route path="/am/calculator" element={<CalculatorPage />} />
                 <Route path="/am/projects" element={<ProjectsPage />} />
                 <Route path="/am/projects/:id" element={<ProjectPage />} />
+                <Route path="/am/specifications" element={<SpecificationsPage />} />
                 <Route path="/am/specifications/:id" element={<SpecificationDetailPage />} />
                 <Route path="/am/offers" element={<OffersPage />} />
                 <Route path="/am/offers/:id" element={<OfferDetailPage />} />
@@ -115,6 +117,7 @@ function AppContent() {
                 <Route path="/admin/calculator" element={<CalculatorPage />} />
                 <Route path="/admin/projects" element={<ProjectsPage />} />
                 <Route path="/admin/projects/:id" element={<ProjectPage />} />
+                <Route path="/admin/specifications" element={<SpecificationsPage />} />
                 <Route path="/admin/specifications/:id" element={<SpecificationDetailPage />} />
                 <Route path="/admin/offers" element={<OffersPage />} />
                 <Route path="/admin/offers/:id" element={<OfferDetailPage />} />

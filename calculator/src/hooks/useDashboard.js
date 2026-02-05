@@ -28,8 +28,10 @@ export function useDashboardStats() {
       const projectStats = {
         total: projects?.length || 0,
         draft: projects?.filter(p => p.status === 'draft').length || 0,
-        in_progress: projects?.filter(p => p.status === 'in_progress').length || 0,
-        review: projects?.filter(p => p.status === 'review').length || 0,
+        // Active projects = 'active' + 'in_production' statuses
+        in_progress: projects?.filter(p => p.status === 'active' || p.status === 'in_production').length || 0,
+        pending_payment: projects?.filter(p => p.status === 'pending_payment').length || 0,
+        on_hold: projects?.filter(p => p.status === 'on_hold').length || 0,
         completed: projects?.filter(p => p.status === 'completed').length || 0,
       };
 
@@ -75,28 +77,57 @@ export function useDashboardStats() {
           : 0,
       };
 
-      // Get pending approvals
-      const { count: pendingSpecs } = await supabase
+      // Get finalized specifications
+      const { data: finalizedSpecs } = await supabase
         .from('specifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'pending');
+        .select('id, totals_json')
+        .eq('status', 'finalized');
 
-      const { count: pendingOffers } = await supabase
+      // Get all offers to check which specs have offers
+      const { data: allOffers } = await supabase
         .from('offers')
-        .select('id', { count: 'exact', head: true })
+        .select('specification_id');
+
+      // Create set of spec IDs that have offers
+      const specIdsWithOffers = new Set(allOffers?.map(o => o.specification_id) || []);
+
+      // Filter specs that don't have an offer yet
+      const specsWithoutOffer = finalizedSpecs?.filter(s => !specIdsWithOffers.has(s.id)) || [];
+      const finalizedSpecsAmount = specsWithoutOffer.reduce((sum, s) => {
+        const total = s.totals_json?.total || s.totals_json?.grandTotal || 0;
+        return sum + parseFloat(total);
+      }, 0);
+
+      // Get pending offers (awaiting client acceptance) with amounts
+      const { data: pendingOffersData } = await supabase
+        .from('offers')
+        .select(`
+          id,
+          specification:specifications(totals_json)
+        `)
         .eq('status', 'pending');
 
-      const pendingApprovals = {
-        specs: pendingSpecs || 0,
-        offers: pendingOffers || 0,
-        total: (pendingSpecs || 0) + (pendingOffers || 0),
+      const pendingOffersAmount = pendingOffersData?.reduce((sum, o) => {
+        const total = o.specification?.totals_json?.total || o.specification?.totals_json?.grandTotal || 0;
+        return sum + parseFloat(total);
+      }, 0) || 0;
+
+      const finalizedSpecsStats = {
+        count: specsWithoutOffer.length,
+        amount: finalizedSpecsAmount,
+      };
+
+      const pendingOffersStats = {
+        count: pendingOffersData?.length || 0,
+        amount: pendingOffersAmount,
       };
 
       return {
         users,
         projects: projectStats,
         revenue,
-        pendingApprovals,
+        finalizedSpecs: finalizedSpecsStats,
+        pendingOffers: pendingOffersStats,
       };
     },
     refetchInterval: 60000, // Refresh every minute

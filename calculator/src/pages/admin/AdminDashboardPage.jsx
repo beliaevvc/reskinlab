@@ -27,7 +27,7 @@ function BarChart({ data, dataKey, label, color = 'emerald' }) {
 }
 
 // Stat card component
-function StatCard({ title, value, change, changeLabel, icon, color = 'emerald', link }) {
+function StatCard({ title, value, subtitle, change, changeLabel, icon, color = 'emerald', link }) {
   const colorClasses = {
     emerald: 'bg-emerald-50 text-emerald-600',
     blue: 'bg-blue-50 text-blue-600',
@@ -47,6 +47,9 @@ function StatCard({ title, value, change, changeLabel, icon, color = 'emerald', 
         <div>
           <p className="text-sm text-neutral-500">{title}</p>
           <p className="text-2xl font-bold text-neutral-900 mt-1">{value}</p>
+          {subtitle && (
+            <p className="text-sm text-neutral-500 mt-0.5">{subtitle}</p>
+          )}
           {change !== undefined && (
             <p className={`text-sm mt-1 ${change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
               {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% {changeLabel}
@@ -169,20 +172,21 @@ export function AdminDashboardPage() {
         />
         
         <StatCard
-          title="Pending Approvals"
-          value={stats?.pendingApprovals?.total || 0}
-          color={stats?.pendingApprovals?.total > 0 ? 'amber' : 'emerald'}
-          link="/admin/offers"
+          title="Awaiting Offer"
+          value={stats?.finalizedSpecs?.count || 0}
+          subtitle={stats?.finalizedSpecs?.amount > 0 ? formatCurrency(stats.finalizedSpecs.amount) : null}
+          color={stats?.finalizedSpecs?.count > 0 ? 'purple' : 'emerald'}
+          link="/admin/specifications"
           icon={
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           }
         />
       </div>
 
       {/* Secondary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white rounded-md border border-neutral-200 p-4">
           <p className="text-sm text-neutral-500">This Month</p>
           <p className="text-xl font-bold text-emerald-600 mt-1">
@@ -195,6 +199,15 @@ export function AdminDashboardPage() {
             {formatCurrency(stats?.revenue?.pending || 0)}
           </p>
         </div>
+        <Link to="/admin/offers" className="bg-white rounded-md border border-neutral-200 p-4 hover:border-emerald-300 hover:shadow-md transition-all">
+          <p className="text-sm text-neutral-500">Pending Offers</p>
+          <p className={`text-xl font-bold mt-1 ${stats?.pendingOffers?.count > 0 ? 'text-amber-600' : 'text-neutral-400'}`}>
+            {stats?.pendingOffers?.count || 0}
+          </p>
+          {stats?.pendingOffers?.amount > 0 && (
+            <p className="text-xs text-neutral-400 mt-0.5">{formatCurrency(stats.pendingOffers.amount)}</p>
+          )}
+        </Link>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
           <p className="text-sm text-neutral-500">Completed Projects</p>
           <p className="text-xl font-bold text-emerald-600 mt-1">
@@ -205,6 +218,12 @@ export function AdminDashboardPage() {
           <p className="text-sm text-neutral-500">Active Clients</p>
           <p className="text-xl font-bold text-blue-600 mt-1">
             {stats?.users?.clients || 0}
+          </p>
+        </div>
+        <div className="bg-white rounded-md border border-neutral-200 p-4">
+          <p className="text-sm text-neutral-500">Draft Projects</p>
+          <p className="text-xl font-bold text-neutral-500 mt-1">
+            {stats?.projects?.draft || 0}
           </p>
         </div>
       </div>

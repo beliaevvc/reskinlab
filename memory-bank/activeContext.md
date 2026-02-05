@@ -5,6 +5,17 @@
 
 ## Recently Completed Tasks
 
+### Admin Dashboard & Specifications Page (5 Февраля 2026) — ARCHIVED ✅
+Исправление багов в дашборде и создание страницы спецификаций:
+- Фикс "Active Projects", разделение "Pending Approvals"
+- Страницы `/admin/specifications` и `/am/specifications`
+- **Archive:** `memory-bank/archive/archive-admin-specifications-page.md`
+- **Reflection:** `memory-bank/reflection/reflection-admin-specifications-page.md`
+
+**Примечание:** AM роль требует отдельного аудита — много функционала отсутствует или устарело.
+
+---
+
 ### Projects & Invoices UI Improvements (5 Февраля 2026) — ARCHIVED ✅
 Комплексное улучшение UI/UX страницы проектов и инвойсов:
 - Фильтрация инвойсов по клиенту, проекту и спецификации

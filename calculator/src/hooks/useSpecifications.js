@@ -321,6 +321,99 @@ export function useAdminDeleteSpecification() {
 }
 
 /**
+ * Admin: Get all specifications with project and client info
+ */
+export function useAllSpecifications() {
+  return useQuery({
+    queryKey: ['specifications', 'all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('specifications')
+        .select(`
+          *,
+          project:projects (
+            id,
+            name,
+            status,
+            client:clients (
+              id,
+              company_name,
+              profile:profiles!user_id (
+                id,
+                email,
+                full_name
+              )
+            )
+          ),
+          offer:offers (
+            id,
+            status,
+            number
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+/**
+ * AM: Get specifications for projects assigned to current AM
+ */
+export function useAMSpecifications(userId) {
+  return useQuery({
+    queryKey: ['specifications', 'am', userId],
+    queryFn: async () => {
+      // First get projects assigned to this AM
+      const { data: amProjects } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('am_id', userId);
+
+      if (!amProjects || amProjects.length === 0) {
+        return [];
+      }
+
+      const projectIds = amProjects.map(p => p.id);
+
+      // Then get specifications for those projects
+      const { data, error } = await supabase
+        .from('specifications')
+        .select(`
+          *,
+          project:projects (
+            id,
+            name,
+            status,
+            client:clients (
+              id,
+              company_name,
+              profile:profiles!user_id (
+                id,
+                email,
+                full_name
+              )
+            )
+          ),
+          offer:offers (
+            id,
+            status,
+            number
+          )
+        `)
+        .in('project_id', projectIds)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+}
+
+/**
  * Get the latest draft specification for a project (if any)
  */
 export function useLatestDraftSpecification(projectId) {

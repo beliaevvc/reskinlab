@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Icon } from './Icon';
 
 // Payment schedule component - разбивка по этапам
@@ -191,6 +192,8 @@ export function SpecificationView({
   specNumber,
   specDate,
 }) {
+  const [workflowExpanded, setWorkflowExpanded] = useState(false);
+  
   // Use provided specNumber or fallback to empty
   const displayNumber = specNumber || '—';
   const displayDate = specDate || new Date().toLocaleDateString();
@@ -277,45 +280,64 @@ export function SpecificationView({
 
         {/* Production Workflow */}
         <div className="mb-10">
-          <h2 className="text-lg font-bold text-neutral-900 mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded flex items-center justify-center text-xs font-bold">
-              ⟳
-            </span>
-            Production Workflow
-          </h2>
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-neutral-200" />
+          <button
+            onClick={() => setWorkflowExpanded(!workflowExpanded)}
+            className="w-full text-lg font-bold text-neutral-900 mb-4 flex items-center justify-between gap-2 hover:text-emerald-700 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded flex items-center justify-center text-xs font-bold">
+                ⟳
+              </span>
+              Production Workflow
+              <span className="text-sm font-normal text-neutral-500">
+                ({activeStages.length} stages)
+              </span>
+            </div>
+            <svg
+              className={`w-5 h-5 text-neutral-400 transition-transform ${workflowExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {workflowExpanded && (
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-neutral-200" />
 
-            <div className="space-y-0">
-              {activeStages.map((stage, index) => (
-                <div key={stage.id} className="relative flex gap-4 pb-6">
-                  {/* Timeline dot */}
-                  <div className="relative z-10 flex-shrink-0 w-8 h-8 bg-white border-2 border-emerald-500 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-bold text-emerald-600">
-                      {index + 1}
-                    </span>
-                  </div>
-                  {/* Stage content */}
-                  <div className="flex-1 bg-neutral-50 rounded-md p-4 -mt-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
-                      <div>
-                        <h3 className="font-bold text-neutral-900">
-                          {stage.name}
-                        </h3>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          {stage.description}
-                        </p>
-                      </div>
-                      <div className="text-xs font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded whitespace-nowrap self-start sm:self-auto">
-                        {stage.duration}
+              <div className="space-y-0">
+                {activeStages.map((stage, index) => (
+                  <div key={stage.id} className="relative flex gap-4 pb-6">
+                    {/* Timeline dot */}
+                    <div className="relative z-10 flex-shrink-0 w-8 h-8 bg-white border-2 border-emerald-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-emerald-600">
+                        {index + 1}
+                      </span>
+                    </div>
+                    {/* Stage content */}
+                    <div className="flex-1 bg-neutral-50 rounded-md p-4 -mt-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                        <div>
+                          <h3 className="font-bold text-neutral-900">
+                            {stage.name}
+                          </h3>
+                          <p className="text-xs text-neutral-500 mt-0.5">
+                            {stage.description}
+                          </p>
+                        </div>
+                        <div className="text-xs font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded whitespace-nowrap self-start sm:self-auto">
+                          {stage.duration}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Table Scroll Hint (Mobile) */}
