@@ -1,6 +1,20 @@
 # Tasks
 
 ## Recent Task
+**Admin Sidebar Sections** — ARCHIVED ✅
+
+### Summary
+Улучшение структуры левого меню админки:
+- Добавлен заголовок "Settings" перед блоком настроек (Calculator, Promo Codes, Task Settings, Wallets)
+- Audit Log отделён линией как отдельный раздел
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-admin-sidebar-sections.md`
+- **Reflection:** `memory-bank/reflection/reflection-admin-sidebar-sections.md`
+
+---
+
+## Recent Task
 **Admin Dashboard & Specifications Page** — ARCHIVED ✅
 
 ### Summary

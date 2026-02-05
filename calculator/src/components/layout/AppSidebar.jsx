@@ -27,11 +27,12 @@ const adminNavItems = [
   { to: '/admin/specifications', label: 'Specifications', icon: 'clipboard' },
   { to: '/admin/offers', label: 'Offers', icon: 'document' },
   { to: '/admin/invoices', label: 'Invoices', icon: 'receipt' },
-  { type: 'divider' },
+  { type: 'section', label: 'Settings' },
   { to: '/admin/pricing', label: 'Calculator', icon: 'calculator' },
   { to: '/admin/promo-codes', label: 'Promo Codes', icon: 'ticket' },
   { to: '/admin/task-settings', label: 'Task Settings', icon: 'settings' },
   { to: '/admin/wallets', label: 'Wallets', icon: 'wallet' },
+  { type: 'divider' },
   { to: '/admin/audit', label: 'Audit Log', icon: 'shield' },
 ];
 
@@ -183,6 +184,19 @@ export function AppSidebar({ open, onClose }) {
           // Render divider
           if (item.type === 'divider') {
             return <div key={`divider-${index}`} className="my-3 border-t border-neutral-200" />;
+          }
+          
+          // Render section header
+          if (item.type === 'section') {
+            return (
+              <div key={`section-${index}`} className="pt-4 pb-2">
+                <div className="border-t border-neutral-200 pt-3">
+                  <span className="px-3 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                    {item.label}
+                  </span>
+                </div>
+              </div>
+            );
           }
           
           const badgeCount = getBadgeCount(item);

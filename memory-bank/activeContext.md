@@ -5,6 +5,15 @@
 
 ## Recently Completed Tasks
 
+### Admin Sidebar Sections (5 Февраля 2026) — ARCHIVED ✅
+Улучшение структуры левого меню админки:
+- Добавлен заголовок "Settings" перед блоком настроек
+- Audit Log отделён линией как отдельный раздел
+- **Archive:** `memory-bank/archive/archive-admin-sidebar-sections.md`
+- **Reflection:** `memory-bank/reflection/reflection-admin-sidebar-sections.md`
+
+---
+
 ### Admin Dashboard & Specifications Page (5 Февраля 2026) — ARCHIVED ✅
 Исправление багов в дашборде и создание страницы спецификаций:
 - Фикс "Active Projects", разделение "Pending Approvals"
