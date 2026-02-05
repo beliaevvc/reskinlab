@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useLocation } from 'react-router-dom';
-import { useProjects, useAllProjects, useDeleteProject } from '../../hooks/useProjects';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useProjects, useAllProjects, useDeleteProject, useUpdateProject } from '../../hooks/useProjects';
 import { useAuth } from '../../contexts/AuthContext';
-import { CreateProjectModal, ProjectCard } from '../../components/projects';
+import { CreateProjectModal } from '../../components/projects';
+import { InlineEdit } from '../../components/InlineEdit';
+import { Select } from '../../components/Select';
 import { formatDate } from '../../lib/utils';
 
 // Get base path for projects based on current location
@@ -18,11 +20,19 @@ export function ProjectsPage() {
   const { isAdmin, isAM } = useAuth();
   const isStaff = isAdmin || isAM;
   const basePath = useProjectBasePath();
+  const navigate = useNavigate();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [filter, setFilter] = useState({ client: '', status: '' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table'
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('projects-view') || 'cards';
+  });
+
+  const handleViewChange = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('projects-view', mode);
+  };
 
   // Use different hooks for staff vs client
   const { data: clientProjects, isLoading: clientLoading, error: clientError } = useProjects();
@@ -84,79 +94,15 @@ export function ProjectsPage() {
               : 'Manage your game art projects and specifications'}
           </p>
         </div>
-        {!isStaff && (
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2.5 rounded transition-colors"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            New Project
-          </button>
-        )}
-      </div>
-
-      {/* Admin Filters & View Toggle */}
-      {isStaff && (
-        <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="w-48">
-                <label className="block text-xs font-medium text-neutral-500 mb-1">Client</label>
-                <select
-                  value={filter.client}
-                  onChange={(e) => setFilter(prev => ({ ...prev, client: e.target.value }))}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                >
-                  <option value="">All Clients</option>
-                  {clients.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-40">
-                <label className="block text-xs font-medium text-neutral-500 mb-1">Status</label>
-                <select
-                  value={filter.status}
-                  onChange={(e) => setFilter(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                >
-                  <option value="">All Statuses</option>
-                  <option value="draft">Draft</option>
-                  <option value="active">Active</option>
-                  <option value="in_production">In Production</option>
-                  <option value="completed">Completed</option>
-                  <option value="archived">Archived</option>
-                </select>
-              </div>
-              {(filter.client || filter.status) && (
-                <button
-                  onClick={() => setFilter({ client: '', status: '' })}
-                  className="text-sm text-neutral-500 hover:text-neutral-700 mt-5"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-            
-            {/* View Toggle */}
-            <div className="flex items-center gap-1 bg-neutral-100 rounded p-1">
+        <div className="flex items-center gap-3">
+          {/* View Toggle for clients */}
+          {!isStaff && filteredProjects?.length > 0 && (
+            <div className="flex items-center bg-neutral-100 rounded-lg p-1">
               <button
-                onClick={() => setViewMode('cards')}
-                className={`p-2 rounded transition-colors ${
+                onClick={() => handleViewChange('cards')}
+                className={`p-1.5 rounded transition-colors ${
                   viewMode === 'cards'
-                    ? 'bg-white shadow-sm text-emerald-600'
+                    ? 'bg-white text-neutral-900 shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-700'
                 }`}
                 title="Card view"
@@ -166,10 +112,110 @@ export function ProjectsPage() {
                 </svg>
               </button>
               <button
-                onClick={() => setViewMode('table')}
-                className={`p-2 rounded transition-colors ${
+                onClick={() => handleViewChange('table')}
+                className={`p-1.5 rounded transition-colors ${
                   viewMode === 'table'
-                    ? 'bg-white shadow-sm text-emerald-600'
+                    ? 'bg-white text-neutral-900 shadow-sm'
+                    : 'text-neutral-500 hover:text-neutral-700'
+                }`}
+                title="List view"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+          )}
+          {!isStaff && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2.5 rounded transition-colors"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              New Project
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Admin Filters & View Toggle */}
+      {isStaff && (
+        <div className="bg-white rounded-lg border border-neutral-200 p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-52">
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">Client</label>
+              <Select
+                value={filter.client}
+                onChange={(value) => setFilter(prev => ({ ...prev, client: value }))}
+                options={[
+                  { value: '', label: 'All clients' },
+                  ...clients.map(c => ({ value: c.id, label: c.name }))
+                ]}
+              />
+            </div>
+            <div className="w-44">
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">Status</label>
+              <Select
+                value={filter.status}
+                onChange={(value) => setFilter(prev => ({ ...prev, status: value }))}
+                options={[
+                  { value: '', label: 'All statuses' },
+                  { value: 'draft', label: 'Draft' },
+                  { value: 'active', label: 'Active' },
+                  { value: 'in_production', label: 'In Production' },
+                  { value: 'completed', label: 'Completed' },
+                  { value: 'archived', label: 'Archived' },
+                ]}
+              />
+            </div>
+            
+            {/* Clear & Count */}
+            {(filter.client || filter.status) && (
+              <div className="flex items-center gap-3 ml-auto">
+                <span className="text-sm text-neutral-400">
+                  {filteredProjects.length} of {projects?.length || 0}
+                </span>
+                <button
+                  onClick={() => setFilter({ client: '', status: '' })}
+                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+            
+            {/* View Toggle */}
+            <div className={`flex items-center gap-1 bg-neutral-100 rounded-lg p-1 ${(filter.client || filter.status) ? '' : 'ml-auto'}`}>
+              <button
+                onClick={() => handleViewChange('cards')}
+                className={`p-1.5 rounded transition-colors ${
+                  viewMode === 'cards'
+                    ? 'bg-white shadow-sm text-neutral-900'
+                    : 'text-neutral-500 hover:text-neutral-700'
+                }`}
+                title="Card view"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleViewChange('table')}
+                className={`p-1.5 rounded transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-white shadow-sm text-neutral-900'
                     : 'text-neutral-500 hover:text-neutral-700'
                 }`}
                 title="Table view"
@@ -179,10 +225,6 @@ export function ProjectsPage() {
                 </svg>
               </button>
             </div>
-          </div>
-          <div className="mt-3 text-xs text-neutral-500">
-            {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''}
-            {(filter.client || filter.status) && ` (filtered from ${projects?.length || 0})`}
           </div>
         </div>
       )}
@@ -258,75 +300,68 @@ export function ProjectsPage() {
 
       {/* Staff view: Table */}
       {isStaff && viewMode === 'table' && !isLoading && !error && filteredProjects?.length > 0 && (
-        <div className="bg-white rounded-md border border-neutral-200 overflow-hidden">
-          <table className="min-w-full">
+        <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+          <table className="w-full">
             <thead>
-              <tr className="bg-emerald-50/50 border-b border-emerald-100">
-                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase tracking-wide">Project</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase tracking-wide">Client</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase tracking-wide">Status</th>
-                <th className="px-5 py-3 text-center text-xs font-semibold text-emerald-800 uppercase tracking-wide">Specs</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase tracking-wide">Created</th>
-                <th className="px-5 py-3 w-24"></th>
+              <tr className="border-b border-neutral-200">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Project</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Client</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Specs</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Offers</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Invoices</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Tasks</th>
+                <th className="px-4 py-3 w-10"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {filteredProjects.map((project) => (
-                <tr key={project.id} className="hover:bg-emerald-50/30 transition-colors">
-                  <td className="px-5 py-4">
-                    <Link to={`${basePath}/${project.id}`} className="font-medium text-neutral-900 hover:text-emerald-600 transition-colors">
-                      {project.name}
-                    </Link>
-                    {project.description && (
-                      <p className="text-xs text-neutral-400 mt-0.5 truncate max-w-xs">{project.description}</p>
-                    )}
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-semibold">
-                        {(project.client?.company_name || project.client?.profile?.full_name || '?')[0].toUpperCase()}
+              {filteredProjects.map((project) => {
+                const clientName = project.client?.company_name || project.client?.profile?.full_name || '—';
+                const specsCount = project.specifications?.[0]?.count || 0;
+                const offersCount = project.offersCount || 0;
+                const invoicesCount = project.invoices?.[0]?.count || 0;
+                const tasksCount = project.tasks?.[0]?.count || 0;
+                return (
+                  <tr 
+                    key={project.id} 
+                    onClick={() => navigate(`${basePath}/${project.id}`)}
+                    className="hover:bg-neutral-50 transition-colors cursor-pointer"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-neutral-900">{project.name}</div>
+                      {project.description && (
+                        <p className="text-xs text-neutral-500 mt-0.5 truncate max-w-[180px]">{project.description}</p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-medium text-emerald-700">{clientName[0]?.toUpperCase()}</span>
+                        </div>
+                        <span className="text-sm text-neutral-700 truncate max-w-[100px]">{clientName}</span>
                       </div>
-                      <span className="text-sm text-neutral-700">
-                        {project.client?.company_name || project.client?.profile?.full_name || '—'}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <StatusBadge status={project.status} />
-                  </td>
-                  <td className="px-5 py-4 text-center">
-                    <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">
-                      {project.specifications?.[0]?.count || 0}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-sm text-neutral-500">
-                    {formatDate(project.created_at)}
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="flex items-center justify-end gap-1">
-                      <Link 
-                        to={`${basePath}/${project.id}`} 
-                        className="p-2 rounded hover:bg-emerald-100 text-neutral-400 hover:text-emerald-600 transition-colors"
-                        title="View"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={project.status} />
+                    </td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{specsCount}</td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{offersCount}</td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{invoicesCount}</td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{tasksCount}</td>
+                    <td className="px-4 py-3">
                       <button 
-                        onClick={() => setDeleteConfirm(project)} 
-                        className="p-2 rounded hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-colors"
+                        onClick={(e) => { e.stopPropagation(); setDeleteConfirm(project); }} 
+                        className="p-1.5 rounded hover:bg-red-50 text-neutral-300 hover:text-red-500 transition-colors"
                         title="Delete"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -346,12 +381,59 @@ export function ProjectsPage() {
         </div>
       )}
 
-      {/* Client view: Grid */}
-      {!isStaff && !isLoading && !error && filteredProjects?.length > 0 && (
+      {/* Client view: Cards */}
+      {!isStaff && viewMode === 'cards' && !isLoading && !error && filteredProjects?.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+            <ClientProjectCard key={project.id} project={project} basePath={basePath} />
           ))}
+        </div>
+      )}
+
+      {/* Client view: Table */}
+      {!isStaff && viewMode === 'table' && !isLoading && !error && filteredProjects?.length > 0 && (
+        <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-neutral-200">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Project</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Specs</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Offers</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Invoices</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Tasks</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100">
+              {filteredProjects.map((project) => {
+                const specsCount = project.specifications?.[0]?.count || 0;
+                const offersCount = project.offersCount || 0;
+                const invoicesCount = project.invoices?.[0]?.count || 0;
+                const tasksCount = project.tasks?.[0]?.count || 0;
+                return (
+                  <tr 
+                    key={project.id} 
+                    onClick={() => navigate(`${basePath}/${project.id}`)}
+                    className="hover:bg-neutral-50 transition-colors cursor-pointer"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-neutral-900">{project.name}</div>
+                      {project.description && (
+                        <p className="text-xs text-neutral-500 mt-0.5 truncate max-w-[180px]">{project.description}</p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={project.status} />
+                    </td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{specsCount}</td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{offersCount}</td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{invoicesCount}</td>
+                    <td className="px-4 py-3 text-center text-sm text-neutral-600">{tasksCount}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -404,72 +486,173 @@ export function ProjectsPage() {
         </div>,
         document.body
       )}
+
     </div>
   );
 }
 
-// Admin Project Card — matching client style
+// Admin Project Card — vertical card style with inline editing
 function AdminProjectCard({ project, basePath, onDelete }) {
+  const navigate = useNavigate();
+  const updateProject = useUpdateProject();
   const clientName = project.client?.company_name || project.client?.profile?.full_name || '—';
   const specsCount = project.specifications?.[0]?.count || 0;
+  const offersCount = project.offersCount || 0;
+  const invoicesCount = project.invoices?.[0]?.count || 0;
+  const tasksCount = project.tasks?.[0]?.count || 0;
+
+  const handleSave = (field, value) => {
+    updateProject.mutate({
+      projectId: project.id,
+      updates: { [field]: value },
+    });
+  };
 
   return (
-    <div className="group bg-white rounded-md border border-neutral-200 p-5 hover:shadow-md hover:border-emerald-200 transition-all">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
-          <Link
-            to={`${basePath}/${project.id}`}
-            className="text-lg font-semibold text-neutral-900 group-hover:text-emerald-700 transition-colors truncate block"
-          >
-            {project.name}
-          </Link>
-          {project.description && (
-            <p className="text-sm text-neutral-500 mt-1 line-clamp-2">{project.description}</p>
-          )}
-        </div>
+    <div
+      onClick={() => navigate(`${basePath}/${project.id}`)}
+      className="group block bg-white rounded-lg border border-neutral-200 p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer"
+    >
+      {/* Header: Name + Status */}
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h3 className="font-semibold text-neutral-900 group-hover:text-emerald-700 transition-colors line-clamp-1 flex-1">
+          <InlineEdit
+            value={project.name}
+            onSave={(value) => handleSave('name', value)}
+            placeholder="Project name"
+            inputClassName="text-base font-semibold"
+          />
+        </h3>
         <StatusBadge status={project.status} />
       </div>
 
-      {/* Client badge */}
-      <div className="flex items-center gap-2 mb-3 p-2 bg-emerald-50 rounded">
-        <div className="w-6 h-6 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 text-xs font-semibold">
-          {clientName[0].toUpperCase()}
-        </div>
-        <span className="text-sm font-medium text-emerald-800 truncate">{clientName}</span>
+      {/* Description */}
+      <div className="text-sm text-neutral-500 mb-4 min-h-[40px]">
+        <InlineEdit
+          value={project.description}
+          onSave={(value) => handleSave('description', value)}
+          placeholder="Add description..."
+          multiline
+          inputClassName="text-sm"
+        />
       </div>
 
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-1.5 text-neutral-600">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span>{specsCount} spec{specsCount !== 1 ? 's' : ''}</span>
+      {/* Stats grid */}
+      <div className="grid grid-cols-4 gap-2 mb-4">
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{specsCount}</div>
+          <div className="text-xs text-neutral-500">Specs</div>
         </div>
-
-        <div className="flex items-center gap-1.5 text-neutral-400 ml-auto">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span>{formatDate(project.created_at)}</span>
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{offersCount}</div>
+          <div className="text-xs text-neutral-500">Offers</div>
+        </div>
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{invoicesCount}</div>
+          <div className="text-xs text-neutral-500">Invoices</div>
+        </div>
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{tasksCount}</div>
+          <div className="text-xs text-neutral-500">Tasks</div>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-neutral-100">
-        <Link
-          to={`${basePath}/${project.id}`}
-          className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-        >
-          View Project →
-        </Link>
-        <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(); }}
-          className="text-sm text-neutral-400 hover:text-red-500 transition-colors"
-        >
-          Delete
-        </button>
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+        <span className="text-xs text-neutral-400">{formatDate(project.created_at)}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span className="truncate max-w-[100px]">{clientName}</span>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="p-1.5 rounded hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-colors"
+            title="Delete"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Client Project Card — same as AdminProjectCard but without client info
+function ClientProjectCard({ project, basePath }) {
+  const navigate = useNavigate();
+  const updateProject = useUpdateProject();
+  const specsCount = project.specifications?.[0]?.count || 0;
+  const offersCount = project.offersCount || 0;
+  const invoicesCount = project.invoices?.[0]?.count || 0;
+  const tasksCount = project.tasks?.[0]?.count || 0;
+
+  const handleSave = (field, value) => {
+    updateProject.mutate({
+      projectId: project.id,
+      updates: { [field]: value },
+    });
+  };
+
+  return (
+    <div
+      onClick={() => navigate(`${basePath}/${project.id}`)}
+      className="group block bg-white rounded-lg border border-neutral-200 p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer"
+    >
+      {/* Header: Name + Status */}
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h3 className="font-semibold text-neutral-900 group-hover:text-emerald-700 transition-colors line-clamp-1 flex-1">
+          <InlineEdit
+            value={project.name}
+            onSave={(value) => handleSave('name', value)}
+            placeholder="Project name"
+            inputClassName="text-base font-semibold"
+          />
+        </h3>
+        <StatusBadge status={project.status} />
+      </div>
+
+      {/* Description */}
+      <div className="text-sm text-neutral-500 mb-4 min-h-[40px]">
+        <InlineEdit
+          value={project.description}
+          onSave={(value) => handleSave('description', value)}
+          placeholder="Add description..."
+          multiline
+          inputClassName="text-sm"
+        />
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-4 gap-2 mb-4">
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{specsCount}</div>
+          <div className="text-xs text-neutral-500">Specs</div>
+        </div>
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{offersCount}</div>
+          <div className="text-xs text-neutral-500">Offers</div>
+        </div>
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{invoicesCount}</div>
+          <div className="text-xs text-neutral-500">Invoices</div>
+        </div>
+        <div className="text-center p-2 bg-neutral-50 rounded">
+          <div className="text-lg font-semibold text-neutral-900">{tasksCount}</div>
+          <div className="text-xs text-neutral-500">Tasks</div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+        <span className="text-xs text-neutral-400">{formatDate(project.created_at)}</span>
+        <span className="text-sm font-medium text-emerald-600 group-hover:text-emerald-700">
+          Open →
+        </span>
       </div>
     </div>
   );

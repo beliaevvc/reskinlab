@@ -1,6 +1,31 @@
 # Tasks
 
 ## Recent Task
+**Projects & Invoices UI Improvements** — ARCHIVED ✅
+
+### Summary
+Комплексное улучшение UI/UX страницы проектов и инвойсов:
+- Фильтрация инвойсов по клиенту, проекту и спецификации
+- Редизайн карточек и таблиц проектов (переключатель вида, статистика)
+- Inline редактирование названия и описания проекта
+- Создание переиспользуемого компонента InlineEdit
+
+### Files Created
+- `calculator/src/components/InlineEdit.jsx`
+
+### Files Modified
+- `calculator/src/pages/projects/ProjectsPage.jsx`
+- `calculator/src/pages/invoices/InvoicesPage.jsx`
+- `calculator/src/hooks/useProjects.js`
+- `calculator/src/components/project/ProjectHeader.jsx`
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-projects-ui-improvements.md`
+- **Reflection:** `memory-bank/reflection/reflection-projects-ui-improvements.md`
+
+---
+
+## Recent Task
 **Favicon Creation** — ARCHIVED ✅
 
 ### Summary

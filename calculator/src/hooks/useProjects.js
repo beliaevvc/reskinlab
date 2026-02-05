@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { logProjectEvent } from '../lib/auditLog';
 
 /**
- * Fetch all projects for the current client
+ * Fetch all projects for the current client with counts
  * RLS handles filtering by client ownership
  */
 export function useProjects() {
@@ -12,16 +12,46 @@ export function useProjects() {
 
   return useQuery({
     queryKey: ['projects', user?.id],
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnMount: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
         .select(`
           *,
-          specifications:specifications(count)
+          specifications:specifications(count),
+          invoices:invoices(count),
+          tasks:tasks(count)
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      if (data?.length > 0) {
+        const projectIds = data.map(p => p.id);
+        
+        // Get offers count grouped by project
+        const { data: offersData } = await supabase
+          .from('specifications')
+          .select(`
+            project_id,
+            offers:offers(count)
+          `)
+          .in('project_id', projectIds);
+        
+        // Aggregate offers by project
+        const offersByProject = {};
+        offersData?.forEach(spec => {
+          const count = spec.offers?.[0]?.count || 0;
+          offersByProject[spec.project_id] = (offersByProject[spec.project_id] || 0) + count;
+        });
+        
+        // Add offers count to projects
+        data.forEach(project => {
+          project.offersCount = offersByProject[project.id] || 0;
+        });
+      }
+      
       return data;
     },
     enabled: !!user?.id,
@@ -29,17 +59,21 @@ export function useProjects() {
 }
 
 /**
- * Fetch ALL projects with client info (for admin/AM)
+ * Fetch ALL projects with client info and counts (for admin/AM)
  */
 export function useAllProjects() {
   return useQuery({
     queryKey: ['projects', 'all'],
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnMount: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
         .select(`
           *,
           specifications:specifications(count),
+          invoices:invoices(count),
+          tasks:tasks(count),
           client:clients(
             id,
             company_name,
@@ -49,6 +83,32 @@ export function useAllProjects() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      if (data?.length > 0) {
+        const projectIds = data.map(p => p.id);
+        
+        // Get offers count grouped by project
+        const { data: offersData } = await supabase
+          .from('specifications')
+          .select(`
+            project_id,
+            offers:offers(count)
+          `)
+          .in('project_id', projectIds);
+        
+        // Aggregate offers by project
+        const offersByProject = {};
+        offersData?.forEach(spec => {
+          const count = spec.offers?.[0]?.count || 0;
+          offersByProject[spec.project_id] = (offersByProject[spec.project_id] || 0) + count;
+        });
+        
+        // Add offers count to projects
+        data.forEach(project => {
+          project.offersCount = offersByProject[project.id] || 0;
+        });
+      }
+      
       return data;
     },
   });

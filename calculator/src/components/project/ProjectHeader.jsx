@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useViewAsRole } from '../../contexts/ViewAsRoleContext';
+import { useUpdateProject } from '../../hooks/useProjects';
+import { InlineEdit } from '../InlineEdit';
 import { formatDate } from '../../lib/utils';
 
 const STATUS_STYLES = {
@@ -35,7 +37,6 @@ export function ProjectHeader({
   project, 
   taskStats = { total: 0, done: 0 },
   pendingApprovals = 0,
-  onEditName,
   onOpenFilesGallery,
   onCompleteProject,
   onArchiveProject,
@@ -44,6 +45,7 @@ export function ProjectHeader({
   isArchiving = false,
 }) {
   const basePath = useProjectBasePath();
+  const updateProject = useUpdateProject();
   const { 
     viewAsRole, 
     setViewAs, 
@@ -53,6 +55,13 @@ export function ProjectHeader({
   } = useViewAsRole();
 
   if (!project) return null;
+
+  const handleSave = (field, value) => {
+    updateProject.mutate({
+      projectId: project.id,
+      updates: { [field]: value },
+    });
+  };
 
   const progress = taskStats.total > 0 
     ? Math.round((taskStats.done / taskStats.total) * 100) 
@@ -92,25 +101,19 @@ export function ProjectHeader({
           {/* Left: Project info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl font-bold text-neutral-900 truncate">
-                {project.name}
+              <h1 className="text-xl font-bold text-neutral-900">
+                <InlineEdit
+                  value={project.name}
+                  onSave={(value) => handleSave('name', value)}
+                  placeholder="Project name"
+                  inputClassName="text-xl font-bold"
+                />
               </h1>
               <span className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                 STATUS_STYLES[project.status] || STATUS_STYLES.draft
               }`}>
                 {STATUS_LABELS[project.status] || project.status}
               </span>
-              {onEditName && (
-                <button
-                  onClick={onEditName}
-                  className="p-1 hover:bg-neutral-100 rounded text-neutral-400 hover:text-neutral-600"
-                  title="Rename project"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </button>
-              )}
             </div>
 
             {/* Client & dates */}

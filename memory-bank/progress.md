@@ -1,5 +1,31 @@
 # Progress Log
 
+## Projects & Invoices UI Improvements — ARCHIVED ✅
+
+### Date: 2026-02-05
+
+### Summary
+Комплексное улучшение UI/UX страницы проектов и инвойсов:
+- Фильтрация инвойсов по клиенту, проекту и спецификации
+- Редизайн карточек и таблиц проектов (переключатель вида, статистика)
+- Inline редактирование названия и описания проекта
+- Создание переиспользуемого компонента InlineEdit
+
+### Files Created
+- `calculator/src/components/InlineEdit.jsx` — переиспользуемый компонент inline редактирования
+
+### Files Modified
+- `calculator/src/pages/projects/ProjectsPage.jsx` — редизайн карточек и таблиц
+- `calculator/src/pages/invoices/InvoicesPage.jsx` — фильтры
+- `calculator/src/hooks/useProjects.js` — расширенные запросы для counts
+- `calculator/src/components/project/ProjectHeader.jsx` — InlineEdit для названия
+
+### Archive Reference
+📄 `memory-bank/archive/archive-projects-ui-improvements.md`
+📄 `memory-bank/reflection/reflection-projects-ui-improvements.md`
+
+---
+
 ## Multiple Specifications Fix — ARCHIVED ✅
 
 ### Date: 2026-02-04

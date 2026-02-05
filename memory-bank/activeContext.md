@@ -5,6 +5,17 @@
 
 ## Recently Completed Tasks
 
+### Projects & Invoices UI Improvements (5 Февраля 2026) — ARCHIVED ✅
+Комплексное улучшение UI/UX страницы проектов и инвойсов:
+- Фильтрация инвойсов по клиенту, проекту и спецификации
+- Редизайн карточек и таблиц проектов (переключатель вида, статистика)
+- Inline редактирование названия и описания проекта
+- Создание переиспользуемого компонента InlineEdit
+- **Archive:** `memory-bank/archive/archive-projects-ui-improvements.md`
+- **Reflection:** `memory-bank/reflection/reflection-projects-ui-improvements.md`
+
+---
+
 ### Crypto Wallets Admin (4 Февраля 2026) — COMPLETED ✅
 Добавлена страница управления криптокошельками в админке для оплаты инвойсов.
 - Поддержка USDT/USDC
