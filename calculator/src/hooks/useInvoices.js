@@ -34,7 +34,11 @@ export function useInvoices() {
             offer:offers (
               id,
               number,
-              status
+              status,
+              specification:specifications (
+                id,
+                version
+              )
             )
           `)
           .order('created_at', { ascending: false });
@@ -58,7 +62,11 @@ export function useInvoices() {
           offer:offers (
             id,
             number,
-            status
+            status,
+            specification:specifications (
+              id,
+              version
+            )
           )
         `)
         .eq('project.client_id', client.id)

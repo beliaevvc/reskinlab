@@ -98,14 +98,14 @@ export function InvoicesPage() {
 
       {/* Overdue invoices */}
       {overdueInvoices.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-red-700 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wide flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             Overdue ({overdueInvoices.length})
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {overdueInvoices.map((invoice) => (
               <InvoiceCard key={invoice.id} invoice={invoice} onClick={handleInvoiceClick} showClient={showClient} />
             ))}
@@ -115,12 +115,12 @@ export function InvoicesPage() {
 
       {/* Awaiting Confirmation */}
       {awaitingConfirmation.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-blue-700 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             Awaiting Confirmation ({awaitingConfirmation.length})
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {awaitingConfirmation.map((invoice) => (
               <InvoiceCard key={invoice.id} invoice={invoice} onClick={handleInvoiceClick} showClient={showClient} />
             ))}
@@ -130,12 +130,12 @@ export function InvoicesPage() {
 
       {/* Pending invoices */}
       {normalPending.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-neutral-400" />
             Pending Payment ({normalPending.length})
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {normalPending.map((invoice) => (
               <InvoiceCard key={invoice.id} invoice={invoice} onClick={handleInvoiceClick} showClient={showClient} />
             ))}
@@ -145,12 +145,12 @@ export function InvoicesPage() {
 
       {/* Paid invoices */}
       {paidInvoices.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-emerald-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
             Paid ({paidInvoices.length})
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {paidInvoices.map((invoice) => (
               <InvoiceCard key={invoice.id} invoice={invoice} onClick={handleInvoiceClick} showClient={showClient} />
             ))}
@@ -160,11 +160,11 @@ export function InvoicesPage() {
 
       {/* Cancelled */}
       {cancelledInvoices.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-neutral-500">
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide">
             Cancelled ({cancelledInvoices.length})
           </h2>
-          <div className="space-y-3 opacity-60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 opacity-60">
             {cancelledInvoices.map((invoice) => (
               <InvoiceCard key={invoice.id} invoice={invoice} onClick={handleInvoiceClick} showClient={showClient} />
             ))}
