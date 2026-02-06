@@ -1,10 +1,10 @@
 /**
- * Print specification by creating a popup with full styles
+ * Generic print helper — opens a popup with the given element's HTML and all page styles
  */
-export function printSpecification() {
-  const specView = document.getElementById('specification-view');
-  if (!specView) {
-    console.error('Specification view not found');
+function printElement(elementId, title = 'Print') {
+  const el = document.getElementById(elementId);
+  if (!el) {
+    console.error(`Element #${elementId} not found`);
     return;
   }
 
@@ -16,14 +16,12 @@ export function printSpecification() {
         styles += rule.cssText + '\n';
       }
     } catch (e) {
-      // External stylesheets - add import
       if (sheet.href) {
         styles += `@import url("${sheet.href}");\n`;
       }
     }
   }
 
-  // Create popup
   const popup = window.open('', 'print', 'width=900,height=700');
   if (!popup) {
     alert('Please allow popups to print');
@@ -34,7 +32,7 @@ export function printSpecification() {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Specification</title>
+  <title>${title}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     ${styles}
@@ -67,10 +65,9 @@ export function printSpecification() {
 </head>
 <body>
   <div class="max-w-4xl mx-auto">
-    ${specView.innerHTML}
+    ${el.innerHTML}
   </div>
   <script>
-    // Print when ready
     window.onload = function() {
       setTimeout(function() {
         window.print();
@@ -83,4 +80,18 @@ export function printSpecification() {
 </body>
 </html>`);
   popup.document.close();
+}
+
+/**
+ * Print legal text / terms & conditions
+ */
+export function printLegalText() {
+  printElement('legal-text-view', 'Terms & Conditions');
+}
+
+/**
+ * Print specification by creating a popup with full styles
+ */
+export function printSpecification() {
+  printElement('specification-view', 'Specification');
 }

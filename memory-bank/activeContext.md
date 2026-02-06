@@ -5,6 +5,13 @@
 
 ## Recently Completed Tasks
 
+### Terms & Conditions Modal Redesign (6 Февраля 2026) — ARCHIVED ✅
+Полный редизайн отображения Terms & Conditions в офертах.
+- **Archive:** `memory-bank/archive/archive-terms-conditions-modal.md`
+- **Reflection:** `memory-bank/reflection/reflection-terms-conditions-modal.md`
+
+---
+
 ### Admin Sidebar Sections (5 Февраля 2026) — ARCHIVED ✅
 Улучшение структуры левого меню админки:
 - Добавлен заголовок "Settings" перед блоком настроек

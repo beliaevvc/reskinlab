@@ -1,6 +1,22 @@
 # Tasks
 
 ## Recent Task
+**Terms & Conditions Modal Redesign** — ARCHIVED ✅
+
+### Summary
+Полный редизайн отображения Terms & Conditions в офертах:
+- Кнопка → большая модалка с официальным стилем документа
+- Парсер текста + LegalDocument компонент
+- AcceptOfferModal обновлён (stepper, LegalDocument, Print)
+- Рефакторинг printUtils.js — generic printElement()
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-terms-conditions-modal.md`
+- **Reflection:** `memory-bank/reflection/reflection-terms-conditions-modal.md`
+
+---
+
+## Recent Task
 **Admin Sidebar Sections** — ARCHIVED ✅
 
 ### Summary

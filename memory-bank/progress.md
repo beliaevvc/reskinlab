@@ -1,5 +1,31 @@
 # Progress Log
 
+## Terms & Conditions Modal Redesign — ARCHIVED ✅
+
+### Date: 2026-02-06
+
+### Summary
+Полный редизайн отображения Terms & Conditions в офертах:
+- Заменён инлайн-блок с прокруткой на кнопку + большую модалку
+- Парсер текста превращает плоский текст оферты в стилизованный документ (секции, буллеты, подпункты)
+- Обновлена модалка принятия оферты с тем же стилем
+- Кнопки Print в обеих модалках
+
+### Files Created
+- `calculator/src/components/offers/LegalTextModal.jsx` — модалка + LegalDocument + parseLegalText
+
+### Files Modified
+- `calculator/src/components/offers/AcceptOfferModal.jsx` — полный редизайн
+- `calculator/src/pages/offers/OfferDetailPage.jsx` — кнопка вместо инлайна
+- `calculator/src/components/project/OfferModal.jsx` — кнопка вместо `<details>`
+- `calculator/src/components/offers/index.js` — экспорты
+- `calculator/src/lib/printUtils.js` — generic printElement(), printLegalText()
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-terms-conditions-modal.md`
+
+---
+
 ## Projects & Invoices UI Improvements — ARCHIVED ✅
 
 ### Date: 2026-02-05

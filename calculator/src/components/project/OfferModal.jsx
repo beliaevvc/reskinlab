@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatDate, formatCurrency } from '../../lib/utils';
 import { getOfferStatusInfo, isOfferExpired } from '../../lib/offerUtils';
 import { getInvoiceStatusInfo, formatInvoiceAmount } from '../../lib/invoiceUtils';
-import { AcceptOfferModal, LegalTextViewer } from '../../components/offers';
+import { AcceptOfferModal, LegalTextModal } from '../../components/offers';
 import { SpecificationView } from '../../components';
 import { prepareSpecificationForView } from '../../lib/specificationHelpers';
 import { printSpecification } from '../../lib/printUtils';
@@ -16,6 +16,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
   const { data: offer, isLoading, error } = useOffer(isOpen ? offerId : null);
   const { mutate: logView } = useLogOfferView();
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
   const [view, setView] = useState('summary'); // 'summary' | 'specification'
 
@@ -263,19 +264,27 @@ export function OfferModal({ isOpen, onClose, offerId }) {
             </div>
           )}
 
-          {/* Terms & Conditions (collapsed by default) */}
+          {/* Terms & Conditions */}
           {offer.legal_text && (
-            <details className="group">
-              <summary className="cursor-pointer text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-                Terms & Conditions
-              </summary>
-              <div className="mt-3 pl-6">
-                <LegalTextViewer text={offer.legal_text} />
+            <button
+              onClick={() => setShowTermsModal(true)}
+              className="w-full flex items-center justify-between p-3 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-neutral-200 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <span className="text-sm font-medium text-neutral-700">Terms & Conditions</span>
               </div>
-            </details>
+              <div className="flex items-center gap-2 text-xs text-neutral-500">
+                <span>View</span>
+                <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </div>
+            </button>
           )}
         </div>
 
@@ -300,6 +309,13 @@ export function OfferModal({ isOpen, onClose, offerId }) {
         isOpen={showAcceptModal}
         onClose={() => setShowAcceptModal(false)}
         offer={offer}
+      />
+
+      {/* Terms Modal */}
+      <LegalTextModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        text={offer.legal_text}
       />
 
       {/* Invoice Modal */}
