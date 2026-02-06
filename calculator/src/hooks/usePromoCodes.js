@@ -32,22 +32,21 @@ export function useCreatePromoCode() {
         .from('promo_codes')
         .insert({
           code: promoCode.code.toUpperCase(),
-          type: promoCode.type,
-          value: promoCode.value,
-          min_order: promoCode.minOrder || null,
+          discount_type: promoCode.type === 'percentage' ? 'percent' : promoCode.type,
+          discount_value: promoCode.value,
+          min_order_amount: promoCode.minOrder || null,
           max_uses: promoCode.maxUses || null,
-          expires_at: promoCode.expiresAt || null,
+          valid_until: promoCode.expiresAt || null,
           is_active: promoCode.isActive ?? true,
         })
         .select()
         .single();
-
       if (error) throw error;
       return data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['promo-codes'] });
-      logPromoCodeEvent('create_promo_code', data.id, { code: data.code, type: data.type, value: data.value });
+      logPromoCodeEvent('create_promo_code', data.id, { code: data.code, type: data.discount_type, value: data.discount_value });
     },
   });
 }
@@ -60,12 +59,20 @@ export function useUpdatePromoCode() {
 
   return useMutation({
     mutationFn: async ({ id, updates }) => {
+      const dbUpdates = {
+        code: updates.code?.toUpperCase(),
+        discount_type: updates.type === 'percentage' ? 'percent' : (updates.type === 'fixed' ? 'fixed' : undefined),
+        discount_value: updates.value,
+        min_order_amount: updates.minOrder,
+        max_uses: updates.maxUses,
+        valid_until: updates.expiresAt,
+        is_active: updates.isActive,
+      };
+      // Remove undefined values
+      Object.keys(dbUpdates).forEach(key => dbUpdates[key] === undefined && delete dbUpdates[key]);
       const { data, error } = await supabase
         .from('promo_codes')
-        .update({
-          ...updates,
-          code: updates.code?.toUpperCase(),
-        })
+        .update(dbUpdates)
         .eq('id', id)
         .select()
         .single();
@@ -153,32 +160,32 @@ export function useValidatePromoCode() {
       }
 
       // Check expiration
-      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      if (data.valid_until && new Date(data.valid_until) < new Date()) {
         throw new Error('Promo code has expired');
       }
 
       // Check max uses
-      if (data.max_uses && data.times_used >= data.max_uses) {
+      if (data.max_uses && data.current_uses >= data.max_uses) {
         throw new Error('Promo code usage limit reached');
       }
 
       // Check minimum order
-      if (data.min_order && orderTotal < data.min_order) {
-        throw new Error(`Minimum order amount is $${data.min_order}`);
+      if (data.min_order_amount && orderTotal < data.min_order_amount) {
+        throw new Error(`Minimum order amount is $${data.min_order_amount}`);
       }
 
       // Calculate discount
       let discount = 0;
-      if (data.type === 'percentage') {
-        discount = (orderTotal * data.value) / 100;
+      if (data.discount_type === 'percent') {
+        discount = (orderTotal * data.discount_value) / 100;
       } else {
-        discount = Math.min(data.value, orderTotal);
+        discount = Math.min(data.discount_value, orderTotal);
       }
 
       return {
         code: data.code,
-        type: data.type,
-        value: data.value,
+        type: data.discount_type === 'percent' ? 'percentage' : data.discount_type,
+        value: data.discount_value,
         discount,
       };
     },

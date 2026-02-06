@@ -9,9 +9,20 @@ export function Sidebar({ totals, usageRights, paymentModel, onViewSpecification
             <div className="text-xs font-medium text-emerald-600 uppercase tracking-wider mb-1">
               Total
             </div>
-            <div className="text-4xl font-bold text-neutral-900 font-mono">
-              ${Math.round(totals.grandTotal).toLocaleString()}
-            </div>
+            {totals.appliedPromo && totals.discountAmount > 0 ? (
+              <>
+                <div className="text-base font-medium text-neutral-400 font-mono line-through">
+                  ${Math.round(totals.finalTotal).toLocaleString()}
+                </div>
+                <div className="text-4xl font-bold text-emerald-600 font-mono">
+                  ${Math.round(totals.grandTotal).toLocaleString()}
+                </div>
+              </>
+            ) : (
+              <div className="text-4xl font-bold text-neutral-900 font-mono">
+                ${Math.round(totals.grandTotal).toLocaleString()}
+              </div>
+            )}
           </div>
           <div className="space-y-3 border-t border-neutral-100 pt-5 mb-6 text-sm">
             {totals.revisionRounds > 0 && (

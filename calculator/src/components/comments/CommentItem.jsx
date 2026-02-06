@@ -91,13 +91,21 @@ export function CommentItem({ comment, entityType, entityId, onReply, onUserClic
       <div className="flex gap-3">
         {/* Avatar column with thread line */}
         <div className="flex flex-col items-center">
-          <div className={`
-            shrink-0 ${isReply ? 'w-7 h-7 text-[11px]' : 'w-9 h-9 text-xs'}
-            rounded-full ${avatarColor}
-            flex items-center justify-center font-semibold text-white shadow-sm
-          `}>
-            {comment.author?.full_name?.charAt(0)?.toUpperCase() || '?'}
-          </div>
+          {comment.author?.avatar_url ? (
+            <img
+              src={comment.author.avatar_url}
+              alt=""
+              className={`shrink-0 ${isReply ? 'w-7 h-7' : 'w-9 h-9'} rounded-full object-cover shadow-sm`}
+            />
+          ) : (
+            <div className={`
+              shrink-0 ${isReply ? 'w-7 h-7 text-[11px]' : 'w-9 h-9 text-xs'}
+              rounded-full ${avatarColor}
+              flex items-center justify-center font-semibold text-white shadow-sm
+            `}>
+              {comment.author?.full_name?.charAt(0)?.toUpperCase() || '?'}
+            </div>
+          )}
           {/* Thread line */}
           {hasReplies && (
             <div className="w-0.5 flex-1 bg-neutral-200 mt-2 rounded-full" />

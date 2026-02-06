@@ -234,7 +234,7 @@ export function AppSidebar({ open, onClose }) {
       {/* Bottom section */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 bg-white">
         <NavLink
-          to="/profile"
+          to={isAdmin ? '/admin/profile' : isAM ? '/am/profile' : '/profile'}
           onClick={onClose}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors ${

@@ -91,9 +91,13 @@ function ActivityItem({ log }) {
   const desc = getHumanDescription(log);
   return (
     <div className="flex items-center gap-3 py-3">
-      <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-sm">
-        {getActionIcon(log.action)}
-      </div>
+      {log.user?.avatar_url ? (
+        <img src={log.user.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+      ) : (
+        <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-sm">
+          {getActionIcon(log.action)}
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium text-neutral-900 truncate">

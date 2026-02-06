@@ -302,6 +302,29 @@ export function AccountSwitcher() {
     }
   }, []);
 
+  // Sync current user's profile data into saved accounts cache
+  useEffect(() => {
+    if (!profile || !user?.email) return;
+    setSavedAccounts(prev => {
+      const idx = prev.findIndex(a => a.email === user.email);
+      if (idx === -1) return prev;
+      const updated = [...prev];
+      const changed =
+        updated[idx].cached_avatar_url !== (profile.avatar_url || null) ||
+        updated[idx].cached_full_name !== (profile.full_name || null) ||
+        updated[idx].cached_role !== (profile.role || null);
+      if (!changed) return prev;
+      updated[idx] = {
+        ...updated[idx],
+        cached_avatar_url: profile.avatar_url || null,
+        cached_full_name: profile.full_name || null,
+        cached_role: profile.role || null,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, [profile, user?.email]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -457,10 +480,14 @@ export function AccountSwitcher() {
             {/* Current account header */}
             <div className="p-4 bg-gradient-to-br from-neutral-50 to-neutral-100/50">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full ${roleBadge.color} flex items-center justify-center ring-2 ${roleBadge.ring}`}>
-                  <span className="text-lg font-semibold">
-                    {profile?.full_name?.[0] || profile?.email?.[0]?.toUpperCase() || '?'}
-                  </span>
+                <div className={`w-12 h-12 rounded-full ${roleBadge.color} flex items-center justify-center ring-2 ${roleBadge.ring} overflow-hidden`}>
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+                  ) : (
+                    <span className="text-lg font-semibold">
+                      {profile?.full_name?.[0] || profile?.email?.[0]?.toUpperCase() || '?'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-neutral-900">
@@ -489,6 +516,10 @@ export function AccountSwitcher() {
                 </p>
                 {savedAccounts.map((account) => {
                   const isCurrent = account.email === user?.email;
+                  const displayName = account.cached_full_name || account.label;
+                  const avatarUrl = account.cached_avatar_url;
+                  const accountRole = account.cached_role;
+                  const accountBadge = accountRole ? ROLE_BADGES[accountRole] : null;
                   return (
                     <div
                       key={account.email}
@@ -500,14 +531,18 @@ export function AccountSwitcher() {
                         isCurrent ? 'bg-emerald-50/50' : ''
                       } ${isSwitching ? 'opacity-50 pointer-events-none' : ''}`}
                     >
-                      <div className="w-9 h-9 rounded-full bg-neutral-200 flex items-center justify-center">
-                        <span className="text-sm font-medium text-neutral-600">
-                          {account.label[0].toUpperCase()}
-                        </span>
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center overflow-hidden ${accountBadge ? accountBadge.color : 'bg-neutral-200'}`}>
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover" />
+                        ) : (
+                          <span className={`text-sm font-medium ${accountBadge ? '' : 'text-neutral-600'}`}>
+                            {displayName[0].toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0 text-left">
                         <p className="text-sm font-medium text-neutral-900 truncate">
-                          {account.label}
+                          {displayName}
                         </p>
                         <p className="text-xs text-neutral-500 truncate">{account.email}</p>
                       </div>

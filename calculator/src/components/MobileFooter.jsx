@@ -10,9 +10,20 @@ export function MobileFooter({ totals, usageRights, paymentModel, onViewSpecific
       <div className="flex gap-4 items-center">
         <div className="flex-grow">
           <div className="text-[10px] text-neutral-500 uppercase font-medium">Total</div>
-          <div className="text-2xl font-bold text-neutral-900 font-mono">
-            ${Math.round(totals.grandTotal).toLocaleString()}
-          </div>
+          {totals.appliedPromo && totals.discountAmount > 0 ? (
+            <div className="flex items-baseline gap-2">
+              <div className="text-2xl font-bold text-emerald-600 font-mono">
+                ${Math.round(totals.grandTotal).toLocaleString()}
+              </div>
+              <div className="text-sm font-medium text-neutral-400 font-mono line-through">
+                ${Math.round(totals.finalTotal).toLocaleString()}
+              </div>
+            </div>
+          ) : (
+            <div className="text-2xl font-bold text-neutral-900 font-mono">
+              ${Math.round(totals.grandTotal).toLocaleString()}
+            </div>
+          )}
         </div>
         <button
           onClick={onViewSpecification}

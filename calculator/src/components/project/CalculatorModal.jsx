@@ -297,17 +297,16 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
 
       {/* Footer with total */}
         <div className="bg-white border-t border-neutral-200 px-6 py-3 shrink-0">
-          <div className="flex items-center justify-end gap-4">
-            {(totals.discount || 0) > 0 && (
-              <div className="text-sm text-emerald-600">
-                <span>Discount:</span>
-                <span className="ml-2 font-medium">-{safeTotal(totals.discount)}</span>
-              </div>
+          <div className="flex items-baseline justify-end gap-3">
+            <span className="text-neutral-500">Total:</span>
+            {totals.appliedPromo && totals.discountAmount > 0 && (
+              <span className="text-base font-medium text-neutral-400 font-mono line-through">
+                {safeTotal(totals.finalTotal)}
+              </span>
             )}
-            <div className="text-right">
-              <span className="text-neutral-500 mr-3">Total:</span>
-              <span className="text-2xl font-bold text-emerald-600">{safeTotal(totals.grandTotal)}</span>
-            </div>
+            <span className={`text-2xl font-bold font-mono ${totals.appliedPromo && totals.discountAmount > 0 ? 'text-emerald-600' : 'text-neutral-900'}`}>
+              {safeTotal(totals.grandTotal)}
+            </span>
           </div>
         </div>
       </div>

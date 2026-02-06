@@ -191,11 +191,15 @@ export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFilters
                       {/* User */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs font-medium text-neutral-600">
-                              {log.user?.full_name?.[0] || log.user?.email?.[0]?.toUpperCase() || '?'}
-                            </span>
-                          </div>
+                          {log.user?.avatar_url ? (
+                            <img src={log.user.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-medium text-neutral-600">
+                                {log.user?.full_name?.[0] || log.user?.email?.[0]?.toUpperCase() || '?'}
+                              </span>
+                            </div>
+                          )}
                           <span className="text-sm text-neutral-900 truncate max-w-[150px]">
                             {log.user?.full_name || log.user?.email || 'Unknown'}
                           </span>
@@ -247,11 +251,15 @@ export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFilters
                   )}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-full bg-neutral-200 flex items-center justify-center">
-                        <span className="text-[10px] font-medium text-neutral-600">
-                          {log.user?.full_name?.[0] || '?'}
-                        </span>
-                      </div>
+                      {log.user?.avatar_url ? (
+                        <img src={log.user.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-neutral-200 flex items-center justify-center">
+                          <span className="text-[10px] font-medium text-neutral-600">
+                            {log.user?.full_name?.[0] || '?'}
+                          </span>
+                        </div>
+                      )}
                       <span className="text-sm text-neutral-700 truncate max-w-[150px]">
                         {log.user?.full_name || log.user?.email || 'Unknown'}
                       </span>

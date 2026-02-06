@@ -183,7 +183,14 @@ export function useCalculator() {
     const subtotal = productionSum + revisionCost;
     const withRights = subtotal * usageRights.coeff;
     const finalTotal = withRights * paymentModel.coeff;
-    const discountAmount = finalTotal * (appliedPromo ? appliedPromo.discount : 0);
+    let discountAmount = 0;
+    if (appliedPromo) {
+      if (appliedPromo.type === 'fixed') {
+        discountAmount = Math.min(appliedPromo.discount, finalTotal);
+      } else {
+        discountAmount = finalTotal * appliedPromo.discount;
+      }
+    }
     const grandTotal = finalTotal - discountAmount;
 
     return {

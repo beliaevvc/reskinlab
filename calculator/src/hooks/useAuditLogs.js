@@ -46,7 +46,7 @@ export function useAuditLogs(filters = {}, options = {}) {
           ip_address,
           user_agent,
           created_at,
-          user:profiles!user_id(id, email, full_name, role)
+          user:profiles!user_id(id, email, full_name, role, avatar_url)
         `, { count: 'exact' })
         .order(sortBy, { ascending: sortOrder === 'asc' })
         .range(offset, offset + limit - 1);

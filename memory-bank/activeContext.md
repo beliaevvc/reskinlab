@@ -5,6 +5,33 @@
 
 ## Recently Completed Tasks
 
+### Client Dashboard Activity — Audit Logs Integration (7 Февраля 2026) — ARCHIVED ✅
+Блок "Recent Activity" переведён на audit_logs. UI в стиле админки. Сворачиваемый блок.
+- **Archive:** `memory-bank/archive/archive-client-dashboard-activity.md`
+- **Reflection:** `memory-bank/reflection/reflection-client-dashboard-activity.md`
+
+---
+
+### Profile Improvements & Avatar System (7 Февраля 2026) — ARCHIVED ✅
+Полный редизайн профиля для всех ролей: аватар, sticky save, select, смена пароля, danger zone.
+Дополнительные поля admin/AM (phone, telegram, bio). Аватары во всех компонентах: AccountSwitcher, комментарии, логи, дашборд. Фикс роутинга профиля.
+- **Archive:** `memory-bank/archive/archive-profile-improvements.md`
+- **Reflection:** `memory-bank/reflection/reflection-profile-improvements.md`
+
+---
+
+### Promo Codes — Full Fix & Redesign (7 Февраля 2026) — ARCHIVED ✅
+Комплексное исправление системы промокодов: CRUD (5 полей), калькулятор (hardcoded → Supabase), редизайн UI.
+- **Archive:** `memory-bank/archive/archive-promo-codes-fix-and-redesign.md`
+- **Reflection:** `memory-bank/reflection/reflection-promo-codes-fix-and-ui.md`
+
+---
+
+### Sidebar Badge Color Fix (7 Февраля 2026) — ARCHIVED ✅
+Цвет бейджа инвойсов в сайдбаре: синий → зелёный (emerald) для единообразия дизайн-системы.
+
+---
+
 ### Audit Logs — Entity Names & Parent Context (6 Февраля 2026) — ARCHIVED ✅
 Расширение аудит-логов: названия сущностей во всех CRUD-операциях + родительский контекст (project_name, client_name) + обогащение старых записей через batch-fetch.
 - **Archive:** `memory-bank/archive/archive-audit-logs-entity-names.md`
@@ -83,5 +110,5 @@
 - `calculator/src/lib/supabase.js` - Supabase client с отключенным Realtime
 
 ## Archive Documents
-- `memory-bank/archive/archive-offer-templates-admin.md` — Latest archived task
-- `memory-bank/reflection/reflection-offer-templates-admin.md` — Latest reflection
+- `memory-bank/archive/archive-promo-codes-fix-and-redesign.md` — Latest archived task
+- `memory-bank/reflection/reflection-promo-codes-fix-and-ui.md` — Latest reflection

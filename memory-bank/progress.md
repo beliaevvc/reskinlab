@@ -1,5 +1,114 @@
 # Progress Log
 
+## Client Dashboard Activity — Audit Logs Integration — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Блок "Recent Activity" на клиентском дашборде переведён с синтетических данных на настоящие аудит-логи. UI обновлён до стиля админки. Блок сделан сворачиваемым.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| useClientActivity → audit_logs | ✅ | 1 запрос вместо 4, фильтрация по user_id, исключение шума |
+| ActivityItem admin-style | ✅ | Эмодзи, бейджи, humanized descriptions, кликабельные ссылки |
+| Collapsible блок | ✅ | Свёрнут по умолчанию, счётчик, анимация шеврона |
+
+### Files Modified
+- `calculator/src/hooks/useClientActivity.js`
+- `calculator/src/pages/dashboard/DashboardPage.jsx`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-client-dashboard-activity.md`
+
+---
+
+## Profile Improvements & Avatar System — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Полный редизайн профиля (все роли): загрузка аватара, sticky Save, кастомный Select, смена пароля, Danger Zone, доп. поля admin/AM. Аватары подтянуты во все компоненты приложения. Фикс роутинга профиля.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Миграция БД: phone, telegram, bio | ✅ | 042_profile_extra_fields.sql |
+| AuthContext: 3 новые функции | ✅ | uploadAvatar, changePassword, deactivateAccount |
+| ProfilePage: полный редизайн | ✅ | Аватар, sticky save, Select, пароль, danger zone |
+| Фикс роутинга /profile | ✅ | Динамическая ссылка по роли в сайдбаре |
+| AccountSwitcher: аватары и имена | ✅ | Кэш profile data в localStorage |
+| CommentItem: аватары | ✅ | avatar_url из данных → UI |
+| AuditLogsTable: аватары | ✅ | Десктоп + мобайл |
+| AdminDashboard: аватары | ✅ | Recent Activity |
+
+### Files Modified
+- `calculator/src/contexts/AuthContext.jsx`
+- `calculator/src/pages/profile/ProfilePage.jsx`
+- `calculator/src/components/layout/AppSidebar.jsx`
+- `calculator/src/components/admin/AccountSwitcher.jsx`
+- `calculator/src/components/comments/CommentItem.jsx`
+- `calculator/src/components/audit-logs/AuditLogsTable.jsx`
+- `calculator/src/pages/admin/AdminDashboardPage.jsx`
+- `calculator/src/hooks/useAuditLogs.js`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-profile-improvements.md`
+
+---
+
+## Promo Codes — Full Fix & Redesign — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Комплексное исправление системы промокодов: CRUD в админке, применение в калькуляторе, полный редизайн UI.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Bug: column name mismatch (5 полей) | ✅ | type→discount_type, value→discount_value, expires_at→valid_until и др. |
+| Bug: discount_type value mapping | ✅ | percent (БД) ↔ percentage (UI) |
+| Bug: калькулятор не использовал Supabase | ✅ | PromoSection переключён с hardcoded → useValidatePromoCode |
+| Fix: поддержка fixed скидок в калькуляторе | ✅ | useCalculator.js — обработка обоих типов |
+| Fix: `totals.discount` → `totals.discountAmount` | ✅ | CalculatorModal footer использовал несуществующее поле |
+| UI: кликабельные строки таблицы | ✅ | Клик → модалка редактирования |
+| UI: копирование кода промокода | ✅ | Клик на код → clipboard + "Copied!" фидбек |
+| UI: toggle Active/Inactive в таблице | ✅ | Переключатель вместо бейджа |
+| UI: иконка удаления + модалка подтверждения | ✅ | Корзина + DeleteConfirmModal |
+| UI: редизайн модалки Create/Edit | ✅ | Секции, иконки, toggle, X-кнопка |
+| UI: applied-state в PromoSection | ✅ | Зелёный блок с кодом и скидкой + Clear |
+| UI: перечёркнутая цена при скидке | ✅ | Sidebar, MobileFooter, CalculatorModal |
+
+### Files Modified
+- `calculator/src/hooks/usePromoCodes.js`
+- `calculator/src/pages/admin/PromoCodesPage.jsx`
+- `calculator/src/components/PromoSection.jsx`
+- `calculator/src/hooks/useCalculator.js`
+- `calculator/src/components/Sidebar.jsx`
+- `calculator/src/components/MobileFooter.jsx`
+- `calculator/src/components/project/CalculatorModal.jsx`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-promo-codes-fix-and-ui.md`
+
+---
+
+## Sidebar Badge Color Fix — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Цвет бейджа счётчика ожидающих инвойсов в сайдбаре: `bg-blue-500` → `bg-emerald-500`.
+
+### Files Modified
+- `calculator/src/components/layout/AppSidebar.jsx` — строка 225
+
+---
+
 ## Audit Logs — Entity Names & Parent Context — ARCHIVED ✅
 
 ### Date: 2026-02-06

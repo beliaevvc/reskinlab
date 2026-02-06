@@ -329,6 +329,80 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Upload avatar
+  const uploadAvatar = async (file) => {
+    if (!user || !file) return { url: null, error: new Error('No user or file') };
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Delete old avatar files first (in case extension changed)
+      try {
+        const { data: existingFiles } = await supabase.storage
+          .from('avatars')
+          .list(user.id);
+        if (existingFiles?.length) {
+          const filesToRemove = existingFiles.map(f => `${user.id}/${f.name}`);
+          await supabase.storage.from('avatars').remove(filesToRemove);
+        }
+      } catch (e) { /* ignore cleanup errors */ }
+
+      // Upload new avatar
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Add cache-buster to URL
+      const avatarUrl = `${publicUrl}?t=${Date.now()}`;
+
+      // Update profile with new avatar URL
+      await updateProfile({ avatar_url: avatarUrl });
+
+      return { url: avatarUrl, error: null };
+    } catch (err) {
+      return { url: null, error: err };
+    }
+  };
+
+  // Change password
+  const changePassword = async (newPassword) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (err) {
+      return { data: null, error: err };
+    }
+  };
+
+  // Deactivate account (sets is_active = false)
+  const deactivateAccount = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: false })
+        .eq('id', user.id);
+      if (error) throw error;
+      // Log deactivation
+      try { logAuditEvent({ action: 'deactivate_account', entity_type: 'profile', entity_id: user.id }); } catch (e) { /* ignore */ }
+      // Sign out after deactivation
+      await signOut();
+      return { error: null };
+    } catch (err) {
+      return { error: err };
+    }
+  };
+
   // Refresh profile
   const refreshProfile = async () => {
     if (user) {
@@ -359,6 +433,9 @@ export function AuthProvider({ children }) {
     signOut,
     updateProfile,
     updateClient,
+    uploadAvatar,
+    changePassword,
+    deactivateAccount,
     refreshProfile,
   };
 

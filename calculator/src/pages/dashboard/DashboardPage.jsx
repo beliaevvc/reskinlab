@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useClientActivity } from '../../hooks/useClientActivity';
 import { formatDistanceToNow } from '../../lib/utils';
+import { getHumanDescription, getActionIcon } from '../../components/audit-logs/auditLogHumanize';
 
 export function DashboardPage() {
   const { profile, client, isClient, isAM, isAdmin } = useAuth();
   const { data: activity, isLoading: activityLoading } = useClientActivity();
+  const [activityOpen, setActivityOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -176,37 +179,63 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* Recent activity */}
-      <div className="bg-white rounded-md border border-neutral-200 p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-          Recent Activity
-        </h3>
-        {activityLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500" />
+      {/* Recent activity — collapsible */}
+      <div className="bg-white rounded-md border border-neutral-200">
+        <button
+          type="button"
+          onClick={() => setActivityOpen(prev => !prev)}
+          className="w-full flex items-center justify-between p-6 text-left hover:bg-neutral-50 transition-colors rounded-md"
+        >
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-semibold text-neutral-900">
+              Recent Activity
+            </h3>
+            {!activityLoading && activity?.length > 0 && (
+              <span className="text-xs font-medium text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">
+                {activity.length}
+              </span>
+            )}
           </div>
-        ) : activity && activity.length > 0 ? (
-          <div className="space-y-3">
-            {activity.map((item) => (
-              <ActivityItem key={item.id} item={item} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-neutral-500">
-            <svg
-              className="w-12 h-12 mx-auto mb-3 text-neutral-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p>No recent activity</p>
+          <svg
+            className={`w-5 h-5 text-neutral-400 transition-transform duration-200 ${activityOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {activityOpen && (
+          <div className="px-6 pb-6">
+            {activityLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500" />
+              </div>
+            ) : activity && activity.length > 0 ? (
+              <div className="divide-y divide-neutral-100">
+                {activity.map((log) => (
+                  <ActivityItem key={log.id} log={log} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-neutral-500">
+                <svg
+                  className="w-12 h-12 mx-auto mb-3 text-neutral-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p>No recent activity</p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -214,67 +243,89 @@ export function DashboardPage() {
   );
 }
 
-// Activity item component
-function ActivityItem({ item }) {
-  const getIcon = () => {
-    switch (item.type) {
-      case 'project':
-        return (
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-          </div>
-        );
-      case 'specification':
-        return (
-          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-            <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-        );
-      case 'offer':
-        return (
-          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-            <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-        );
-      case 'invoice':
-        return (
-          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-            <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-          </div>
-        );
-      default:
-        return (
-          <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">
-            <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-        );
-    }
-  };
+// --- Activity badge colors (same as admin dashboard) ---
+const ACTIVITY_BADGE_COLORS = {
+  create: 'bg-emerald-100 text-emerald-700',
+  update: 'bg-blue-100 text-blue-700',
+  delete: 'bg-red-100 text-red-700',
+  login: 'bg-purple-100 text-purple-700',
+  logout: 'bg-neutral-100 text-neutral-600',
+  failed: 'bg-red-100 text-red-700',
+  accept: 'bg-green-100 text-green-700',
+  reject: 'bg-orange-100 text-orange-700',
+  finalize: 'bg-indigo-100 text-indigo-700',
+  send: 'bg-cyan-100 text-cyan-700',
+  pay: 'bg-amber-100 text-amber-700',
+  confirm: 'bg-amber-100 text-amber-700',
+  upload: 'bg-sky-100 text-sky-700',
+  download: 'bg-sky-100 text-sky-700',
+  add: 'bg-emerald-100 text-emerald-700',
+  complete: 'bg-green-100 text-green-700',
+};
 
-  return (
-    <div className="flex items-start gap-3 py-2">
-      {getIcon()}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-neutral-900">{item.title}</p>
-        {item.description && (
-          <p className="text-xs text-neutral-500 truncate">{item.description}</p>
-        )}
+function getActivityBadgeColor(action) {
+  const key = Object.keys(ACTIVITY_BADGE_COLORS).find(k => action?.toLowerCase().includes(k));
+  return ACTIVITY_BADGE_COLORS[key] || 'bg-neutral-100 text-neutral-700';
+}
+
+/**
+ * Build a link to the entity page (if applicable)
+ */
+function getEntityLink(log) {
+  const { entity_type, entity_id } = log;
+  if (!entity_id) return null;
+
+  switch (entity_type) {
+    case 'project':
+      return `/projects/${entity_id}`;
+    case 'specification':
+      return `/specifications/${entity_id}`;
+    case 'offer':
+      return `/offers/${entity_id}`;
+    case 'invoice':
+      return `/invoices/${entity_id}`;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Activity item — renders a single audit log entry (admin-style)
+ */
+function ActivityItem({ log }) {
+  const desc = getHumanDescription(log);
+  const link = getEntityLink(log);
+
+  const content = (
+    <div className="flex items-center gap-3 py-3">
+      <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-sm">
+        {getActionIcon(log.action)}
       </div>
-      <span className="text-xs text-neutral-400 whitespace-nowrap">
-        {formatDistanceToNow(item.created_at)}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getActivityBadgeColor(log.action)}`}>
+            {log.action}
+          </span>
+        </div>
+        <p className="text-sm text-neutral-700 mt-0.5 line-clamp-2">
+          {desc}
+        </p>
+      </div>
+      <span className="text-xs text-neutral-400 flex-shrink-0 whitespace-nowrap">
+        {formatDistanceToNow(log.created_at)}
       </span>
     </div>
   );
+
+  if (link) {
+    return (
+      <Link to={link} className="block hover:bg-neutral-50 rounded -mx-2 px-2 transition-colors">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }
 
 export default DashboardPage;

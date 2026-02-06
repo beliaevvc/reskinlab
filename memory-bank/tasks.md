@@ -1,6 +1,69 @@
 # Tasks
 
 ## Recent Task
+**Client Dashboard Activity — Audit Logs Integration** — ARCHIVED ✅
+
+### Summary
+Блок "Recent Activity" на клиентском дашборде переведён с синтетических данных (4 запроса к entity-таблицам) на настоящие аудит-логи (`audit_logs`). UI обновлён до стиля админки (эмодзи, бейджи, разделители). Блок сделан сворачиваемым.
+
+### Complexity: Level 1
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-client-dashboard-activity.md`
+- **Reflection:** `memory-bank/reflection/reflection-client-dashboard-activity.md`
+
+---
+
+## Recent Task
+**Profile Improvements & Avatar System** — ARCHIVED ✅
+
+### Summary
+Полный редизайн профиля (все роли): загрузка аватара, sticky Save, кастомный Select, смена пароля, Danger Zone. Доп. поля для admin/AM (phone, telegram, bio). Аватары подтянуты во все компоненты: AccountSwitcher, комментарии, аудит-логи, дашборд. Фикс роутинга профиля для admin/AM.
+
+### Complexity: Level 2
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-profile-improvements.md`
+- **Reflection:** `memory-bank/reflection/reflection-profile-improvements.md`
+
+---
+
+## Recent Task
+**Promo Codes — Full Fix & Redesign** — ARCHIVED ✅
+
+### Summary
+Комплексное исправление системы промокодов: CRUD в админке (5 полей не соответствовали БД), применение в калькуляторе (hardcoded → Supabase), полный редизайн UI (таблица, модалки, PromoSection, перечёркнутая цена).
+
+### Complexity: Level 2
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-promo-codes-fix-and-redesign.md`
+- **Reflection:** `memory-bank/reflection/reflection-promo-codes-fix-and-ui.md`
+
+---
+
+## Recent Task
+**Sidebar Badge Color Fix** — ARCHIVED ✅
+
+### Summary
+Изменён цвет бейджа счётчика ожидающих подтверждения инвойсов в сайдбаре с синего (`bg-blue-500`) на зелёный (`bg-emerald-500`) для единообразия с дизайн-системой проекта (emerald акценты).
+
+### Complexity: Level 1
+### Date: 2026-02-07
+
+### Files Modified
+- `calculator/src/components/layout/AppSidebar.jsx` — строка 225: `bg-blue-500` → `bg-emerald-500`
+
+### Reflection
+- **Что сделано:** Одна строка — замена CSS-класса цвета бейджа
+- **Урок:** Все акцентные элементы в проекте должны использовать emerald-палитру. При добавлении новых бейджей/индикаторов — всегда проверять соответствие дизайн-системе
+
+---
+
+## Recent Task
 **Audit Logs — Entity Names & Parent Context** — ARCHIVED ✅
 
 ### Summary
