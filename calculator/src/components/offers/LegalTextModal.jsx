@@ -96,6 +96,27 @@ function parseLegalText(text) {
   return { title, sections, footer };
 }
 
+/**
+ * Renders text with **bold** and *italic* markdown markers as styled spans.
+ */
+function FormattedText({ text }) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith('*') && part.endsWith('*') && !part.startsWith('**')) {
+          return <em key={i}>{part.slice(1, -1)}</em>;
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 function LegalDocument({ text }) {
   const { title, sections, footer } = useMemo(() => parseLegalText(text), [text]);
 
@@ -105,7 +126,7 @@ function LegalDocument({ text }) {
       {title && (
         <div className="text-center mb-8 pb-6 border-b-2 border-neutral-900">
           <h1 className="text-base font-bold tracking-widest text-neutral-900 uppercase">
-            {title}
+            <FormattedText text={title} />
           </h1>
         </div>
       )}
@@ -121,7 +142,7 @@ function LegalDocument({ text }) {
                   {section.number}
                 </span>
                 <h2 className="text-sm font-bold tracking-wide text-neutral-900 uppercase">
-                  {section.title}
+                  <FormattedText text={section.title} />
                 </h2>
               </div>
             )}
@@ -133,7 +154,7 @@ function LegalDocument({ text }) {
                   case 'paragraph':
                     return (
                       <p key={iIdx} className="text-sm leading-relaxed text-neutral-600">
-                        {item.text}
+                        <FormattedText text={item.text} />
                       </p>
                     );
 
@@ -141,7 +162,7 @@ function LegalDocument({ text }) {
                     return (
                       <div key={iIdx} className="flex items-start gap-3">
                         <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2" />
-                        <p className="text-sm leading-relaxed text-neutral-600">{item.text}</p>
+                        <p className="text-sm leading-relaxed text-neutral-600"><FormattedText text={item.text} /></p>
                       </div>
                     );
 
@@ -151,7 +172,7 @@ function LegalDocument({ text }) {
                         <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-100 text-neutral-500 text-xs font-medium flex items-center justify-center mt-0.5">
                           {item.number}
                         </span>
-                        <p className="text-sm leading-relaxed text-neutral-600">{item.text}</p>
+                        <p className="text-sm leading-relaxed text-neutral-600"><FormattedText text={item.text} /></p>
                       </div>
                     );
 
@@ -161,14 +182,14 @@ function LegalDocument({ text }) {
                         <span className="flex-shrink-0 text-xs font-mono text-neutral-400 mt-0.5 w-8 text-right">
                           {item.number}
                         </span>
-                        <p className="text-sm leading-relaxed text-neutral-600">{item.text}</p>
+                        <p className="text-sm leading-relaxed text-neutral-600"><FormattedText text={item.text} /></p>
                       </div>
                     );
 
                   case 'label':
                     return (
                       <p key={iIdx} className="text-sm font-semibold text-neutral-700 pt-1">
-                        {item.text}
+                        <FormattedText text={item.text} />
                       </p>
                     );
 
@@ -193,7 +214,7 @@ function LegalDocument({ text }) {
                   : 'text-neutral-400'
               }`}
             >
-              {line}
+              <FormattedText text={line} />
             </p>
           ))}
         </div>
@@ -315,5 +336,5 @@ export function LegalTextModal({ isOpen, onClose, text }) {
   );
 }
 
-export { LegalDocument };
+export { LegalDocument, parseLegalText };
 export default LegalTextModal;

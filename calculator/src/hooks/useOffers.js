@@ -5,6 +5,7 @@ import { logOfferEvent } from '../lib/auditLog';
 import {
   generateOfferNumber,
   getLegalText,
+  getLegalTextFromTemplate,
   getOfferValidUntil,
 } from '../lib/offerUtils';
 import {
@@ -207,7 +208,25 @@ export function useCreateOffer() {
         return existingOffer;
       }
 
-      // 4. Generate offer number with retry on collision
+      // 3.5. Fetch client data for template resolution
+      let clientData = null;
+      if (spec.project?.client_id) {
+        const { data: clientRecord } = await supabase
+          .from('clients')
+          .select('*, profile:profiles(id, full_name)')
+          .eq('id', spec.project.client_id)
+          .single();
+        clientData = clientRecord;
+      }
+
+      // 4. Get legal text from template system (falls back to hardcoded)
+      const { text: legalText, templateId, termsVersion } = await getLegalTextFromTemplate(
+        spec,
+        spec.project,
+        clientData
+      );
+
+      // 5. Generate offer number with retry on collision
       let offer = null;
       let retries = 3;
       
@@ -220,9 +239,10 @@ export function useCreateOffer() {
             specification_id: specificationId,
             number: offerNumber,
             status: 'pending',
-            legal_text: getLegalText(spec),
-            terms_version: '1.0',
+            legal_text: legalText,
+            terms_version: termsVersion,
             valid_until: getOfferValidUntil(),
+            template_id: templateId,
           })
           .select()
           .single();
@@ -243,7 +263,7 @@ export function useCreateOffer() {
         throw offerError;
       }
 
-      // 5. Generate invoices based on payment milestones
+      // 6. Generate invoices based on payment milestones
       const milestones = calculatePaymentMilestones(spec);
 
       for (const milestone of milestones) {
@@ -266,7 +286,7 @@ export function useCreateOffer() {
           });
       }
 
-      // 6. Update project status
+      // 7. Update project status
       await supabase
         .from('projects')
         .update({ status: 'offer_pending' })

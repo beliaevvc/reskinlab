@@ -1,6 +1,21 @@
 # Tasks
 
 ## Recent Task
+**Offer Templates Admin Panel** — ARCHIVED ✅
+
+### Summary
+Комплексная доработка раздела управления шаблонами оферт (8 подзадач):
+модалка настроек, удаление validity_days, inline user picker, grid top bar,
+переработка Preview (LegalDocument + подсветка переменных), bold/italic,
+подсказки по форматированию, автоверсионирование.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-offer-templates-admin.md`
+- **Reflection:** `memory-bank/reflection/reflection-offer-templates-admin.md`
+
+---
+
+## Recent Task
 **Terms & Conditions Modal Redesign** — ARCHIVED ✅
 
 ### Summary

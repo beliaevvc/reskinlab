@@ -1,4 +1,10 @@
 import { supabase } from './supabase';
+import {
+  getTemplateForClient,
+  getAvailableVariables,
+  resolveVariables,
+  renderTemplateContent,
+} from './offerVariables';
 
 /**
  * Generate unique offer number: OFF-YYYY-NNNNN
@@ -34,10 +40,64 @@ export async function generateOfferNumber() {
 }
 
 /**
- * Default legal text template
- * In production, this would come from a database or admin panel
+ * Get legal text from admin-managed template system.
+ * Falls back to hardcoded text if no template is found.
+ * 
+ * @param {Object} spec - Specification with totals_json, state_json
+ * @param {Object} project - Project record
+ * @param {Object} client - Client record with profile
+ * @returns {Promise<{text: string, templateId: string|null, termsVersion: string}>}
+ */
+export async function getLegalTextFromTemplate(spec, project, client) {
+  try {
+    // 1. Get the appropriate template for this client/project
+    const clientId = project?.client_id || client?.profile?.id || client?.id;
+    const template = await getTemplateForClient(clientId, project?.id);
+
+    const templateText = template?.content?.text;
+    if (!template || !templateText) {
+      // Fallback to legacy hardcoded text
+      return {
+        text: getLegalTextFallback(spec),
+        templateId: null,
+        termsVersion: '1.0',
+      };
+    }
+
+    // 2. Resolve variables
+    const variables = await getAvailableVariables();
+    const resolvedVars = resolveVariables(spec, project, client, variables);
+
+    // Override terms_version from template
+    resolvedVars.terms_version = template.terms_version || '1.0';
+
+    // 3. Render template with variables
+    const text = renderTemplateContent(templateText, resolvedVars);
+
+    return {
+      text,
+      templateId: template.id,
+      termsVersion: template.terms_version || '1.0',
+    };
+  } catch (err) {
+    console.error('Error rendering template, falling back to hardcoded:', err);
+    return {
+      text: getLegalTextFallback(spec),
+      templateId: null,
+      termsVersion: '1.0',
+    };
+  }
+}
+
+/**
+ * Legacy hardcoded legal text — used as fallback when no template exists.
+ * @deprecated Use getLegalTextFromTemplate instead
  */
 export function getLegalText(spec) {
+  return getLegalTextFallback(spec);
+}
+
+function getLegalTextFallback(spec) {
   const totals = spec?.totals_json || {};
   const grandTotal = totals.grandTotal || 0;
   const validUntil = new Date();

@@ -1,5 +1,34 @@
 # Progress Log
 
+## Offer Templates Admin Panel — ARCHIVED ✅
+
+### Date: 2026-02-06
+
+### Summary
+Комплексная доработка раздела управления шаблонами оферт в админ-панели:
+- Модалка настроек (описание + аудитория) вместо collapsible bar
+- Удаление validity_days из UI (оферты бессрочные)
+- Inline user picker для назначения аудитории (вместо dropdown)
+- Grid layout top bar (центрирование Edit/Preview toggle)
+- Preview — LegalDocument + подсветка переменных зелёным (HighlightText)
+- Bold/Italic сквозь всю цепочку (TipTap → plain text → preview → client)
+- Sticky подсказки по форматированию в редакторе
+- Автоверсионирование YYYY.MM.DD HH:mm при Save
+
+### Files Modified
+- `calculator/src/pages/admin/OfferTemplateEditorPage.jsx`
+- `calculator/src/pages/admin/OfferTemplatesPage.jsx`
+- `calculator/src/hooks/useOfferTemplates.js`
+- `calculator/src/components/admin/offer-templates/OfferPreview.jsx`
+- `calculator/src/components/admin/offer-templates/OfferTemplateEditor.jsx`
+- `calculator/src/components/offers/LegalTextModal.jsx`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-offer-templates-admin.md`
+📄 `memory-bank/reflection/reflection-offer-templates-admin.md`
+
+---
+
 ## Terms & Conditions Modal Redesign — ARCHIVED ✅
 
 ### Date: 2026-02-06
