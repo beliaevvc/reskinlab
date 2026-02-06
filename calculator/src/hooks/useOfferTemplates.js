@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logOfferTemplateEvent } from '../lib/auditLog';
 
 // ============================================
 // OFFER TEMPLATES
@@ -132,8 +133,9 @@ export function useCreateOfferTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['offer-templates'] });
+      logOfferTemplateEvent('create_offer_template', data.id, { name: data.name });
     },
   });
 }
@@ -162,6 +164,7 @@ export function useUpdateOfferTemplate() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['offer-templates'] });
       queryClient.invalidateQueries({ queryKey: ['offer-template', data.id] });
+      logOfferTemplateEvent('update_offer_template', data.id, { name: data.name });
     },
   });
 }
@@ -174,16 +177,24 @@ export function useDeleteOfferTemplate() {
 
   return useMutation({
     mutationFn: async (id) => {
+      // Fetch template name before deletion for audit log
+      const { data: templateData } = await supabase
+        .from('offer_templates')
+        .select('name')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('offer_templates')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-      return id;
+      return { id, name: templateData?.name };
     },
-    onSuccess: () => {
+    onSuccess: ({ id, name }) => {
       queryClient.invalidateQueries({ queryKey: ['offer-templates'] });
+      logOfferTemplateEvent('delete_offer_template', id, { name });
     },
   });
 }
@@ -215,9 +226,10 @@ export function useSetActiveTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['offer-templates'] });
       queryClient.invalidateQueries({ queryKey: ['offer-template'] });
+      logOfferTemplateEvent('set_active_template', data.id, { name: data.name });
     },
   });
 }
@@ -256,8 +268,9 @@ export function useDuplicateTemplate() {
       if (createError) throw createError;
       return newTemplate;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['offer-templates'] });
+      logOfferTemplateEvent('duplicate_template', data.id, { name: data.name });
     },
   });
 }
@@ -363,9 +376,10 @@ export function useAssignOfferToClient() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['template-assignments', variables.template_id] });
       queryClient.invalidateQueries({ queryKey: ['client-offer-assignments'] });
+      logOfferTemplateEvent('assign_offer_to_client', variables.template_id, { client_id: variables.client_id });
     },
   });
 }
@@ -389,6 +403,7 @@ export function useRemoveOfferAssignment() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['template-assignments', data.templateId] });
       queryClient.invalidateQueries({ queryKey: ['client-offer-assignments'] });
+      logOfferTemplateEvent('remove_offer_assignment', data.templateId, { assignment_id: data.id });
     },
   });
 }

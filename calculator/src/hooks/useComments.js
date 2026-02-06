@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logCommentEvent } from '../lib/auditLog';
 
 /**
  * Fetch comments for an entity
@@ -151,6 +152,7 @@ export function useAddComment() {
           predicate: (query) => query.queryKey[0] === 'tasks',
         });
       }
+      logCommentEvent('add_comment', data.id, { entity_type: data.entity_type, entity_id: data.entity_id });
     },
   });
 }
@@ -177,6 +179,7 @@ export function useUpdateComment() {
       queryClient.invalidateQueries({
         queryKey: ['comments', data.entity_type, data.entity_id],
       });
+      logCommentEvent('update_comment', data.id, { entity_type: data.entity_type, entity_id: data.entity_id });
     },
   });
 }
@@ -216,7 +219,7 @@ export function useDeleteComment() {
       const projectId = files?.[0]?.project_id;
       return { commentId, entityType, entityId, projectId };
     },
-    onSuccess: ({ entityType, entityId, projectId }) => {
+    onSuccess: ({ commentId, entityType, entityId, projectId }) => {
       queryClient.invalidateQueries({
         queryKey: ['comments', entityType, entityId],
       });
@@ -232,6 +235,7 @@ export function useDeleteComment() {
       queryClient.invalidateQueries({
         queryKey: ['task-files'],
       });
+      logCommentEvent('delete_comment', commentId, { entity_type: entityType, entity_id: entityId });
     },
   });
 }

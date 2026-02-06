@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logSettingsEvent } from '../lib/auditLog';
 
 /**
  * Получить текущие настройки автоматического создания задач
@@ -86,6 +87,7 @@ export function useUpdateTaskAutoCreationSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-auto-creation-settings'] });
+      logSettingsEvent('update_task_auto_settings');
     },
   });
 }

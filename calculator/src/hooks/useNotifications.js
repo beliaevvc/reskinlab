@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logAuditEvent } from '../lib/auditLog';
 
 /**
  * Fetch notifications for current user
@@ -106,8 +107,9 @@ export function useMarkNotificationRead() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, notificationId) => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      logAuditEvent({ action: 'mark_notification_read', entity_type: 'notification', entity_id: notificationId });
     },
   });
 }
@@ -131,6 +133,7 @@ export function useMarkAllNotificationsRead() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      logAuditEvent({ action: 'mark_all_notifications_read', entity_type: 'notification', entity_id: null });
     },
   });
 }

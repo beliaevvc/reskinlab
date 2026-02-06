@@ -4,7 +4,6 @@ import { useTaskAutoTemplates, useCreateTaskAutoTemplate, useUpdateTaskAutoTempl
 import { useTaskSpecItemTemplates, useUpdateTaskSpecItemTemplate, useCreateTaskSpecItemTemplate } from '../../hooks/useTaskSpecItemTemplates';
 import { ALL_ITEMS } from '../../data/categories';
 import { TemplateChecklistEditor } from '../../components/admin/TemplateChecklistEditor';
-
 const STAGE_OPTIONS = [
   { value: 'briefing', label: 'Briefing' },
   { value: 'moodboard', label: 'Moodboard & Concept' },

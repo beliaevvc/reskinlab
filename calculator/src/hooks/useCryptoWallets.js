@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logCryptoWalletEvent } from '../lib/auditLog';
 
 /**
  * Fetch all crypto wallets (for admin)
@@ -63,8 +64,9 @@ export function useCreateWallet() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+      logCryptoWalletEvent('create_wallet', data.id, { currency: data.currency, network: data.network });
     },
   });
 }
@@ -95,8 +97,9 @@ export function useUpdateWallet() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+      logCryptoWalletEvent('update_wallet', data.id, { currency: data.currency, network: data.network });
     },
   });
 }
@@ -109,16 +112,24 @@ export function useDeleteWallet() {
 
   return useMutation({
     mutationFn: async (id) => {
+      // Fetch wallet info before deletion for audit log
+      const { data: walletData } = await supabase
+        .from('crypto_wallets')
+        .select('currency, network')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('crypto_wallets')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-      return id;
+      return { id, currency: walletData?.currency, network: walletData?.network };
     },
-    onSuccess: () => {
+    onSuccess: ({ id, currency, network }) => {
       queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+      logCryptoWalletEvent('delete_wallet', id, { currency, network });
     },
   });
 }
@@ -141,8 +152,9 @@ export function useToggleWallet() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+      logCryptoWalletEvent('toggle_wallet', data.id, { is_active: data.is_active, currency: data.currency });
     },
   });
 }

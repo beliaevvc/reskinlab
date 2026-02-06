@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePromoCodes, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode, useTogglePromoCode } from '../../hooks/usePromoCodes';
 import { formatDate, formatCurrency } from '../../lib/utils';
 
+
 /**
  * Generate a random promo code
  * Format: PREFIX-XXXXXXXX (8 chars after prefix)

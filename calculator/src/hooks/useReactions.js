@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logAuditEvent } from '../lib/auditLog';
 
 // Популярные эмодзи для быстрого выбора
 export const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
@@ -69,8 +70,9 @@ export function useToggleReaction() {
         return { action: 'added' };
       }
     },
-    onSuccess: (_, { commentId }) => {
+    onSuccess: (result, { commentId, emoji, userId }) => {
       queryClient.invalidateQueries({ queryKey: ['reactions', commentId] });
+      logAuditEvent({ action: result.action === 'added' ? 'add_reaction' : 'remove_reaction', entity_type: 'comment_reaction', entity_id: commentId, details: { emoji, user_id: userId } });
     },
   });
 }

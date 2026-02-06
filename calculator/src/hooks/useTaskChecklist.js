@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logAuditEvent } from '../lib/auditLog';
 
 /**
  * Получить чеклист для задачи
@@ -47,6 +48,7 @@ export function useCreateChecklistItem() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-checklist', data.task_id] });
+      logAuditEvent({ action: 'create_checklist_item', entity_type: 'task_checklist', entity_id: data.id, details: { title: data.title, task_id: data.task_id } });
     },
   });
 }
@@ -71,6 +73,7 @@ export function useUpdateChecklistItem() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-checklist', data.task_id] });
+      logAuditEvent({ action: 'update_checklist_item', entity_type: 'task_checklist', entity_id: data.id, details: { task_id: data.task_id } });
     },
   });
 }
@@ -91,8 +94,9 @@ export function useDeleteChecklistItem() {
       if (error) throw error;
       return { itemId, taskId };
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['task-checklist', variables.taskId] });
+      logAuditEvent({ action: 'delete_checklist_item', entity_type: 'task_checklist', entity_id: variables.itemId, details: { task_id: variables.taskId } });
     },
   });
 }
@@ -124,6 +128,7 @@ export function useReorderChecklistItems() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-checklist', data.taskId] });
+      logAuditEvent({ action: 'reorder_checklist_items', entity_type: 'task_checklist', entity_id: data.taskId, details: { items_count: data.items?.length } });
     },
   });
 }

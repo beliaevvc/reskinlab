@@ -7,7 +7,6 @@ import { getInvoiceStatusInfo, formatInvoiceAmount } from '../../lib/invoiceUtil
 import { AcceptOfferModal, LegalTextModal } from '../../components/offers';
 import { SpecificationView } from '../../components';
 import { prepareSpecificationForView } from '../../lib/specificationHelpers';
-
 // Get base path based on current location
 function useOfferBasePath() {
   const location = useLocation();

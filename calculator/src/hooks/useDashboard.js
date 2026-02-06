@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { enrichLogsWithParentNames } from '../lib/auditLog';
 
 /**
  * Dashboard overview stats for admin
@@ -140,6 +141,8 @@ export function useDashboardStats() {
 export function useRecentActivity(limit = 10) {
   return useQuery({
     queryKey: ['recent-activity', limit],
+    refetchOnMount: 'always',
+    staleTime: 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('audit_logs')
@@ -147,13 +150,16 @@ export function useRecentActivity(limit = 10) {
           *,
           user:profiles!user_id(id, email, full_name, avatar_url)
         `)
+        .not('action', 'eq', 'page_view')
         .order('created_at', { ascending: false })
         .limit(limit);
 
       if (error) throw error;
-      return data;
+
+      // Enrich old logs with missing parent names
+      return enrichLogsWithParentNames(data || []);
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
   });
 }
 

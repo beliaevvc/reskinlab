@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logPromoCodeEvent } from '../lib/auditLog';
 
 /**
  * Fetch all promo codes
@@ -44,8 +45,9 @@ export function useCreatePromoCode() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['promo-codes'] });
+      logPromoCodeEvent('create_promo_code', data.id, { code: data.code, type: data.type, value: data.value });
     },
   });
 }
@@ -71,8 +73,9 @@ export function useUpdatePromoCode() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['promo-codes'] });
+      logPromoCodeEvent('update_promo_code', data.id, { code: data.code });
     },
   });
 }
@@ -85,16 +88,24 @@ export function useDeletePromoCode() {
 
   return useMutation({
     mutationFn: async (id) => {
+      // Fetch promo code before deletion for audit log
+      const { data: promoData } = await supabase
+        .from('promo_codes')
+        .select('code')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('promo_codes')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-      return id;
+      return { id, code: promoData?.code };
     },
-    onSuccess: () => {
+    onSuccess: ({ id, code }) => {
       queryClient.invalidateQueries({ queryKey: ['promo-codes'] });
+      logPromoCodeEvent('delete_promo_code', id, { code });
     },
   });
 }
@@ -117,8 +128,9 @@ export function useTogglePromoCode() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['promo-codes'] });
+      logPromoCodeEvent('toggle_promo_code', data.id, { is_active: data.is_active });
     },
   });
 }

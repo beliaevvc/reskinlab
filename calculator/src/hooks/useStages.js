@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logStageEvent } from '../lib/auditLog';
 
 /**
  * Default workflow stages for a new project
@@ -109,9 +110,10 @@ export function useCreateStages() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, projectId) => {
+    onSuccess: (data, projectId) => {
       queryClient.invalidateQueries({ queryKey: ['stages', projectId] });
       queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      logStageEvent('create_stages', projectId, { count: data?.length });
     },
   });
 }
@@ -154,6 +156,7 @@ export function useUpdateStageStatus() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['stages', data.projectId] });
       queryClient.invalidateQueries({ queryKey: ['stage', data.id] });
+      logStageEvent('update_stage_status', data.id, { status: data.status, project_id: data.projectId });
     },
   });
 }
@@ -215,6 +218,7 @@ export function useActivateStageWithPrevious() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['stages', data.projectId] });
+      logStageEvent('activate_stages', data.projectId, { project_id: data.projectId });
     },
   });
 }
@@ -280,6 +284,7 @@ export function useDeactivateStageWithPrevious() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['stages', data.projectId] });
+      logStageEvent('deactivate_stages', data.projectId, { project_id: data.projectId });
     },
   });
 }

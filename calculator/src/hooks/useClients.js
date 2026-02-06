@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logClientEvent } from '../lib/auditLog';
 
 /**
  * Fetch all clients with aggregated stats - admin only
@@ -108,8 +109,9 @@ export function useCreateClient() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
+      logClientEvent('create_client', data.id, { company_name: data.company_name });
     },
   });
 }
@@ -135,6 +137,7 @@ export function useUpdateClient() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['client', data.id] });
+      logClientEvent('update_client', data.id, { company_name: data.company_name });
     },
   });
 }

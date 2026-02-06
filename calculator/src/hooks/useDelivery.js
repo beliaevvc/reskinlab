@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logDeliveryEvent } from '../lib/auditLog';
 
 /**
  * Delivery status info
@@ -94,6 +95,7 @@ export function useCreateDelivery() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['deliveries', data.project_id] });
+      logDeliveryEvent('create_delivery', data.id, { title: data.title, project_id: data.project_id });
     },
   });
 }
@@ -125,6 +127,7 @@ export function useApproveDelivery() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['deliveries', data.project_id] });
       queryClient.invalidateQueries({ queryKey: ['delivery', data.id] });
+      logDeliveryEvent('approve_delivery', data.id, { project_id: data.project_id });
     },
   });
 }
@@ -166,6 +169,7 @@ export function useRequestRevision() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['deliveries', data.project_id] });
       queryClient.invalidateQueries({ queryKey: ['delivery', data.id] });
+      logDeliveryEvent('request_revision', data.id, { project_id: data.project_id, revision_count: data.revision_count });
     },
   });
 }
@@ -200,6 +204,7 @@ export function useResubmitDelivery() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['deliveries', data.project_id] });
       queryClient.invalidateQueries({ queryKey: ['delivery', data.id] });
+      logDeliveryEvent('resubmit_delivery', data.id, { project_id: data.project_id });
     },
   });
 }
@@ -317,6 +322,7 @@ export function useFinalizeProject() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['projects', data.id] });
+      logDeliveryEvent('finalize_project', data.id, { status: data.status });
     },
   });
 }

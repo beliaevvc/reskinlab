@@ -34,7 +34,7 @@ const adminNavItems = [
   { to: '/admin/task-settings', label: 'Task Settings', icon: 'settings' },
   { to: '/admin/wallets', label: 'Wallets', icon: 'wallet' },
   { type: 'divider' },
-  { to: '/admin/audit', label: 'Audit Log', icon: 'shield' },
+  { to: '/admin/audit-logs', label: 'Audit Log', icon: 'shield' },
 ];
 
 // Simple icon component
@@ -222,7 +222,7 @@ export function AppSidebar({ open, onClose }) {
               <NavIcon name={item.icon} />
               <span className="flex-1">{item.label}</span>
               {badgeCount && (
-                <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {badgeCount}
                 </span>
               )}

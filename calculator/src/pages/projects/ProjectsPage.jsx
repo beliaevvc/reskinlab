@@ -7,7 +7,6 @@ import { CreateProjectModal } from '../../components/projects';
 import { InlineEdit } from '../../components/InlineEdit';
 import { Select } from '../../components/Select';
 import { formatDate } from '../../lib/utils';
-
 // Get base path for projects based on current location
 function useProjectBasePath() {
   const location = useLocation();

@@ -11,6 +11,7 @@ import {
   NETWORK_INFO,
 } from '../../hooks/useCryptoWallets';
 
+
 function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
   const [formData, setFormData] = useState({
     currency: wallet?.currency || 'USDT',

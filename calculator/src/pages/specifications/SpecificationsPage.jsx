@@ -5,7 +5,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { SpecificationModal } from '../../components/project';
 import { ClientFilter } from '../../components/offers';
-
 // Status badge component
 function StatusBadge({ status, hasOffer, offerStatus }) {
   if (status === 'draft') {
@@ -258,6 +257,7 @@ export function SpecificationsPage() {
   const { user, isAdmin, isAM } = useAuth();
   const location = useLocation();
   const isStaff = isAdmin || isAM;
+
   const isAdminView = location.pathname.startsWith('/admin');
   const isAMView = location.pathname.startsWith('/am');
   const isAdminOrAMView = isAdminView || isAMView;

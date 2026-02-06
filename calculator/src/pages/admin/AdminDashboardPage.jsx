@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useDashboardStats, useRecentActivity, useRevenueChart, useProjectsChart } from '../../hooks/useDashboard';
 import { formatCurrency, formatDate } from '../../lib/utils';
+import { getHumanDescription, getActionIcon } from '../../components/audit-logs/auditLogHumanize';
 
 // Simple bar chart component
 function BarChart({ data, dataKey, label, color = 'emerald' }) {
@@ -65,44 +66,48 @@ function StatCard({ title, value, subtitle, change, changeLabel, icon, color = '
 }
 
 // Activity item component
+const ACTIVITY_BADGE_COLORS = {
+  create: 'bg-emerald-100 text-emerald-700',
+  update: 'bg-blue-100 text-blue-700',
+  delete: 'bg-red-100 text-red-700',
+  login: 'bg-purple-100 text-purple-700',
+  logout: 'bg-neutral-100 text-neutral-600',
+  failed: 'bg-red-100 text-red-700',
+  accept: 'bg-green-100 text-green-700',
+  reject: 'bg-orange-100 text-orange-700',
+  finalize: 'bg-indigo-100 text-indigo-700',
+  send: 'bg-cyan-100 text-cyan-700',
+  pay: 'bg-amber-100 text-amber-700',
+  confirm: 'bg-amber-100 text-amber-700',
+  upload: 'bg-sky-100 text-sky-700',
+};
+
+function getActivityBadgeColor(action) {
+  const key = Object.keys(ACTIVITY_BADGE_COLORS).find(k => action?.toLowerCase().includes(k));
+  return ACTIVITY_BADGE_COLORS[key] || 'bg-neutral-100 text-neutral-700';
+}
+
 function ActivityItem({ log }) {
-  const ACTION_COLORS = {
-    create: 'bg-emerald-100 text-emerald-700',
-    update: 'bg-blue-100 text-blue-700',
-    delete: 'bg-red-100 text-red-700',
-    login: 'bg-purple-100 text-purple-700',
-    logout: 'bg-neutral-100 text-neutral-700',
-    accept: 'bg-green-100 text-green-700',
-  };
-
-  const actionColor = Object.keys(ACTION_COLORS).find(k => log.action?.toLowerCase().includes(k));
-
+  const desc = getHumanDescription(log);
   return (
     <div className="flex items-center gap-3 py-3">
-      <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
-        {log.user?.avatar_url ? (
-          <img src={log.user.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
-        ) : (
-          <span className="text-xs font-medium text-neutral-600">
-            {log.user?.full_name?.[0] || log.user?.email?.[0]?.toUpperCase() || '?'}
-          </span>
-        )}
+      <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-sm">
+        {getActionIcon(log.action)}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium text-neutral-900 truncate">
             {log.user?.full_name || log.user?.email || 'Unknown'}
           </span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${ACTION_COLORS[actionColor] || 'bg-neutral-100 text-neutral-700'}`}>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getActivityBadgeColor(log.action)}`}>
             {log.action}
           </span>
         </div>
-        <p className="text-xs text-neutral-500 truncate">
-          {log.entity_type && `${log.entity_type}`}
-          {log.details?.changes && ` • ${Object.keys(log.details.changes).join(', ')} changed`}
+        <p className="text-xs text-neutral-500 mt-0.5 line-clamp-2">
+          {desc}
         </p>
       </div>
-      <span className="text-xs text-neutral-400 flex-shrink-0">
+      <span className="text-xs text-neutral-400 flex-shrink-0 whitespace-nowrap">
         {formatDate(log.created_at, true)}
       </span>
     </div>
@@ -268,7 +273,7 @@ export function AdminDashboardPage() {
         <div className="bg-white rounded-md border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-neutral-900">Recent Activity</h3>
-            <Link to="/admin/audit" className="text-sm text-emerald-600 hover:text-emerald-700">
+            <Link to="/admin/audit-logs" className="text-sm text-emerald-600 hover:text-emerald-700">
               View all
             </Link>
           </div>

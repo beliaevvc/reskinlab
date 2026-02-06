@@ -8,7 +8,6 @@ import { SpecificationView } from '../../components';
 import { prepareSpecificationForView } from '../../lib/specificationHelpers';
 import { useAuth } from '../../contexts/AuthContext';
 import useCalculatorStore from '../../stores/calculatorStore';
-
 // Get base path based on current location
 function useBasePath() {
   const location = useLocation();

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { logSpecificationEvent } from '../lib/auditLog';
+import { logSpecificationEvent, fetchProjectName } from '../lib/auditLog';
 
 /**
  * Fetch specifications for a project
@@ -122,10 +122,14 @@ export function useSaveSpecification() {
 
         if (error) throw error;
 
+        // Fetch project name for audit log context
+        const project_name = await fetchProjectName(projectId);
+
         // Log audit event for new specification
         try {
           await logSpecificationEvent('create_specification', data.id, {
             project_id: projectId,
+            project_name,
             version: data.version,
             total: totalsJson?.grandTotal,
           });
@@ -133,13 +137,14 @@ export function useSaveSpecification() {
           console.warn('Failed to log audit event:', e);
         }
 
-        return data;
+        return { ...data, _project_name: project_name };
       }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['specifications', data.project_id] });
       queryClient.invalidateQueries({ queryKey: ['specifications', 'detail', data.id] });
       queryClient.invalidateQueries({ queryKey: ['projects', data.project_id] });
+      logSpecificationEvent('save_specification', data.id, { project_id: data.project_id, project_name: data._project_name, version: data.version });
     },
   });
 }
@@ -185,6 +190,9 @@ export function useFinalizeSpecification() {
 
       if (error) throw error;
       
+      // Fetch project name for context
+      const project_name = await fetchProjectName(existingSpec.project_id);
+
       // If update returned nothing, refetch the spec
       if (!data) {
         const { data: refetched } = await supabase
@@ -197,30 +205,35 @@ export function useFinalizeSpecification() {
         try {
           await logSpecificationEvent('finalize_specification', specId, {
             version: refetched?.version,
+            project_id: existingSpec.project_id,
+            project_name,
           });
         } catch (e) {
           console.warn('Failed to log audit event:', e);
         }
         
-        return refetched;
+        return { ...refetched, _project_name: project_name };
       }
 
       // Log audit event
       try {
         await logSpecificationEvent('finalize_specification', data.id, {
           version: data.version,
+          project_id: data.project_id,
+          project_name,
         });
       } catch (e) {
         console.warn('Failed to log audit event:', e);
       }
       
-      return data;
+      return { ...data, _project_name: project_name };
     },
     onSuccess: (data) => {
       if (data) {
         queryClient.invalidateQueries({ queryKey: ['specifications', data.project_id] });
         queryClient.invalidateQueries({ queryKey: ['specifications', 'detail', data.id] });
         queryClient.invalidateQueries({ queryKey: ['projects', data.project_id] });
+        logSpecificationEvent('finalize_specification', data.id, { version: data.version, project_name: data._project_name });
       }
     },
   });
@@ -234,6 +247,14 @@ export function useDeleteSpecification() {
 
   return useMutation({
     mutationFn: async ({ specId, projectId }) => {
+      // Fetch spec version before deletion for audit log
+      const { data: specData } = await supabase
+        .from('specifications')
+        .select('version')
+        .eq('id', specId)
+        .single();
+      const project_name = await fetchProjectName(projectId);
+
       const { error } = await supabase
         .from('specifications')
         .delete()
@@ -241,11 +262,12 @@ export function useDeleteSpecification() {
         .eq('status', 'draft'); // Only drafts can be deleted
 
       if (error) throw error;
-      return { specId, projectId };
+      return { specId, projectId, version: specData?.version, project_name };
     },
-    onSuccess: ({ projectId }) => {
+    onSuccess: ({ specId, projectId, version, project_name }) => {
       queryClient.invalidateQueries({ queryKey: ['specifications', projectId] });
       queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      logSpecificationEvent('delete_specification', specId, { project_id: projectId, project_name, version });
     },
   });
 }
@@ -258,6 +280,14 @@ export function useAdminDeleteSpecification() {
 
   return useMutation({
     mutationFn: async ({ specId, projectId }) => {
+      // Fetch spec version before deletion for audit log
+      const { data: specData } = await supabase
+        .from('specifications')
+        .select('version')
+        .eq('id', specId)
+        .single();
+      const project_name = await fetchProjectName(projectId);
+
       // 1. Get related offers first
       const { data: offers } = await supabase
         .from('offers')
@@ -308,14 +338,15 @@ export function useAdminDeleteSpecification() {
         .eq('id', specId);
 
       if (error) throw error;
-      return { specId, projectId };
+      return { specId, projectId, version: specData?.version, project_name };
     },
-    onSuccess: ({ projectId }) => {
+    onSuccess: ({ specId, projectId, version, project_name }) => {
       queryClient.invalidateQueries({ queryKey: ['specifications'] });
       queryClient.invalidateQueries({ queryKey: ['specification'] });
       queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      logSpecificationEvent('admin_delete_specification', specId, { project_id: projectId, project_name, version });
     },
   });
 }

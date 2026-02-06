@@ -5,6 +5,13 @@
 
 ## Recently Completed Tasks
 
+### Audit Logs — Entity Names & Parent Context (6 Февраля 2026) — ARCHIVED ✅
+Расширение аудит-логов: названия сущностей во всех CRUD-операциях + родительский контекст (project_name, client_name) + обогащение старых записей через batch-fetch.
+- **Archive:** `memory-bank/archive/archive-audit-logs-entity-names.md`
+- **Reflection:** `memory-bank/reflection/reflection-audit-logs-entity-names.md`
+
+---
+
 ### Offer Templates Admin Panel (6 Февраля 2026) — ARCHIVED ✅
 Комплексная доработка раздела управления шаблонами оферт в админ-панели.
 - Модалка настроек, удаление validity_days, inline user picker, grid top bar

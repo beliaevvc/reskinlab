@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { logAuditEvent } from '../lib/auditLog';
 
 /**
  * Fetch all price configurations
@@ -71,8 +72,9 @@ export function useCreatePriceConfig() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['price-configs'] });
+      logAuditEvent({ action: 'create_price_config', entity_type: 'price_config', entity_id: data.id, details: { name: data.name, category: data.category } });
     },
   });
 }
@@ -93,8 +95,9 @@ export function useDeletePriceConfig() {
       if (error) throw error;
       return id;
     },
-    onSuccess: () => {
+    onSuccess: (id) => {
       queryClient.invalidateQueries({ queryKey: ['price-configs'] });
+      logAuditEvent({ action: 'delete_price_config', entity_type: 'price_config', entity_id: id });
     },
   });
 }

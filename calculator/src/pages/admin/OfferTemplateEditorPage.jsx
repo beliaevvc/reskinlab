@@ -13,7 +13,6 @@ import {
 } from '../../hooks/useOfferTemplates';
 import { OfferTemplateEditor } from '../../components/admin/offer-templates/OfferTemplateEditor';
 import { OfferPreview } from '../../components/admin/offer-templates/OfferPreview';
-
 // ── Settings Modal ──────────────────────────────────
 function SettingsModal({ isOpen, onClose, templateId, meta, onMetaChange }) {
   if (!isOpen) return null;

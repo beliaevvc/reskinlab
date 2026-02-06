@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { logTaskEvent, fetchProjectName } from '../lib/auditLog';
 
 /**
  * Task status columns for Kanban (5 columns)
@@ -229,13 +230,15 @@ export function useCreateTask() {
         .single();
 
       if (error) throw error;
-      return data;
+      const project_name = await fetchProjectName(projectId);
+      return { ...data, _project_name: project_name };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', data.project_id] });
       if (data.stage_id) {
         queryClient.invalidateQueries({ queryKey: ['tasks', 'stage', data.stage_id] });
       }
+      logTaskEvent('create_task', data.id, { title: data.title, project_id: data.project_id, project_name: data._project_name });
     },
   });
 }
@@ -256,7 +259,8 @@ export function useUpdateTask() {
         .single();
 
       if (error) throw error;
-      return data;
+      const project_name = await fetchProjectName(data.project_id);
+      return { ...data, _project_name: project_name };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task', data.id] });
@@ -264,6 +268,7 @@ export function useUpdateTask() {
       if (data.stage_id) {
         queryClient.invalidateQueries({ queryKey: ['tasks', 'stage', data.stage_id] });
       }
+      logTaskEvent('update_task', data.id, { title: data.title, project_id: data.project_id, project_name: data._project_name });
     },
   });
 }
@@ -298,6 +303,7 @@ export function useUpdateTaskStatus() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task', data.id] });
       queryClient.invalidateQueries({ queryKey: ['tasks', data.projectId] });
+      logTaskEvent('update_task_status', data.id, { status: data.status });
     },
   });
 }
@@ -335,6 +341,7 @@ export function useReorderTask() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task', data.id] });
       queryClient.invalidateQueries({ queryKey: ['tasks', data.projectId] });
+      logTaskEvent('reorder_task', data.id, { status: data.status, order: data.order });
     },
   });
 }
@@ -347,16 +354,25 @@ export function useDeleteTask() {
 
   return useMutation({
     mutationFn: async ({ taskId, projectId }) => {
+      // Fetch task title before deletion for audit log
+      const { data: taskData } = await supabase
+        .from('tasks')
+        .select('title')
+        .eq('id', taskId)
+        .single();
+      const project_name = await fetchProjectName(projectId);
+
       const { error } = await supabase
         .from('tasks')
         .delete()
         .eq('id', taskId);
 
       if (error) throw error;
-      return { taskId, projectId };
+      return { taskId, projectId, title: taskData?.title, project_name };
     },
-    onSuccess: ({ projectId }) => {
+    onSuccess: ({ taskId, projectId, title, project_name }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
+      logTaskEvent('delete_task', taskId, { project_id: projectId, project_name, title });
     },
   });
 }

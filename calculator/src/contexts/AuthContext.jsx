@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { logAuthEvent } from '../lib/auditLog';
+import { logAuthEvent, logFailedLogin, logAuditEvent, fetchAndCacheIp } from '../lib/auditLog';
 
 const AuthContext = createContext({});
 
@@ -210,6 +210,8 @@ export function AuthProvider({ children }) {
         },
       });
       if (error) throw error;
+      // Log registration
+      try { logAuthEvent('register', data?.user?.id); } catch (e) { /* ignore */ }
       return { data, error: null };
     } catch (err) {
       setError(err.message);
@@ -234,14 +236,17 @@ export function AuthProvider({ children }) {
         await fetchProfile(data.user.id, true); // force=true to bypass cache
       }
 
-      // Log successful login
+      // Log successful login + cache IP
       try {
         await logAuthEvent('login', data.user?.id);
+        fetchAndCacheIp(); // non-blocking IP cache
       } catch (e) { /* ignore */ }
 
       return { data, error: null };
     } catch (err) {
       setError(err.message);
+      // Log failed login attempt
+      try { logFailedLogin(email); } catch (e) { /* ignore */ }
       return { data: null, error: err };
     }
   };
@@ -288,10 +293,13 @@ export function AuthProvider({ children }) {
         .select()
         .single();
       if (error) throw error;
+      const oldProfile = profile;
       setProfile(data);
       try {
         localStorage.setItem(`profile_${user.id}`, JSON.stringify(data));
       } catch (e) { /* ignore */ }
+      // Log profile update
+      try { logAuditEvent({ action: 'update_profile', entity_type: 'profile', entity_id: user.id, oldData: oldProfile, newData: data }); } catch (e) { /* ignore */ }
       return { data, error: null };
     } catch (err) {
       setError(err.message);
@@ -310,7 +318,10 @@ export function AuthProvider({ children }) {
         .select()
         .single();
       if (error) throw error;
+      const oldClient = client;
       setClient(data);
+      // Log client update
+      try { logAuditEvent({ action: 'update_client', entity_type: 'client', entity_id: data.id, oldData: oldClient, newData: data }); } catch (e) { /* ignore */ }
       return { data, error: null };
     } catch (err) {
       setError(err.message);

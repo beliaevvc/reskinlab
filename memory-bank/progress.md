@@ -1,5 +1,44 @@
 # Progress Log
 
+## Audit Logs — Entity Names & Parent Context — ARCHIVED ✅
+
+### Date: 2026-02-06
+
+### Summary
+Расширение аудит-логов: названия сущностей + родительский контекст + обогащение старых записей.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Humanize расширен на все поля metadata | ✅ | title, code, company_name, filename, currency, version |
+| Delete-операции содержат названия | ✅ | 6 хуков: projects, specs, templates, promo, wallets, tasks |
+| Parent context (project_name) | ✅ | specs, offers, tasks — все логируют project_name |
+| Parent context (client_name) | ✅ | projects — логируют client_name |
+| Enrichment старых записей | ✅ | enrichLogsWithParentNames — batch fetch при отображении |
+| Дашборд обновлён | ✅ | Recent Activity — humanize + enrichment |
+| Entity link с subtext | ✅ | AuditLogEntityLink показывает имя + контекст |
+
+### Files Modified
+- `calculator/src/lib/auditLog.js`
+- `calculator/src/components/audit-logs/auditLogHumanize.js`
+- `calculator/src/components/audit-logs/AuditLogEntityLink.jsx`
+- `calculator/src/hooks/useAuditLogs.js`
+- `calculator/src/hooks/useDashboard.js`
+- `calculator/src/hooks/useProjects.js`
+- `calculator/src/hooks/useSpecifications.js`
+- `calculator/src/hooks/useOffers.js`
+- `calculator/src/hooks/useTasks.js`
+- `calculator/src/hooks/useOfferTemplates.js`
+- `calculator/src/hooks/usePromoCodes.js`
+- `calculator/src/hooks/useCryptoWallets.js`
+- `calculator/src/pages/admin/AdminDashboardPage.jsx`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-audit-logs-entity-names.md`
+
+---
+
 ## Offer Templates Admin Panel — ARCHIVED ✅
 
 ### Date: 2026-02-06

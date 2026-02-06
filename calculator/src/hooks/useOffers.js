@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { logOfferEvent } from '../lib/auditLog';
+import { logOfferEvent, fetchProjectName } from '../lib/auditLog';
 import {
   generateOfferNumber,
   getLegalText,
@@ -297,6 +297,8 @@ export function useCreateOffer() {
         await logOfferEvent('create_offer', offer.id, {
           offer_number: offer.number,
           specification_id: specificationId,
+          project_id: spec.project_id,
+          project_name: spec.project?.name,
           total: spec.totals_json?.grandTotal || 0,
           milestones_count: milestones.length,
         });
@@ -386,11 +388,13 @@ export function useAcceptOffer() {
         .update({ status: 'pending_payment' })
         .eq('id', offer.specification.project_id);
 
-      // Log audit event
+      // Log audit event with project name
+      const project_name = await fetchProjectName(offer.specification.project_id);
       try {
         await logOfferEvent('accept_offer', offerId, {
           offer_number: offer.number,
           project_id: offer.specification.project_id,
+          project_name,
         });
       } catch (e) {
         console.warn('Failed to log audit event:', e);

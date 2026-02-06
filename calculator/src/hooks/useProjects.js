@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { logProjectEvent } from '../lib/auditLog';
+import { logProjectEvent, fetchClientName } from '../lib/auditLog';
 
 /**
  * Fetch all projects for the current client with counts
@@ -122,6 +122,14 @@ export function useDeleteProject() {
 
   return useMutation({
     mutationFn: async (projectId) => {
+      // Fetch project name and client before deletion for audit log
+      const { data: projectData } = await supabase
+        .from('projects')
+        .select('name, client_id')
+        .eq('id', projectId)
+        .single();
+      const client_name = await fetchClientName(projectData?.client_id);
+
       // Helper to safely delete (ignore errors for non-existent tables/records)
       const safeDelete = async (table, column, value) => {
         try {
@@ -189,14 +197,15 @@ export function useDeleteProject() {
         .eq('id', projectId);
 
       if (error) throw error;
-      return projectId;
+      return { id: projectId, name: projectData?.name, client_name };
     },
-    onSuccess: () => {
+    onSuccess: ({ id, name, client_name }) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['stages'] });
+      logProjectEvent('delete_project', id, { name, client_name });
     },
   });
 }
@@ -346,20 +355,25 @@ export function useCreateProject() {
 
       if (error) throw error;
 
+      // Fetch client name for audit log context
+      const client_name = await fetchClientName(clientId);
+
       // Log audit event
       try {
         await logProjectEvent('create_project', data.id, {
           name: data.name,
           status: data.status,
+          client_name,
         });
       } catch (e) {
         console.warn('Failed to log audit event:', e);
       }
 
-      return data;
+      return { ...data, _client_name: client_name };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      logProjectEvent('create_project', data.id, { name: data.name, client_name: data._client_name });
     },
   });
 }
@@ -376,15 +390,18 @@ export function useUpdateProject() {
         .from('projects')
         .update(updates)
         .eq('id', projectId)
-        .select()
+        .select('*, client:clients!client_id(id)')
         .single();
 
       if (error) throw error;
-      return data;
+      // Fetch client name for audit context
+      const client_name = await fetchClientName(data.client?.id);
+      return { ...data, _client_name: client_name };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['projects', data.id] });
+      logProjectEvent('update_project', data.id, { name: data.name, client_name: data._client_name });
     },
   });
 }
@@ -425,6 +442,14 @@ export function useCompleteProject() {
         throw new Error('Only admins and AMs can complete projects');
       }
 
+      // Fetch project info for audit log
+      const { data: proj } = await supabase
+        .from('projects')
+        .select('name, client_id')
+        .eq('id', projectId)
+        .single();
+      const client_name = await fetchClientName(proj?.client_id);
+
       const { error } = await supabase.rpc('complete_project', {
         project_uuid: projectId,
       });
@@ -433,17 +458,20 @@ export function useCompleteProject() {
 
       try {
         await logProjectEvent('complete_project', projectId, {
+          name: proj?.name,
           status: 'completed',
+          client_name,
         });
       } catch (e) {
         console.warn('Failed to log audit event:', e);
       }
 
-      return projectId;
+      return { projectId, name: proj?.name, client_name };
     },
-    onSuccess: (projectId) => {
+    onSuccess: ({ projectId, name, client_name }) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      logProjectEvent('complete_project', projectId, { name, client_name });
     },
   });
 }
@@ -461,6 +489,14 @@ export function useArchiveProject() {
         throw new Error('Only admins and AMs can archive projects');
       }
 
+      // Fetch project info for audit log
+      const { data: proj } = await supabase
+        .from('projects')
+        .select('name, client_id')
+        .eq('id', projectId)
+        .single();
+      const client_name = await fetchClientName(proj?.client_id);
+
       const { error } = await supabase.rpc('archive_project', {
         project_uuid: projectId,
       });
@@ -469,17 +505,20 @@ export function useArchiveProject() {
 
       try {
         await logProjectEvent('archive_project', projectId, {
+          name: proj?.name,
           status: 'archived',
+          client_name,
         });
       } catch (e) {
         console.warn('Failed to log audit event:', e);
       }
 
-      return projectId;
+      return { projectId, name: proj?.name, client_name };
     },
-    onSuccess: (projectId) => {
+    onSuccess: ({ projectId, name, client_name }) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      logProjectEvent('archive_project', projectId, { name, client_name });
     },
   });
 }

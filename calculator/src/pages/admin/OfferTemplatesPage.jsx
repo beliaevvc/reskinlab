@@ -10,7 +10,6 @@ import {
   useClientOfferAssignments,
 } from '../../hooks/useOfferTemplates';
 import { formatDate } from '../../lib/utils';
-
 // ============================================
 // Create Template Modal
 // ============================================
@@ -159,6 +158,7 @@ function AudienceBadge({ template, assignments }) {
 // ============================================
 export function OfferTemplatesPage() {
   const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
 
   const { data: templates, isLoading } = useOfferTemplates();

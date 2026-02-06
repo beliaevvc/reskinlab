@@ -5,11 +5,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { OfferCard, OffersTable } from '../../components/offers';
 import { ClientFilter } from '../../components/offers/ClientFilter';
 import { OfferModal } from '../../components/project';
-
 export function OffersPage() {
   const { isAdmin, isAM } = useAuth();
   const location = useLocation();
   const isStaff = isAdmin || isAM;
+
   const isAdminOrAMView = location.pathname.startsWith('/admin') || location.pathname.startsWith('/am');
 
   // Use different hooks for staff vs client

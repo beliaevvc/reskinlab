@@ -10,7 +10,6 @@ import { useProjectFiles } from '../../hooks/useFiles';
 import { ProjectHeader, ProjectSidebar, ProjectStages, SpecificationModal, OfferModal, InvoiceModal, FilesGalleryModal, CalculatorModal } from '../../components/project';
 import { StageChangeModal } from '../../components/project/StageChangeModal';
 import { KanbanBoard, TaskDetailModal, CreateTaskModal } from '../../components/tasks';
-
 // Local storage key for sidebar state
 const SIDEBAR_COLLAPSED_KEY = 'project-sidebar-collapsed';
 

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logAuditEvent } from '../lib/auditLog';
 
 /**
  * Получить все шаблоны автоматических задач
@@ -42,8 +43,9 @@ export function useCreateTaskAutoTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-auto-templates'] });
+      logAuditEvent({ action: 'create_task_auto_template', entity_type: 'task_auto_template', entity_id: data.id, details: { title: data.title } });
     },
   });
 }
@@ -71,8 +73,9 @@ export function useUpdateTaskAutoTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-auto-templates'] });
+      logAuditEvent({ action: 'update_task_auto_template', entity_type: 'task_auto_template', entity_id: data.id, details: { title: data.title } });
     },
   });
 }
@@ -93,8 +96,9 @@ export function useDeleteTaskAutoTemplate() {
       if (error) throw error;
       return id;
     },
-    onSuccess: () => {
+    onSuccess: (id) => {
       queryClient.invalidateQueries({ queryKey: ['task-auto-templates'] });
+      logAuditEvent({ action: 'delete_task_auto_template', entity_type: 'task_auto_template', entity_id: id });
     },
   });
 }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logAuditEvent } from '../lib/auditLog';
 
 /**
  * Получить все шаблоны задач из спецификации
@@ -43,8 +44,9 @@ export function useUpdateTaskSpecItemTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-spec-item-templates'] });
+      logAuditEvent({ action: 'update_task_spec_item_template', entity_type: 'task_spec_item_template', entity_id: data.id, details: { item_id: data.item_id } });
     },
   });
 }
@@ -71,8 +73,9 @@ export function useCreateTaskSpecItemTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['task-spec-item-templates'] });
+      logAuditEvent({ action: 'create_task_spec_item_template', entity_type: 'task_spec_item_template', entity_id: data.id, details: { item_id: data.item_id } });
     },
   });
 }

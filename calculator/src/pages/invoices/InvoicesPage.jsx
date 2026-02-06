@@ -6,10 +6,10 @@ import { InvoiceCard, InvoicesTable } from '../../components/invoices';
 import { InvoiceModal } from '../../components/project';
 import { Select } from '../../components/Select';
 import { formatInvoiceAmount, isInvoiceOverdue } from '../../lib/invoiceUtils';
-
 export function InvoicesPage() {
   const { isAdmin, isStaff } = useAuth();
   const { data: invoices, isLoading, error } = useInvoices();
+
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('invoices-view') || 'grid';

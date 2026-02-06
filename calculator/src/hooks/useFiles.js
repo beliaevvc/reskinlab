@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logFileAction } from '../lib/auditLog';
 
 /**
  * File type icons mapping
@@ -187,6 +188,7 @@ export function useUploadFile() {
       if (data.task_id) {
         queryClient.invalidateQueries({ queryKey: ['task-files', data.task_id] });
       }
+      logFileAction('upload_file', data.id, { filename: data.filename, bucket: data.bucket, project_id: data.project_id });
     },
   });
 }
@@ -278,6 +280,7 @@ export function useDeleteFile() {
       queryClient.invalidateQueries({ queryKey: ['comment-files'] });
       // Also invalidate comments to refresh attachments display
       queryClient.invalidateQueries({ queryKey: ['comments'] });
+      logFileAction('delete_file', data.fileId, { project_id: data.projectId });
     },
   });
 }

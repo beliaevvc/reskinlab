@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { logApprovalEvent } from '../lib/auditLog';
 
 /**
  * Fetch all approvals for a project
@@ -198,6 +199,7 @@ export function useRespondToApproval() {
       if (data.stage_id) {
         queryClient.invalidateQueries({ queryKey: ['stages', data.project_id] });
       }
+      logApprovalEvent('respond_to_approval', data.id, { status: data.status, project_id: data.project_id });
     },
   });
 }

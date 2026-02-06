@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Audit Logs — Entity Names & Parent Context** — ARCHIVED ✅
+
+### Summary
+Расширение аудит-логов: названия сущностей во всех CRUD-операциях + родительский контекст (project_name, client_name) + обогащение старых записей через batch-fetch. 13 файлов изменено.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-audit-logs-entity-names.md`
+- **Reflection:** `memory-bank/reflection/reflection-audit-logs-entity-names.md`
+
+---
+
+## Recent Task
 **Offer Templates Admin Panel** — ARCHIVED ✅
 
 ### Summary
