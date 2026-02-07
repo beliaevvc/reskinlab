@@ -1,5 +1,18 @@
 # Progress Log
 
+## Minimum Order Amount — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Минимальная сумма заказа ($1000) для первого заказа в проекте. Админка: toggle + amount + message. Промо capping. Предупреждения в UI. Блокировка save.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-minimum-order-amount.md`
+📄 `memory-bank/reflection/reflection-minimum-order-amount.md`
+
+---
+
 ## Project Resources Tab & UI Consistency — ARCHIVED ✅
 
 ### Date: 2026-02-07

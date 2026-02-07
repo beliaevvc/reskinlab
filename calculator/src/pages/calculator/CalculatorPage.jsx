@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
+import { useMinimumOrder } from '../../hooks/useMinimumOrder';
 import { useSaveSpecification, useSpecification } from '../../hooks/useSpecifications';
 import useCalculatorStore from '../../stores/calculatorStore';
 import {
@@ -44,6 +45,7 @@ export function CalculatorPage() {
     setPaymentModel,
     setRevisionRounds,
     setAppliedPromo,
+    setMinimumOrderConfig,
     updateItem,
     toggleDetails,
     applyPreset,
@@ -60,6 +62,18 @@ export function CalculatorPage() {
     setSpecification,
     resetSpecification,
   } = useCalculatorStore();
+
+  // Minimum order settings
+  const minimumOrder = useMinimumOrder(currentProjectId);
+
+  // Sync minimum order config into calculator
+  useEffect(() => {
+    setMinimumOrderConfig({
+      amount: minimumOrder.amount,
+      isFirstOrder: minimumOrder.isFirstOrder,
+      isEnabled: minimumOrder.isEnabled,
+    });
+  }, [minimumOrder.amount, minimumOrder.isFirstOrder, minimumOrder.isEnabled, setMinimumOrderConfig]);
 
   // Save mutation
   const saveSpec = useSaveSpecification();
@@ -171,7 +185,9 @@ export function CalculatorPage() {
           <SaveDraftButton
             onSave={handleSave}
             isSaving={saveSpec.isPending}
-            disabled={totals.grandTotal === 0}
+            disabled={totals.grandTotal === 0 || minimumOrder.isBelowMinimum(totals.grandTotal)}
+            belowMinimum={minimumOrder.isBelowMinimum(totals.grandTotal)}
+            minimumAmount={minimumOrder.amount}
             variant="primary"
           />
         </div>
@@ -225,6 +241,7 @@ export function CalculatorPage() {
           totals={totals}
           usageRights={usageRights}
           paymentModel={paymentModel}
+          minimumOrder={minimumOrder}
           onViewSpecification={() => setView('specification')}
         />
       </main>
@@ -234,6 +251,7 @@ export function CalculatorPage() {
         totals={totals}
         usageRights={usageRights}
         paymentModel={paymentModel}
+        minimumOrder={minimumOrder}
         onViewSpecification={() => setView('specification')}
       />
     </div>

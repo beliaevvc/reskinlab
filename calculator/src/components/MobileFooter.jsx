@@ -1,6 +1,6 @@
 import { Icon } from './Icon';
 
-export function MobileFooter({ totals, usageRights, paymentModel, onViewSpecification }) {
+export function MobileFooter({ totals, usageRights, paymentModel, minimumOrder, onViewSpecification }) {
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-neutral-200 p-4 pb-8 z-40">
       <div className="flex justify-between mb-3 text-xs font-mono text-neutral-500">
@@ -23,6 +23,16 @@ export function MobileFooter({ totals, usageRights, paymentModel, onViewSpecific
             <div className="text-2xl font-bold text-neutral-900 font-mono">
               ${Math.round(totals.grandTotal).toLocaleString()}
             </div>
+          )}
+          {minimumOrder?.isMinimumActive && minimumOrder.isBelowMinimum(totals.grandTotal) && (
+            <p className="text-[10px] text-amber-600 mt-0.5">
+              {minimumOrder.message || `Min. $${minimumOrder.amount.toLocaleString()} for first order`}
+            </p>
+          )}
+          {totals.minimumApplied && (
+            <p className="text-[10px] text-amber-600 mt-0.5">
+              Promo capped at minimum
+            </p>
           )}
         </div>
         <button

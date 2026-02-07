@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
+import { useMinimumOrder } from '../../hooks/useMinimumOrder';
 import { useSaveSpecification, useSpecification } from '../../hooks/useSpecifications';
 import useCalculatorStore from '../../stores/calculatorStore';
 import { formatCurrency } from '../../lib/utils';
@@ -32,12 +33,25 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
     setPaymentModel,
     setRevisionRounds,
     setAppliedPromo,
+    setMinimumOrderConfig,
     updateItem,
     toggleDetails,
     applyPreset,
     loadState,
     resetCalculator,
   } = calculator;
+
+  // Minimum order settings (projectId comes from modal props)
+  const minimumOrder = useMinimumOrder(projectId);
+
+  // Sync minimum order config into calculator
+  useEffect(() => {
+    setMinimumOrderConfig({
+      amount: minimumOrder.amount,
+      isFirstOrder: minimumOrder.isFirstOrder,
+      isEnabled: minimumOrder.isEnabled,
+    });
+  }, [minimumOrder.amount, minimumOrder.isFirstOrder, minimumOrder.isEnabled, setMinimumOrderConfig]);
 
   // Store context
   const {
@@ -194,7 +208,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
             {/* Save button */}
             <button
               onClick={handleSave}
-              disabled={saveSpec.isPending || !totals.grandTotal || totals.grandTotal === 0}
+              disabled={saveSpec.isPending || !totals.grandTotal || totals.grandTotal === 0 || minimumOrder.isBelowMinimum(totals.grandTotal)}
               className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white rounded font-medium transition-colors"
             >
               {saveSpec.isPending ? (
@@ -297,7 +311,18 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
 
       {/* Footer with total */}
         <div className="bg-white border-t border-neutral-200 px-6 py-3 shrink-0">
-          <div className="flex items-baseline justify-end gap-3">
+          <div className="flex items-center justify-end gap-3">
+            {/* Minimum order warnings */}
+            {minimumOrder.isMinimumActive && minimumOrder.isBelowMinimum(totals.grandTotal) && (
+              <span className="text-xs text-amber-600 mr-auto">
+                {minimumOrder.message || `Min. $${minimumOrder.amount.toLocaleString()} for first order`}
+              </span>
+            )}
+            {totals.minimumApplied && (
+              <span className="text-xs text-amber-600 mr-auto">
+                Promo capped at minimum order amount
+              </span>
+            )}
             <span className="text-neutral-500">Total:</span>
             {totals.appliedPromo && totals.discountAmount > 0 && (
               <span className="text-base font-medium text-neutral-400 font-mono line-through">

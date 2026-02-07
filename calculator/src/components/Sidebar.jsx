@@ -1,6 +1,6 @@
 import { Icon } from './Icon';
 
-export function Sidebar({ totals, usageRights, paymentModel, onViewSpecification }) {
+export function Sidebar({ totals, usageRights, paymentModel, minimumOrder, onViewSpecification }) {
   return (
     <div className="hidden lg:block lg:col-span-1">
       <div className="sticky top-[10rem]">
@@ -22,6 +22,16 @@ export function Sidebar({ totals, usageRights, paymentModel, onViewSpecification
               <div className="text-4xl font-bold text-neutral-900 font-mono">
                 ${Math.round(totals.grandTotal).toLocaleString()}
               </div>
+            )}
+            {minimumOrder?.isMinimumActive && minimumOrder.isBelowMinimum(totals.grandTotal) && (
+              <p className="text-xs text-amber-600 mt-1.5">
+                {minimumOrder.message || `Min. $${minimumOrder.amount.toLocaleString()} for first order`}
+              </p>
+            )}
+            {totals.minimumApplied && (
+              <p className="text-xs text-amber-600 mt-1">
+                Promo capped at minimum order amount
+              </p>
             )}
           </div>
           <div className="space-y-3 border-t border-neutral-100 pt-5 mb-6 text-sm">

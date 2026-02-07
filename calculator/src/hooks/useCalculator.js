@@ -33,6 +33,13 @@ export function useCalculator() {
   const [appliedPromo, setAppliedPromo] = useState(null);
   const [items, setItems] = useState(createInitialItemsState);
 
+  // Minimum order config (set externally from useMinimumOrder hook)
+  const [minimumOrderConfig, setMinimumOrderConfig] = useState({
+    amount: 0,
+    isFirstOrder: false,
+    isEnabled: false,
+  });
+
   // Синхронизация state при добавлении новых items (Исправление бага с отображением)
   useEffect(() => {
     setItems((prev) => {
@@ -191,7 +198,18 @@ export function useCalculator() {
         discountAmount = finalTotal * appliedPromo.discount;
       }
     }
-    const grandTotal = finalTotal - discountAmount;
+
+    // Minimum order enforcement for first order in project
+    let grandTotal = finalTotal - discountAmount;
+    let minimumApplied = false;
+    const { amount: minAmount, isFirstOrder: minFirstOrder, isEnabled: minEnabled } = minimumOrderConfig;
+
+    if (minEnabled && minFirstOrder && minAmount > 0 && grandTotal < minAmount && finalTotal >= minAmount) {
+      // Promo cannot reduce below minimum — cap the discount
+      grandTotal = minAmount;
+      discountAmount = finalTotal - minAmount;
+      minimumApplied = true;
+    }
 
     return {
       productionSum,
@@ -203,8 +221,10 @@ export function useCalculator() {
       grandTotal,
       appliedPromo,
       lineItems,
+      minimumApplied,
+      minimumOrderAmount: minEnabled && minFirstOrder ? minAmount : 0,
     };
-  }, [items, globalStyle, usageRights, paymentModel, revisionRounds, appliedPromo]);
+  }, [items, globalStyle, usageRights, paymentModel, revisionRounds, appliedPromo, minimumOrderConfig]);
 
   return {
     // State
@@ -222,6 +242,7 @@ export function useCalculator() {
     setPaymentModel,
     setRevisionRounds,
     setAppliedPromo,
+    setMinimumOrderConfig,
     updateItem,
     toggleDetails,
     applyPreset,

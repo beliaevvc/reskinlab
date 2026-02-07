@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Minimum Order Amount** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-minimum-order-amount.md`
+- **Reflection:** `memory-bank/reflection/reflection-minimum-order-amount.md`
+
+---
+
+## Recent Task
 **Project Resources Tab & UI Consistency** — ARCHIVED ✅
 
 ### Complexity: Level 2

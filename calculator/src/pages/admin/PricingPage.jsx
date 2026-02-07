@@ -5,6 +5,7 @@ import { logPriceChange } from '../../lib/auditLog';
 
 // Category icons
 const CATEGORY_ICONS = {
+  'Minimum Order': '🛡️',
   'Symbols': '🎰',
   'Backgrounds': '🖼️',
   'Pop-ups': '💥',
@@ -22,6 +23,7 @@ const CATEGORY_ICONS = {
 
 // Category order
 const CATEGORY_ORDER = [
+  'Minimum Order',
   'Symbols',
   'Backgrounds', 
   'Pop-ups',
@@ -200,6 +202,166 @@ function CategorySection({ category, configs, expandedCategories, toggleCategory
   );
 }
 
+/**
+ * Custom section for Minimum Order settings
+ * Shows: toggle (on/off), amount ($), and client-facing message
+ */
+function MinimumOrderSection({ configs, onSaveConfig, isSaving }) {
+  const enabledConfig = configs.find(c => c.name === 'min_order_enabled');
+  const amountConfig = configs.find(c => c.name === 'min_order_amount');
+  const messageConfig = configs.find(c => c.name === 'min_order_message');
+
+  const [isEnabled, setIsEnabled] = useState(enabledConfig?.value === 1);
+  const [amount, setAmount] = useState(amountConfig?.value?.toString() || '1000');
+  const [message, setMessage] = useState(messageConfig?.description || '');
+  const [isDirty, setIsDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleToggle = () => {
+    setIsEnabled(!isEnabled);
+    setIsDirty(true);
+  };
+
+  const handleAmountChange = (e) => {
+    setAmount(e.target.value);
+    setIsDirty(true);
+  };
+
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+    setIsDirty(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Save enabled toggle
+      if (enabledConfig) {
+        await onSaveConfig(enabledConfig.id, isEnabled ? 1 : 0, enabledConfig.description);
+      }
+      // Save amount
+      if (amountConfig) {
+        await onSaveConfig(amountConfig.id, parseFloat(amount) || 0, amountConfig.description);
+      }
+      // Save message (stored in description of min_order_message)
+      if (messageConfig) {
+        await onSaveConfig(messageConfig.id, messageConfig.value, message.trim() || null);
+      }
+      setIsDirty(false);
+    } catch (err) {
+      alert('Failed to save: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-md border border-neutral-200 overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 bg-neutral-50 border-b border-neutral-200 flex items-center gap-3">
+        <span className="text-xl">🛡️</span>
+        <div>
+          <h3 className="font-semibold text-neutral-900">Minimum Order</h3>
+          <p className="text-sm text-neutral-500">
+            Minimum amount required for the first order in a project
+          </p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 space-y-5">
+        {/* Toggle */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-neutral-900">Enable Minimum Order</p>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              When enabled, the first order in every project must meet the minimum amount
+            </p>
+          </div>
+          <button
+            onClick={handleToggle}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              isEnabled ? 'bg-emerald-500' : 'bg-neutral-300'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                isEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Amount */}
+        <div className={`transition-opacity ${isEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+          <label className="block text-sm font-medium text-neutral-900 mb-1.5">
+            Minimum Amount ($)
+          </label>
+          <div className="flex items-center gap-2">
+            <span className="text-neutral-500 text-lg">$</span>
+            <input
+              type="number"
+              value={amount}
+              onChange={handleAmountChange}
+              min="0"
+              step="100"
+              className="w-40 px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-right text-lg font-mono"
+            />
+          </div>
+          <p className="text-xs text-neutral-500 mt-1">
+            Applies only to the first order (before any paid invoices in the project)
+          </p>
+        </div>
+
+        {/* Message */}
+        <div className={`transition-opacity ${isEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+          <label className="block text-sm font-medium text-neutral-900 mb-1.5">
+            Client Message
+          </label>
+          <input
+            type="text"
+            value={message}
+            onChange={handleMessageChange}
+            placeholder="e.g. Minimum order amount is $1,000 for your first order"
+            className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+          />
+          <p className="text-xs text-neutral-500 mt-1">
+            Shown to clients in the calculator when their order is below the minimum
+          </p>
+        </div>
+
+        {/* Save button */}
+        {isDirty && (
+          <div className="pt-2 border-t border-neutral-100">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-5 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 font-medium text-sm disabled:opacity-50 transition-colors"
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        )}
+
+        {/* Preview */}
+        {isEnabled && (
+          <div className="pt-3 border-t border-neutral-100">
+            <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Preview</p>
+            <div className="bg-amber-50 border border-amber-200 rounded p-3 flex items-start gap-2">
+              <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-xs text-amber-700">
+                {message || `Min. $${parseInt(amount || 0).toLocaleString()} for first order`}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function PricingPage() {
   const { data: configs, isLoading } = usePriceConfigs();
   const updateConfig = useUpdatePriceConfig();
@@ -275,6 +437,24 @@ export function PricingPage() {
     setEditingId(null);
     setEditValue('');
     setEditDescription('');
+  };
+
+  // Direct save handler for MinimumOrderSection (saves individual config by id)
+  const handleSaveConfig = async (id, value, description) => {
+    const config = configs?.find(c => c.id === id);
+    const oldValue = config?.value;
+    const oldDescription = config?.description;
+
+    await updateConfig.mutateAsync({ id, value, description });
+
+    await logPriceChange({
+      configId: id,
+      configName: config?.name,
+      oldValue,
+      newValue: value,
+      oldDescription,
+      newDescription: description,
+    });
   };
 
   const expandAll = () => setExpandedCategories(Object.keys(groupedConfigs));
@@ -358,22 +538,31 @@ export function PricingPage() {
       ) : (
         <div className="space-y-4">
           {Object.entries(groupedConfigs).map(([category, categoryConfigs]) => (
-            <CategorySection
-              key={category}
-              category={category}
-              configs={categoryConfigs}
-              expandedCategories={expandedCategories}
-              toggleCategory={toggleCategory}
-              onEdit={handleEdit}
-              editingId={editingId}
-              editValue={editValue}
-              setEditValue={setEditValue}
-              editDescription={editDescription}
-              setEditDescription={setEditDescription}
-              onSave={handleSave}
-              onCancel={handleCancel}
-              isSaving={updateConfig.isPending}
-            />
+            category === 'Minimum Order' ? (
+              <MinimumOrderSection
+                key={category}
+                configs={categoryConfigs}
+                onSaveConfig={handleSaveConfig}
+                isSaving={updateConfig.isPending}
+              />
+            ) : (
+              <CategorySection
+                key={category}
+                category={category}
+                configs={categoryConfigs}
+                expandedCategories={expandedCategories}
+                toggleCategory={toggleCategory}
+                onEdit={handleEdit}
+                editingId={editingId}
+                editValue={editValue}
+                setEditValue={setEditValue}
+                editDescription={editDescription}
+                setEditDescription={setEditDescription}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                isSaving={updateConfig.isPending}
+              />
+            )
           ))}
         </div>
       )}
