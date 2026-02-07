@@ -155,7 +155,7 @@ export function CommentInput({
       )}
 
       {/* Input form */}
-      <form onSubmit={handleSubmit} className="flex items-end gap-2">
+      <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
         {/* File attachment button */}
         <input
           ref={fileInputRef}
@@ -169,7 +169,7 @@ export function CommentInput({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isPending}
-          className="p-2.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors disabled:opacity-50"
+          className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors disabled:opacity-50"
           title="Attach files"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,7 +178,7 @@ export function CommentInput({
         </button>
 
         {/* Text input */}
-        <div className="flex-1 relative">
+        <div className="flex-1 min-w-0">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -186,7 +186,7 @@ export function CommentInput({
             placeholder={replyingTo ? 'Write a reply...' : 'Type a message...'}
             rows={1}
             disabled={isPending}
-            className="w-full px-4 py-2.5 border border-neutral-200 rounded-2xl resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm disabled:opacity-50 disabled:bg-neutral-50"
+            className="w-full px-4 py-2.5 border border-neutral-200 rounded-2xl resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm disabled:opacity-50 disabled:bg-neutral-50 block"
             style={{ maxHeight: '120px', minHeight: '42px' }}
             onInput={(e) => {
               e.target.style.height = 'auto';
@@ -199,7 +199,7 @@ export function CommentInput({
         <button
           type="submit"
           disabled={(!content.trim() && selectedFiles.length === 0) || isPending}
-          className="p-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

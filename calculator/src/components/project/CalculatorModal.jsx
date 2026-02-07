@@ -79,7 +79,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
     if (specificationId && loadedSpec?.state_json && loadedSpec.id !== loadedSpecId) {
       loadState(loadedSpec.state_json);
       setLoadedSpecId(loadedSpec.id);
-      setSpecification(loadedSpec.id, loadedSpec.version, loadedSpec.status === 'draft');
+      setSpecification(loadedSpec.id, loadedSpec.number || loadedSpec.version, loadedSpec.status === 'draft');
     }
   }, [specificationId, loadedSpec, loadedSpecId, loadState, setSpecification]);
 
@@ -113,7 +113,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
         totalsJson: totals,
       });
 
-      setSpecification(result.id, result.version, true);
+      setSpecification(result.id, result.number || result.version, true);
       setLastSaved(new Date());
       handleClose();
     } catch (error) {

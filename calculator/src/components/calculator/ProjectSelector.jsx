@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useProjectsForSelector } from '../../hooks/useProjects';
+import { useAuth } from '../../contexts/AuthContext';
 import useCalculatorStore from '../../stores/calculatorStore';
 import { CreateProjectModal } from '../projects';
 
@@ -7,6 +8,8 @@ export function ProjectSelector({ onProjectChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const dropdownRef = useRef(null);
+  const { isAdmin, isAM } = useAuth();
+  const isStaff = isAdmin || isAM;
 
   const { data: projects, isLoading } = useProjectsForSelector();
   const {
@@ -204,6 +207,7 @@ export function ProjectSelector({ onProjectChange }) {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={handleCreateSuccess}
+        isStaff={isStaff}
       />
     </div>
   );

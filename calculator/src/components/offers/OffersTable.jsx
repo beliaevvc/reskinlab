@@ -87,7 +87,7 @@ export function OffersTable({ offers, onOfferClick, showClient = true }) {
                 <td className="px-4 py-3">
                   {spec && (
                     <span className="text-xs bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">
-                      {spec.version}
+                      {spec.number || spec.version}
                     </span>
                   )}
                 </td>

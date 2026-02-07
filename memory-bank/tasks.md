@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Project Resources Tab & UI Consistency** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-project-resources-tab.md`
+- **Reflection:** `memory-bank/reflection/reflection-project-resources-tab.md`
+
+---
+
+## Recent Task
 **Client Dashboard Activity — Audit Logs Integration** — ARCHIVED ✅
 
 ### Summary

@@ -111,7 +111,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                 )}
                 {offer?.specification && (
                   <span className="text-neutral-500">
-                    Spec: <button onClick={() => setShowSpecModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{offer.specification.version}</button>
+                    Spec: <button onClick={() => setShowSpecModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{offer.specification.number || offer.specification.version}</button>
                   </span>
                 )}
               </div>

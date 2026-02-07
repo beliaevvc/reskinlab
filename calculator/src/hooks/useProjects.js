@@ -148,7 +148,22 @@ export function useDeleteProject() {
         }
       };
 
-      // 1. Get specifications to find offers
+      // 1. Get comments to delete their reactions and reads first
+      const { data: comments } = await supabase
+        .from('comments')
+        .select('id')
+        .eq('project_id', projectId);
+      
+      if (comments?.length) {
+        const commentIds = comments.map(c => c.id);
+        await safeDeleteIn('comment_reactions', 'comment_id', commentIds);
+        await safeDeleteIn('comment_reads', 'comment_id', commentIds);
+      }
+      
+      // 2. Delete comments
+      await safeDelete('comments', 'project_id', projectId);
+
+      // 3. Get specifications to find offers
       const { data: specs } = await supabase
         .from('specifications')
         .select('id')
@@ -156,10 +171,10 @@ export function useDeleteProject() {
       
       const specIds = specs?.map(s => s.id) || [];
       
-      // 2. Delete invoices first (they reference offers)
+      // 4. Delete invoices (they reference offers)
       await safeDelete('invoices', 'project_id', projectId);
       
-      // 3. Delete offer_acceptance_logs (they reference offers)
+      // 5. Delete offer_acceptance_logs (they reference offers)
       if (specIds.length) {
         const { data: offers } = await supabase
           .from('offers')
@@ -171,26 +186,35 @@ export function useDeleteProject() {
           await safeDeleteIn('offer_acceptance_logs', 'offer_id', offerIds);
         }
         
-        // 4. Delete offers
+        // 6. Delete offers
         await safeDeleteIn('offers', 'specification_id', specIds);
       }
       
-      // 5. Delete specifications
+      // 7. Delete specifications
       await safeDelete('specifications', 'project_id', projectId);
       
-      // 6. Delete approvals (may not exist)
+      // 8. Delete approvals
       await safeDelete('approvals', 'project_id', projectId);
       
-      // 7. Delete tasks first (they reference workflow_stages)
+      // 9. Delete tasks (they reference workflow_stages via task_checklist_items CASCADE)
       await safeDelete('tasks', 'project_id', projectId);
       
-      // 8. Delete workflow_stages (they reference projects)
+      // 10. Delete workflow_stages
       await safeDelete('workflow_stages', 'project_id', projectId);
       
-      // 9. Delete project files
+      // 11. Delete assets
+      await safeDelete('assets', 'project_id', projectId);
+      
+      // 12. Delete project files
       await safeDelete('project_files', 'project_id', projectId);
       
-      // 10. Finally delete the project
+      // 13. Delete client_offer_assignments
+      await safeDelete('client_offer_assignments', 'project_id', projectId);
+      
+      // 14. Delete project_links (resources)
+      await safeDelete('project_links', 'project_id', projectId);
+      
+      // 15. Finally delete the project
       const { error } = await supabase
         .from('projects')
         .delete()
@@ -224,6 +248,7 @@ export function useProject(projectId) {
           *,
           specifications (
             id,
+            number,
             version,
             version_number,
             status,
@@ -310,8 +335,9 @@ export function useCreateProject() {
   const { client, user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ name, description }) => {
-      let clientId = client?.id;
+    mutationFn: async ({ name, description, clientId: explicitClientId }) => {
+      // If clientId is passed explicitly (admin creating for a client), use it directly
+      let clientId = explicitClientId || client?.id;
 
       if (!clientId && user?.id) {
         // Try to fetch client record
@@ -339,7 +365,7 @@ export function useCreateProject() {
       }
 
       if (!clientId) {
-        throw new Error('Please log in to create a project.');
+        throw new Error('Please select a client or log in to create a project.');
       }
 
       const { data, error } = await supabase

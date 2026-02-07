@@ -211,16 +211,71 @@ import { Icon } from '../Icon';
 
 ---
 
-## 9. Общие правила
+## 9. Модальные окна подтверждения (Confirm Modal)
 
-1. **Не использовать нативные `<select>`** — только `<Select>` из `src/components/Select.jsx`
-2. **Не использовать `!important`**
-3. **Focus-стили:** `focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500`
-4. **Hover-стили для интерактивных элементов** — всегда добавлять `transition-colors`
-5. **Скругления:** `rounded` для мелких элементов, `rounded-lg` для карточек и инпутов
-6. **Тени:** `shadow-lg` только для выпадающих списков и модальных окон
-7. **z-index:** `z-50` для выпадающих списков, `z-[9999]` для модальных окон
+**Правило:** Везде, где нужно подтверждение действия — использовать кастомную модалку, **не** нативный `confirm()` / `alert()`.
+
+**Структура:**
+```jsx
+{showConfirm && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
+    {/* Modal */}
+    <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+      {/* Icon + Title */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center {iconBgClass}">
+          {/* SVG icon */}
+        </div>
+        <h3 className="text-lg font-semibold text-neutral-900">{title}</h3>
+      </div>
+      {/* Message */}
+      <p className="text-sm text-neutral-600 mb-6">{message}</p>
+      {/* Actions */}
+      <div className="flex gap-3">
+        <button className="flex-1 px-4 py-2.5 rounded-md border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors text-sm">
+          Cancel
+        </button>
+        <button className="flex-1 px-4 py-2.5 rounded-md text-white font-medium transition-colors text-sm {confirmBtnClass}">
+          {confirmLabel}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+```
+
+**Цвета иконки и кнопки по типу действия:**
+
+| Тип действия | Icon bg | Icon color | Confirm button |
+|---|---|---|---|
+| Success / Complete | `bg-emerald-100` | `text-emerald-600` | `bg-emerald-500 hover:bg-emerald-600` |
+| Warning / Archive | `bg-amber-100` | `text-amber-600` | `bg-amber-500 hover:bg-amber-600` |
+| Danger / Delete | `bg-red-100` | `text-red-600` | `bg-red-500 hover:bg-red-600` |
+| Info | `bg-blue-100` | `text-blue-600` | `bg-blue-500 hover:bg-blue-600` |
+
+**Ключевые правила:**
+- Overlay: `bg-black/50 backdrop-blur-sm`
+- Контейнер: `max-w-sm rounded-lg shadow-xl p-6`
+- Cancel-кнопка всегда слева, Confirm-кнопка справа
+- Обе кнопки `flex-1` (одинаковой ширины)
+- Закрывается по клику на overlay
+- Текст сообщения может содержать название сущности (жирным через `<span className="font-medium">`)
 
 ---
 
-*Последнее обновление: 2026-02-06*
+## 10. Общие правила
+
+1. **Не использовать нативные `<select>`** — только `<Select>` из `src/components/Select.jsx`
+2. **Не использовать нативные `confirm()` / `alert()`** — только кастомные модалки (см. секцию 9)
+3. **Не использовать `!important`**
+4. **Focus-стили:** `focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500`
+5. **Hover-стили для интерактивных элементов** — всегда добавлять `transition-colors`
+6. **Скругления:** `rounded` для мелких элементов, `rounded-lg` для карточек и инпутов
+7. **Тени:** `shadow-lg` только для выпадающих списков и модальных окон
+8. **z-index:** `z-50` для выпадающих списков, `z-[9999]` для модальных окон
+
+---
+
+*Последнее обновление: 2026-02-07*

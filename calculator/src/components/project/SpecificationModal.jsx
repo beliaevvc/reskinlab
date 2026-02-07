@@ -72,7 +72,7 @@ export function SpecificationModal({ isOpen, onClose, specificationId, onEdit, o
           <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between rounded-t-lg z-10">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-bold text-neutral-900">
-                Specification {specification?.version || ''}
+                Specification {specification?.number || specification?.version || ''}
               </h2>
               {specification && (
                 <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -223,7 +223,7 @@ export function SpecificationModal({ isOpen, onClose, specificationId, onEdit, o
                 Delete Specification?
               </h3>
               <p className="text-neutral-600">
-                You are about to delete <span className="font-medium">v{specification?.version_number || specification?.version}</span>.
+                You are about to delete <span className="font-medium">{specification?.number || `v${specification?.version_number || specification?.version}`}</span>.
                 {hasOffer && (
                   <span className="block mt-2 text-red-600 font-medium">
                     This will also delete the associated offer!

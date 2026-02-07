@@ -71,7 +71,7 @@ export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess
           </h2>
           <p className="text-neutral-600">
             You are about to finalize{' '}
-            <span className="font-medium">{specification?.version}</span>.
+            <span className="font-medium">{specification?.number || specification?.version}</span>.
           </p>
         </div>
 

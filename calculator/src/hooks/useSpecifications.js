@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { logSpecificationEvent, fetchProjectName } from '../lib/auditLog';
+import { generateSpecNumber } from '../lib/specUtils';
 
 /**
  * Fetch specifications for a project
@@ -105,11 +106,13 @@ export function useSaveSpecification() {
       } else {
         // Create new specification
         const versionNumber = await getNextVersionNumber(projectId);
+        const specNumber = await generateSpecNumber();
 
         const { data, error } = await supabase
           .from('specifications')
           .insert({
             project_id: projectId,
+            number: specNumber,
             version: `v${versionNumber}.0`,
             version_number: versionNumber,
             is_addon: false,

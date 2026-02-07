@@ -5,6 +5,13 @@
 
 ## Recently Completed Tasks
 
+### Project Resources Tab & UI Consistency (7 Февраля 2026) — ARCHIVED ✅
+Новая вкладка "Resources" в правой панели проекта для внешних ссылок. UI consistency fixes.
+- **Archive:** `memory-bank/archive/archive-project-resources-tab.md`
+- **Reflection:** `memory-bank/reflection/reflection-project-resources-tab.md`
+
+---
+
 ### Client Dashboard Activity — Audit Logs Integration (7 Февраля 2026) — ARCHIVED ✅
 Блок "Recent Activity" переведён на audit_logs. UI в стиле админки. Сворачиваемый блок.
 - **Archive:** `memory-bank/archive/archive-client-dashboard-activity.md`

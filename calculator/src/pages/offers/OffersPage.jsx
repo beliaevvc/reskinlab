@@ -172,7 +172,7 @@ export function OffersPage() {
             Offers will appear here after you finalize a specification in the calculator.
           </p>
           <Link
-            to="/calculator"
+            to={location.pathname.startsWith('/admin') ? '/admin/calculator' : location.pathname.startsWith('/am') ? '/am/calculator' : '/calculator'}
             className="inline-flex items-center gap-2 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
           >
             Go to Calculator

@@ -1,5 +1,18 @@
 # Progress Log
 
+## Project Resources Tab & UI Consistency — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Новая вкладка "Resources" в ProjectSidebar для внешних ссылок проекта. UI consistency fixes.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-project-resources-tab.md`
+📄 `memory-bank/reflection/reflection-project-resources-tab.md`
+
+---
+
 ## Client Dashboard Activity — Audit Logs Integration — ARCHIVED ✅
 
 ### Date: 2026-02-07

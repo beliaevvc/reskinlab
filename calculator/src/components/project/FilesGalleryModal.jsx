@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
 import { getFileIcon, formatFileSize, useDeleteFile } from '../../hooks/useFiles';
 import { useAuth } from '../../contexts/AuthContext';
+import { Select } from '../Select';
 
 // Get signed URL for file
 function useSignedUrl(bucket, path) {
@@ -423,29 +424,31 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
             </div>
 
             {/* Type filter */}
-            <select
+            <Select
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="px-3 py-2 border border-neutral-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              <option value="all">All Types</option>
-              <option value="image">Images</option>
-              <option value="document">Documents</option>
-              <option value="design">Design Files</option>
-              <option value="archive">Archives</option>
-              <option value="video">Videos</option>
-            </select>
+              onChange={(val) => setFilter(val)}
+              options={[
+                { value: 'all', label: 'All Types' },
+                { value: 'image', label: 'Images' },
+                { value: 'document', label: 'Documents' },
+                { value: 'design', label: 'Design Files' },
+                { value: 'archive', label: 'Archives' },
+                { value: 'video', label: 'Videos' },
+              ]}
+              className="min-w-[130px]"
+            />
 
             {/* Sort */}
-            <select
+            <Select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-neutral-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              <option value="date">Newest First</option>
-              <option value="name">Name A-Z</option>
-              <option value="size">Largest First</option>
-            </select>
+              onChange={(val) => setSortBy(val)}
+              options={[
+                { value: 'date', label: 'Newest First' },
+                { value: 'name', label: 'Name A-Z' },
+                { value: 'size', label: 'Largest First' },
+              ]}
+              className="min-w-[130px]"
+            />
 
             {/* View toggle */}
             <div className="flex items-center border border-neutral-200 rounded overflow-hidden">

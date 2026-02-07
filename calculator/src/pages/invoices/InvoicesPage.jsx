@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useInvoices } from '../../hooks/useInvoices';
 import { useAuth } from '../../contexts/AuthContext';
 import { InvoiceCard, InvoicesTable } from '../../components/invoices';
@@ -8,6 +8,7 @@ import { Select } from '../../components/Select';
 import { formatInvoiceAmount, isInvoiceOverdue } from '../../lib/invoiceUtils';
 export function InvoicesPage() {
   const { isAdmin, isStaff } = useAuth();
+  const location = useLocation();
   const { data: invoices, isLoading, error } = useInvoices();
 
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
@@ -77,7 +78,7 @@ export function InvoicesPage() {
         uniqueOffers.set(offer.id, {
           id: offer.id,
           number: offer.number,
-          specVersion: offer.specification?.version,
+          specVersion: offer.specification?.number || offer.specification?.version,
         });
       }
     });
@@ -310,12 +311,20 @@ export function InvoicesPage() {
           <p className="mt-2 text-neutral-500 max-w-md mx-auto">
             Invoices will appear here after you accept an offer.
           </p>
-          <Link
-            to="/offers"
-            className="inline-flex items-center gap-2 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
-          >
-            View Offers
-          </Link>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <Link
+              to={location.pathname.startsWith('/admin') ? '/admin/calculator' : location.pathname.startsWith('/am') ? '/am/calculator' : '/calculator'}
+              className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
+            >
+              Go to Calculator
+            </Link>
+            <Link
+              to={location.pathname.startsWith('/admin') ? '/admin/offers' : location.pathname.startsWith('/am') ? '/am/offers' : '/offers'}
+              className="inline-flex items-center gap-2 bg-white hover:bg-neutral-50 text-neutral-700 font-medium px-6 py-2.5 rounded border border-neutral-200 transition-colors"
+            >
+              View Offers
+            </Link>
+          </div>
         </div>
       )}
 

@@ -92,7 +92,7 @@ export function CalculatorPage() {
       
       // Update store with specification context
       if (loadedSpec.project_id) {
-        setSpecification(loadedSpec.id, loadedSpec.status === 'draft');
+        setSpecification(loadedSpec.id, loadedSpec.number || loadedSpec.version, loadedSpec.status === 'draft');
       }
     }
   }, [specIdFromUrl, loadedSpec, loadedSpecId, loadState, setSpecification]);
@@ -123,7 +123,7 @@ export function CalculatorPage() {
 
       // Update store with new spec info
       if (!currentSpecificationId) {
-        setSpecification(result.id, result.version, true);
+        setSpecification(result.id, result.number || result.version, true);
       }
       setLastSaved(new Date());
     } catch (error) {

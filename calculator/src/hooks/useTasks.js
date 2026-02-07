@@ -40,6 +40,7 @@ export function useTasks(projectId) {
           ),
           source_specification:specifications (
             id,
+            number,
             version_number
           )
         `)

@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useAllSpecifications, useAMSpecifications } from '../../hooks/useSpecifications';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency, formatDate } from '../../lib/utils';
@@ -67,7 +67,7 @@ function SpecificationCard({ spec, onClick }) {
             <h3 className="font-semibold text-neutral-900 truncate">
               {spec.project?.name || 'Unknown Project'}
             </h3>
-            <span className="text-xs text-neutral-400">{spec.version}</span>
+            <span className="text-xs text-neutral-400">{spec.number || spec.version}</span>
           </div>
           <p className="text-sm text-neutral-500 truncate mt-0.5">
             {spec.project?.client?.company_name || spec.project?.client?.profile?.full_name || 'No client'}
@@ -130,7 +130,7 @@ function SpecificationsTable({ specifications, onSpecClick, showClient }) {
                   {spec.project?.client?.company_name || spec.project?.client?.profile?.full_name || '-'}
                 </td>
               )}
-              <td className="py-3 text-sm text-neutral-600">{spec.version}</td>
+              <td className="py-3 text-sm text-neutral-600">{spec.number || spec.version}</td>
               <td className="py-3 font-medium text-neutral-900">{formatCurrency(total)}</td>
               <td className="py-3">
                 <StatusBadge status={spec.status} hasOffer={hasOffer} offerStatus={spec.offer?.status} />
@@ -448,8 +448,14 @@ export function SpecificationsPage() {
             No specifications yet
           </h2>
           <p className="mt-2 text-neutral-500 max-w-md mx-auto">
-            Specifications will appear here after creating them in projects.
+            Specifications will appear here after creating them in the calculator.
           </p>
+          <Link
+            to={isAdminView ? '/admin/calculator' : isAMView ? '/am/calculator' : '/calculator'}
+            className="inline-flex items-center gap-2 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
+          >
+            Go to Calculator
+          </Link>
         </div>
       )}
 

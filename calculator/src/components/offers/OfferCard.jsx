@@ -40,7 +40,7 @@ export function OfferCard({ offer, onClick }) {
           </span>
           {spec && (
             <span className="text-xs bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">
-              {spec.version}
+              {spec.number || spec.version}
             </span>
           )}
         </div>

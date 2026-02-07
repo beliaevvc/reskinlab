@@ -50,7 +50,7 @@ export function SpecificationDetailPage() {
 
     // Set context
     setProject(specification.project_id, specification.project?.name);
-    setSpecification(specification.id, specification.version, true);
+    setSpecification(specification.id, specification.number || specification.version, true);
 
     // Navigate to calculator with spec parameter
     navigate(`/calculator?spec=${specification.id}`);
@@ -157,7 +157,7 @@ export function SpecificationDetailPage() {
               />
             </svg>
             <span className="text-neutral-900 font-medium">
-              {specification.version}
+              {specification.number || specification.version}
             </span>
           </nav>
 
@@ -218,7 +218,7 @@ export function SpecificationDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-neutral-900">
-                Specification {specification.version}
+                Specification {specification.number || specification.version}
               </h1>
               <span
                 className={`px-2.5 py-1 rounded-full text-xs font-medium ${

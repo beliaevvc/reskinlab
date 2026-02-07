@@ -54,6 +54,11 @@ body {
   background: #A3A3A3;
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Global text selection — emerald green */
 ::selection {
   background: #a7f3d0;

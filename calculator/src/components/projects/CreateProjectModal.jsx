@@ -1,25 +1,33 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useCreateProject } from '../../hooks/useProjects';
+import { useClients } from '../../hooks/useClients';
+import { Select } from '../Select';
 
-export function CreateProjectModal({ isOpen, onClose, onSuccess }) {
+export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedClientId, setSelectedClientId] = useState('');
   const createProject = useCreateProject();
+  const { data: clients, isLoading: clientsLoading } = useClients();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name.trim()) return;
+    if (isStaff && !selectedClientId) return;
 
     try {
       const project = await createProject.mutateAsync({
         name: name.trim(),
         description: description.trim() || null,
+        clientId: isStaff ? selectedClientId : undefined,
       });
 
       // Reset form
       setName('');
       setDescription('');
+      setSelectedClientId('');
 
       // Callback with created project
       if (onSuccess) {
@@ -34,7 +42,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
       <div
@@ -77,6 +85,27 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }) {
               <p className="text-sm text-red-800">
                 {createProject.error.message || 'Failed to create project'}
               </p>
+            </div>
+          )}
+
+          {/* Client selector (staff only) */}
+          {isStaff && (
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+                Client <span className="text-red-500">*</span>
+              </label>
+              <Select
+                value={selectedClientId}
+                onChange={setSelectedClientId}
+                disabled={clientsLoading}
+                options={[
+                  { value: '', label: clientsLoading ? 'Loading clients...' : 'Select a client' },
+                  ...(clients || []).map((c) => ({
+                    value: c.id,
+                    label: c.user?.full_name || c.user?.email || c.company_name || c.id,
+                  })),
+                ]}
+              />
             </div>
           )}
 
@@ -129,7 +158,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }) {
             </button>
             <button
               type="submit"
-              disabled={!name.trim() || createProject.isPending}
+              disabled={!name.trim() || createProject.isPending || (isStaff && !selectedClientId)}
               className="flex-1 px-4 py-2.5 rounded bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed text-white font-medium transition-colors flex items-center justify-center gap-2"
             >
               {createProject.isPending ? (
@@ -144,7 +173,8 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

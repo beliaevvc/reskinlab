@@ -54,7 +54,7 @@ export function InvoiceCard({ invoice, onClick, showClient = false }) {
           )}
           {spec && (
             <span className="text-xs bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded shrink-0">
-              {spec.version}
+              {spec.number || spec.version}
             </span>
           )}
           {showClient && clientName && (

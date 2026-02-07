@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Icon } from './Icon';
 
-export function Select({ value, options, onChange, disabled = false, className = '' }) {
+export function Select({ value, options, onChange, disabled = false, className = '', size = 'default' }) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -40,7 +40,9 @@ export function Select({ value, options, onChange, disabled = false, className =
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm rounded border outline-none transition-colors duration-150 cursor-pointer text-left ${
+        className={`w-full flex items-center justify-between gap-2 rounded border outline-none transition-colors duration-150 cursor-pointer text-left ${
+          size === 'sm' ? 'px-2 py-1 text-xs' : 'px-3 py-2.5 text-sm'
+        } ${
           disabled
             ? 'bg-neutral-50 border-neutral-200 text-neutral-400 cursor-not-allowed'
             : isOpen
@@ -64,7 +66,9 @@ export function Select({ value, options, onChange, disabled = false, className =
               key={option.value}
               type="button"
               onClick={() => handleSelect(option)}
-              className={`w-full px-3 py-2.5 text-sm text-left transition-colors duration-100 cursor-pointer flex items-center justify-between ${
+              className={`w-full text-left transition-colors duration-100 cursor-pointer flex items-center justify-between ${
+                size === 'sm' ? 'px-2 py-1.5 text-xs' : 'px-3 py-2.5 text-sm'
+              } ${
                 option.value === value
                   ? 'bg-emerald-50 text-emerald-700 font-medium'
                   : 'text-neutral-700 hover:bg-neutral-50'

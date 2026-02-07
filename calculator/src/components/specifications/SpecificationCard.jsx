@@ -24,7 +24,7 @@ export function SpecificationCard({ specification, projectId, projectName }) {
 
     // Set context in store
     setProject(projectId, projectName);
-    setSpecification(specification.id, specification.version, isDraft);
+    setSpecification(specification.id, specification.number || specification.version, isDraft);
 
     // Navigate to calculator with spec parameter
     navigate(`/calculator?spec=${specification.id}`);
@@ -37,7 +37,7 @@ export function SpecificationCard({ specification, projectId, projectName }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-neutral-900">
-              {specification.version}
+              {specification.number || specification.version}
             </span>
             {specification.is_addon && (
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">
