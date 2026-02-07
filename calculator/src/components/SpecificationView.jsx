@@ -360,10 +360,13 @@ export function SpecificationView({
           <table className="w-full border-collapse min-w-[600px] sm:min-w-0">
             <thead>
               <tr className="border-b border-neutral-300">
-                <th className="text-left py-2 text-xs uppercase text-neutral-500 w-5/12">
+                <th className="text-left py-2 text-xs uppercase text-neutral-500 w-4/12">
                   Item
                 </th>
-                <th className="text-center py-2 text-xs uppercase text-neutral-500 w-3/12">
+                <th className="text-center py-2 text-xs uppercase text-neutral-500 w-2/12">
+                  Type
+                </th>
+                <th className="text-center py-2 text-xs uppercase text-neutral-500 w-2/12">
                   Anim
                 </th>
                 <th className="text-center py-2 text-xs uppercase text-neutral-500 w-1/12">
@@ -375,47 +378,62 @@ export function SpecificationView({
               </tr>
             </thead>
             <tbody>
-              {totals.lineItems.map((item, index) => (
-                <tr key={index} className="border-b border-neutral-100">
-                  <td className="py-4 align-top">
-                    <div className="font-bold text-sm">{item.name}</div>
-                    {item.details && item.details.descEn && (
-                      <div className="text-[10px] text-neutral-500 mt-1 leading-relaxed opacity-80 max-w-prose">
-                        {item.details.descEn}{' '}
-                        <span className="italic text-neutral-400">
-                          Ex: {item.details.examplesEn}
-                        </span>
+              {totals.lineItems.map((item, index) => {
+                const orderType = item.orderType || 'art_and_anim';
+                const typeBadge = orderType === 'art_only'
+                  ? { label: 'Art Only', cls: 'bg-blue-50 text-blue-700' }
+                  : orderType === 'anim_only'
+                  ? { label: 'Anim Only', cls: 'bg-violet-50 text-violet-700' }
+                  : { label: 'Art+Anim', cls: 'bg-neutral-100 text-neutral-600' };
+
+                return (
+                  <tr key={index} className="border-b border-neutral-100">
+                    <td className="py-4 align-top">
+                      <div className="font-bold text-sm">{item.name}</div>
+                      {item.details && item.details.descEn && (
+                        <div className="text-[10px] text-neutral-500 mt-1 leading-relaxed opacity-80 max-w-prose">
+                          {item.details.descEn}{' '}
+                          <span className="italic text-neutral-400">
+                            Ex: {item.details.examplesEn}
+                          </span>
+                        </div>
+                      )}
+                      <div className="text-xs text-neutral-400 font-mono mt-1">
+                        Base: ${item.base}
                       </div>
-                    )}
-                    <div className="text-xs text-neutral-400 font-mono mt-1">
-                      Base: ${item.base}
-                    </div>
-                  </td>
-                  <td className="py-4 text-center text-sm align-top">
-                    <span
-                      className={`px-2 py-1 rounded text-xs inline-block ${
-                        item.anim.id !== 'none'
-                          ? 'bg-emerald-50 text-emerald-700 font-bold'
-                          : 'text-neutral-400'
-                      }`}
-                    >
-                      {item.anim.short}{' '}
-                      {item.anim.id !== 'none' && `(x${item.anim.coeff})`}
-                    </span>
-                  </td>
-                  <td className="py-4 text-center text-sm font-mono align-top">
-                    {item.qty}
-                  </td>
-                  <td className="py-4 text-right text-sm font-bold font-mono align-top">
-                    ${Math.round(item.total).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="py-4 text-center text-sm align-top">
+                      <span className={`px-2 py-1 rounded text-xs font-medium inline-block ${typeBadge.cls}`}>
+                        {typeBadge.label}
+                      </span>
+                    </td>
+                    <td className="py-4 text-center text-sm align-top">
+                      <span
+                        className={`px-2 py-1 rounded text-xs inline-block ${
+                          item.anim.id !== 'none'
+                            ? 'bg-emerald-50 text-emerald-700 font-bold'
+                            : 'text-neutral-400'
+                        }`}
+                      >
+                        {item.anim.short}{' '}
+                        {item.anim.id !== 'none' && `(x${item.anim.coeff})`}
+                      </span>
+                    </td>
+                    <td className="py-4 text-center text-sm font-mono align-top">
+                      {item.qty}
+                    </td>
+                    <td className="py-4 text-right text-sm font-bold font-mono align-top">
+                      ${Math.round(item.total).toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })}
               {totals.revisionRounds > 0 && (
                 <tr className="border-b border-neutral-100 bg-neutral-50/50">
                   <td className="py-4 pl-2 font-bold text-sm text-emerald-900">
                     Extra Revisions (+2.5%/round)
                   </td>
+                  <td className="py-4 text-center text-sm">-</td>
                   <td className="py-4 text-center text-sm">-</td>
                   <td className="py-4 text-center text-sm font-bold text-emerald-700">
                     +{totals.revisionRounds}

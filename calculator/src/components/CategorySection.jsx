@@ -8,7 +8,8 @@ export function CategorySection({ category, items, onUpdate, onToggleDetails }) 
       </h2>
       <div className="hidden sm:flex px-3 pb-1 text-[10px] uppercase font-medium text-neutral-400">
         <div className="flex-grow">Item</div>
-        <div className="w-32 pl-2">Anim</div>
+        <div className="w-[88px] text-center">Type</div>
+        <div className="w-36 pl-2">Anim</div>
         <div className="w-[100px] text-center">Qty</div>
       </div>
       <div className="space-y-2">

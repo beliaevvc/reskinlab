@@ -16,7 +16,7 @@ import {
 const createInitialItemsState = () => {
   const initial = {};
   ALL_ITEMS.forEach((item) => {
-    initial[item.id] = { qty: 0, anim: 'none', expanded: false };
+    initial[item.id] = { qty: 0, anim: 'none', orderType: 'art_and_anim', expanded: false };
   });
   return initial;
 };
@@ -47,7 +47,7 @@ export function useCalculator() {
       let changed = false;
       ALL_ITEMS.forEach((item) => {
         if (!next[item.id]) {
-          next[item.id] = { qty: 0, anim: 'none', expanded: false };
+          next[item.id] = { qty: 0, anim: 'none', orderType: 'art_and_anim', expanded: false };
           changed = true;
         }
       });
@@ -82,6 +82,7 @@ export function useCalculator() {
       newItems[item.id] = {
         qty,
         anim: qty > 0 ? preset.animId : 'none',
+        orderType: 'art_and_anim',
         expanded: false,
       };
     });
@@ -129,10 +130,11 @@ export function useCalculator() {
           newItems[item.id] = {
             qty: savedItem.qty || 0,
             anim: savedItem.anim || 'none',
+            orderType: savedItem.orderType || 'art_and_anim',
             expanded: false,
           };
         } else {
-          newItems[item.id] = { qty: 0, anim: 'none', expanded: false };
+          newItems[item.id] = { qty: 0, anim: 'none', orderType: 'art_and_anim', expanded: false };
         }
       });
       setItems(newItems);
@@ -159,6 +161,7 @@ export function useCalculator() {
       if (!state || state.qty <= 0) return;
 
       const animObj = ANIMATIONS.find((a) => a.id === state.anim) || ANIMATIONS[0];
+      const orderType = state.orderType || 'art_and_anim';
 
       // 1. Base Art Price
       const baseArtPrice = item.base * globalStyle.coeff;
@@ -170,8 +173,17 @@ export function useCalculator() {
         animCost = baseArtPrice * animObj.coeff * complexity;
       }
 
-      // 3. Unit Total = Art + Anim
-      const unitPrice = baseArtPrice + animCost;
+      // 3. Unit Total based on orderType
+      let unitPrice;
+      if (orderType === 'art_only') {
+        unitPrice = baseArtPrice;
+      } else if (orderType === 'anim_only') {
+        unitPrice = animCost; // 0 if anim === 'none'
+      } else {
+        // art_and_anim (default)
+        unitPrice = baseArtPrice + animCost;
+      }
+
       const total = unitPrice * state.qty;
 
       productionSum += total;
@@ -179,6 +191,7 @@ export function useCalculator() {
         ...item,
         qty: state.qty,
         anim: animObj,
+        orderType,
         unitPrice,
         total,
         details: item.details,
