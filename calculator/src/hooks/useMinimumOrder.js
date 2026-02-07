@@ -33,7 +33,7 @@ function useMinimumOrderSettings() {
 /**
  * Check if project has any paid invoices (= not first order)
  */
-function useProjectHasPaidInvoices(projectId) {
+export function useProjectHasPaidInvoices(projectId) {
   return useQuery({
     queryKey: ['project-paid-invoices', projectId],
     queryFn: async () => {

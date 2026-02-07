@@ -7,6 +7,8 @@ export function SettingsSection({
   paymentModel,
   onUsageRightsChange,
   onPaymentModelChange,
+  disabledUsageRights = false,
+  disabledPaymentModel = false,
 }) {
   const rightsOptions = USAGE_RIGHTS.map(r => ({
     value: r.id,
@@ -34,25 +36,37 @@ export function SettingsSection({
         <Icon name="settings" className="text-emerald-500" /> Settings
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white border border-neutral-200 p-4 rounded-md">
-          <label className="text-xs font-medium text-neutral-500 uppercase mb-2 block">
+        <div className={`bg-white border border-neutral-200 p-4 rounded-md ${disabledUsageRights ? 'opacity-75' : ''}`}>
+          <label className="text-xs font-medium text-neutral-500 uppercase mb-2 flex items-center gap-2">
             Rights
+            {disabledUsageRights && (
+              <span className="normal-case text-neutral-400" title="Inherited from the first paid specification in this project">
+                (locked)
+              </span>
+            )}
           </label>
           <Select
             value={usageRights.id}
             options={rightsOptions}
             onChange={handleRightsChange}
+            disabled={disabledUsageRights}
           />
           <p className="text-xs text-neutral-500 mt-2 h-10">{usageRights.desc}</p>
         </div>
-        <div className="bg-white border border-neutral-200 p-4 rounded-md">
-          <label className="text-xs font-medium text-neutral-500 uppercase mb-2 block">
+        <div className={`bg-white border border-neutral-200 p-4 rounded-md ${disabledPaymentModel ? 'opacity-75' : ''}`}>
+          <label className="text-xs font-medium text-neutral-500 uppercase mb-2 flex items-center gap-2">
             Payment
+            {disabledPaymentModel && (
+              <span className="normal-case text-neutral-400" title="Inherited from the first paid specification in this project">
+                (locked)
+              </span>
+            )}
           </label>
           <Select
             value={paymentModel.id}
             options={paymentOptions}
             onChange={handlePaymentChange}
+            disabled={disabledPaymentModel}
           />
           <p className="text-xs text-neutral-500 mt-2 h-10">{paymentModel.desc}</p>
         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
 import { useMinimumOrder } from '../../hooks/useMinimumOrder';
+import { useInheritedSettings } from '../../hooks/useInheritedSettings';
 import { useSaveSpecification, useSpecification } from '../../hooks/useSpecifications';
 import useCalculatorStore from '../../stores/calculatorStore';
 import { formatCurrency } from '../../lib/utils';
@@ -43,6 +44,13 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
 
   // Minimum order settings (projectId comes from modal props)
   const minimumOrder = useMinimumOrder(projectId);
+
+  // Inherited settings from first paid specification
+  const {
+    shouldInherit,
+    parentSpecId,
+    inheritedSettings,
+  } = useInheritedSettings(projectId);
 
   // Sync minimum order config into calculator
   useEffect(() => {
@@ -97,10 +105,38 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
     }
   }, [specificationId, loadedSpec, loadedSpecId, loadState, setSpecification]);
 
+  // Determine if settings should be locked (inherited from first paid spec)
+  // Locked when: (a) creating new spec in project with paid specs, OR (b) editing an existing addon spec
+  const isSettingsLocked =
+    (shouldInherit && !specificationId) ||
+    (loadedSpec?.is_addon === true);
+
+  // Apply inherited settings when creating new spec in a project with paid specs
+  const [inheritedApplied, setInheritedApplied] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && shouldInherit && inheritedSettings && !specificationId && !inheritedApplied && initialized) {
+      console.log('CalculatorModal: Applying inherited settings from parent spec:', parentSpecId);
+      setGlobalStyle(inheritedSettings.globalStyle);
+      setUsageRights(inheritedSettings.usageRights);
+      setPaymentModel(inheritedSettings.paymentModel);
+      setInheritedApplied(true);
+    }
+  }, [isOpen, shouldInherit, inheritedSettings, specificationId, inheritedApplied, initialized, parentSpecId, setGlobalStyle, setUsageRights, setPaymentModel]);
+
+  // Wrap applyPreset to re-enforce inherited style after preset application
+  const handleApplyPreset = useCallback((preset) => {
+    applyPreset(preset);
+    if (isSettingsLocked && inheritedSettings) {
+      setGlobalStyle(inheritedSettings.globalStyle);
+    }
+  }, [applyPreset, isSettingsLocked, inheritedSettings, setGlobalStyle]);
+
   // Reset on close
   const handleClose = useCallback(() => {
     setInitialized(false);
     setLoadedSpecId(null);
+    setInheritedApplied(false);
     setView('editor');
     onClose();
   }, [onClose]);
@@ -119,12 +155,14 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
 
   // Handle save
   const handleSave = useCallback(async () => {
+    const existingSpecId = specificationId || loadedSpecId;
     try {
       const result = await saveSpec.mutateAsync({
-        specId: specificationId || loadedSpecId,
+        specId: existingSpecId,
         projectId: projectId,
         stateJson: getStateForSave(),
         totalsJson: totals,
+        parentSpecId: isSettingsLocked && !existingSpecId ? parentSpecId : null,
       });
 
       setSpecification(result.id, result.number || result.version, true);
@@ -143,6 +181,8 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
     setSpecification,
     setLastSaved,
     handleClose,
+    isSettingsLocked,
+    parentSpecId,
   ]);
 
   if (!isOpen) return null;
@@ -264,12 +304,13 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
             /* Editor */
             <div className="max-w-5xl mx-auto p-6 space-y-8">
               {/* Quick Bundles */}
-              <PresetBundles onApplyPreset={applyPreset} />
+              <PresetBundles onApplyPreset={handleApplyPreset} />
 
               {/* Visual Style Selector */}
               <StyleSelector
                 globalStyle={globalStyle}
-                onStyleChange={setGlobalStyle}
+                onStyleChange={isSettingsLocked ? () => {} : setGlobalStyle}
+                disabled={isSettingsLocked}
               />
 
               {/* Categories */}
@@ -293,8 +334,10 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
               <SettingsSection
                 usageRights={usageRights}
                 paymentModel={paymentModel}
-                onUsageRightsChange={setUsageRights}
-                onPaymentModelChange={setPaymentModel}
+                onUsageRightsChange={isSettingsLocked ? () => {} : setUsageRights}
+                onPaymentModelChange={isSettingsLocked ? () => {} : setPaymentModel}
+                disabledUsageRights={isSettingsLocked}
+                disabledPaymentModel={isSettingsLocked}
               />
 
               {/* Promo */}

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
 import { useMinimumOrder } from '../../hooks/useMinimumOrder';
+import { useInheritedSettings } from '../../hooks/useInheritedSettings';
 import { useSaveSpecification, useSpecification } from '../../hooks/useSpecifications';
 import useCalculatorStore from '../../stores/calculatorStore';
 import {
@@ -66,6 +67,13 @@ export function CalculatorPage() {
   // Minimum order settings
   const minimumOrder = useMinimumOrder(currentProjectId);
 
+  // Inherited settings from first paid specification
+  const {
+    shouldInherit,
+    parentSpecId,
+    inheritedSettings,
+  } = useInheritedSettings(currentProjectId);
+
   // Sync minimum order config into calculator
   useEffect(() => {
     setMinimumOrderConfig({
@@ -111,6 +119,40 @@ export function CalculatorPage() {
     }
   }, [specIdFromUrl, loadedSpec, loadedSpecId, loadState, setSpecification]);
 
+  // Determine if settings should be locked (inherited from first paid spec)
+  // Locked when: (a) creating new spec in project with paid specs, OR (b) editing an existing addon spec
+  const isSettingsLocked =
+    (shouldInherit && !specIdFromUrl) ||
+    (loadedSpec?.is_addon === true);
+
+  // Apply inherited settings when creating new spec in a project with paid specs
+  const [inheritedApplied, setInheritedApplied] = useState(false);
+
+  useEffect(() => {
+    if (shouldInherit && inheritedSettings && !specIdFromUrl && !inheritedApplied) {
+      console.log('Applying inherited settings from parent spec:', parentSpecId);
+      setGlobalStyle(inheritedSettings.globalStyle);
+      setUsageRights(inheritedSettings.usageRights);
+      setPaymentModel(inheritedSettings.paymentModel);
+      setInheritedApplied(true);
+    }
+  }, [shouldInherit, inheritedSettings, specIdFromUrl, inheritedApplied, parentSpecId, setGlobalStyle, setUsageRights, setPaymentModel]);
+
+  // Reset inheritedApplied flag when project changes
+  useEffect(() => {
+    setInheritedApplied(false);
+  }, [currentProjectId]);
+
+  // Wrap applyPreset to re-enforce inherited style after preset application
+  const handleApplyPreset = useCallback((preset) => {
+    applyPreset(preset);
+    // Re-apply inherited globalStyle if settings are locked
+    // (presets only affect globalStyle + items, not rights/payment)
+    if (isSettingsLocked && inheritedSettings) {
+      setGlobalStyle(inheritedSettings.globalStyle);
+    }
+  }, [applyPreset, isSettingsLocked, inheritedSettings, setGlobalStyle]);
+
   // Prepare state for saving
   const getStateForSave = useCallback(() => {
     return {
@@ -133,6 +175,7 @@ export function CalculatorPage() {
         projectId: currentProjectId,
         stateJson: getStateForSave(),
         totalsJson: totals,
+        parentSpecId: isSettingsLocked && !currentSpecificationId ? parentSpecId : null,
       });
 
       // Update store with new spec info
@@ -151,6 +194,8 @@ export function CalculatorPage() {
     saveSpec,
     setSpecification,
     setLastSaved,
+    isSettingsLocked,
+    parentSpecId,
   ]);
 
   // Specification View
@@ -196,12 +241,13 @@ export function CalculatorPage() {
       <main className="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
         <div className="lg:col-span-2 space-y-10">
           {/* Quick Bundles */}
-          <PresetBundles onApplyPreset={applyPreset} />
+          <PresetBundles onApplyPreset={handleApplyPreset} />
 
           {/* Visual Style Selector */}
           <StyleSelector
             globalStyle={globalStyle}
-            onStyleChange={setGlobalStyle}
+            onStyleChange={isSettingsLocked ? () => {} : setGlobalStyle}
+            disabled={isSettingsLocked}
           />
 
           {/* Categories */}
@@ -225,8 +271,10 @@ export function CalculatorPage() {
           <SettingsSection
             usageRights={usageRights}
             paymentModel={paymentModel}
-            onUsageRightsChange={setUsageRights}
-            onPaymentModelChange={setPaymentModel}
+            onUsageRightsChange={isSettingsLocked ? () => {} : setUsageRights}
+            onPaymentModelChange={isSettingsLocked ? () => {} : setPaymentModel}
+            disabledUsageRights={isSettingsLocked}
+            disabledPaymentModel={isSettingsLocked}
           />
 
           {/* Promo */}

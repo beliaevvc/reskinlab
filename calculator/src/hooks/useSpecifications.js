@@ -87,7 +87,7 @@ export function useSaveSpecification() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ specId, projectId, stateJson, totalsJson }) => {
+    mutationFn: async ({ specId, projectId, stateJson, totalsJson, parentSpecId = null }) => {
       if (specId) {
         // Update existing draft
         const { data, error } = await supabase
@@ -105,6 +105,7 @@ export function useSaveSpecification() {
         return data;
       } else {
         // Create new specification
+        const isAddon = !!parentSpecId;
         const versionNumber = await getNextVersionNumber(projectId);
         const specNumber = await generateSpecNumber();
 
@@ -115,7 +116,8 @@ export function useSaveSpecification() {
             number: specNumber,
             version: `v${versionNumber}.0`,
             version_number: versionNumber,
-            is_addon: false,
+            is_addon: isAddon,
+            parent_spec_id: parentSpecId || null,
             status: 'draft',
             state_json: stateJson,
             totals_json: totalsJson,
