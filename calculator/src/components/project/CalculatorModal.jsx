@@ -27,6 +27,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
     paymentModel,
     revisionRounds,
     appliedPromo,
+    defaultOrderType,
     items,
     totals,
     setGlobalStyle,
@@ -36,6 +37,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
     setAppliedPromo,
     setMinimumOrderConfig,
     updateItem,
+    setAllOrderType,
     toggleDetails,
     applyPreset,
     loadState,
@@ -313,16 +315,49 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
                 disabled={isSettingsLocked}
               />
 
-              {/* Categories */}
-              {CATEGORIES.map((category, index) => (
-                <CategorySection
-                  key={index}
-                  category={category}
-                  items={items}
-                  onUpdate={updateItem}
-                  onToggleDetails={toggleDetails}
-                />
-              ))}
+              {/* Order Type Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-neutral-500 font-medium">Order type:</span>
+                <div className="flex rounded-md border border-neutral-200 overflow-hidden">
+                  {[
+                    { id: 'art_only', label: 'Art Only', activeCls: 'bg-blue-500 text-white' },
+                    { id: 'anim_only', label: 'Anim Only', activeCls: 'bg-violet-500 text-white' },
+                    { id: 'art_and_anim', label: 'Art+Anim', activeCls: 'bg-emerald-500 text-white' },
+                  ].map((type) => (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => setAllOrderType(type.id)}
+                      className={`text-xs font-medium px-3 py-1.5 transition-colors duration-100 cursor-pointer border-r last:border-r-0 border-neutral-200 ${
+                        defaultOrderType === type.id ? type.activeCls : 'bg-white text-neutral-500 hover:bg-neutral-50'
+                      }`}
+                    >
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Categories (filter out addonExcluded items for addon specs) */}
+              {CATEGORIES.map((category, index) => {
+                const filteredCategory = isSettingsLocked
+                  ? {
+                      ...category,
+                      items: category.items.filter((item) => !item.addonExcluded),
+                    }
+                  : category;
+                // Skip empty categories after filtering
+                if (filteredCategory.items.length === 0) return null;
+                return (
+                  <CategorySection
+                    key={index}
+                    category={filteredCategory}
+                    items={items}
+                    onUpdate={updateItem}
+                    onToggleDetails={toggleDetails}
+                  />
+                );
+              })}
 
               {/* Options */}
               <OptionsSection

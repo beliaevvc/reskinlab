@@ -1,5 +1,117 @@
 # Progress Log
 
+## Concept Document — автозадача + сортировка по весам — ARCHIVED ✅
+
+### Date: 2026-02-08
+
+### Summary
+Автоматическая задача Concept Document (шаблон + чеклист 10 пунктов + get_item_task_name). Система sort_order для управления порядком создания задач. Дефолтные веса по категориям калькулятора. UI в админке.
+
+### Files Created
+- `calculator/supabase/migrations/047_concept_document_task_template.sql`
+- `calculator/supabase/migrations/048_task_sort_order.sql`
+
+### Files Modified
+- `calculator/src/hooks/useTaskSpecItemTemplates.js`
+- `calculator/src/pages/admin/TaskAutoCreationSettingsPage.jsx`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-concept-doc-task-and-sort-order.md`
+
+---
+
+## Concept Document в калькуляторе — ARCHIVED ✅
+
+### Date: 2026-02-08
+
+### Summary
+Новая категория "Concept Document" в калькуляторе. Уникальная модель: $1000 + 1% от суммы остальных items. Флаговая архитектура. Двухпроходный расчёт. Оба калькулятора, спецификации, пресеты, админка.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Данные категории (categories.js) | ✅ | Флаги: noOrderType, noAnimation, noStyleCoeff, surchargePercent, maxQty, recommended, addonExcluded |
+| Расчёты (useCalculator.js) | ✅ | Двухпроходный: regularItemsSum → surcharge items. Обновлены createInitialItemsState, updateItem, setAllOrderType, applyPreset, loadState |
+| ItemRow UI | ✅ | Скрытие controls, maxQty ограничение, бейдж Recommended, surcharge "+" display |
+| CategorySection headers | ✅ | Условное скрытие Type/Anim заголовков |
+| SpecificationView | ✅ | Тире "—" вместо Art Only / None для noOrderType/noAnimation items |
+| CalculatorPage addon filter | ✅ | Фильтрация addonExcluded items |
+| CalculatorModal addon filter | ✅ | Аналогичная фильтрация |
+| Пресеты | ✅ | concept_doc: 1 в Premium Flagship |
+| Миграция БД | ✅ | 046_concept_document.sql (base + surcharge в price_configs) |
+| Админка | ✅ | Категория Concept Document в CATEGORY_ICONS + CATEGORY_ORDER |
+
+### Files Modified
+- `calculator/src/data/categories.js`
+- `calculator/src/hooks/useCalculator.js`
+- `calculator/src/components/ItemRow.jsx`
+- `calculator/src/components/CategorySection.jsx`
+- `calculator/src/components/SpecificationView.jsx`
+- `calculator/src/pages/calculator/CalculatorPage.jsx`
+- `calculator/src/components/project/CalculatorModal.jsx`
+- `calculator/src/data/presets.js`
+- `calculator/src/pages/admin/PricingPage.jsx`
+
+### Files Created
+- `calculator/supabase/migrations/046_concept_document.sql`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-concept-document.md`
+
+---
+
+## Per-item Order Type (Art / Animation / Both) — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Переключатель типа заказа per-item (Art Only / Anim Only / Art+Anim). Глобальный дефолт. Колонка Type в спецификации. Фильтрация None для обязательной анимации.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Формула расчёта в useCalculator.js | ✅ | orderType в state, формула по типу, loadState/preset |
+| Переключатель в ItemRow.jsx | ✅ | Сегментированные кнопки с цветами |
+| Заголовки в CategorySection.jsx | ✅ | Добавлена колонка Type |
+| SpecificationView.jsx | ✅ | Бейджи: нейтральный, синий, фиолетовый |
+| Глобальный переключатель | ✅ | defaultOrderType + автоприменение при активации |
+| Фильтрация None | ✅ | Убран для Art+Anim и Anim Only |
+| Обратная совместимость | ✅ | Fallback 'art_and_anim' |
+
+### Files Modified
+- `calculator/src/hooks/useCalculator.js`
+- `calculator/src/components/ItemRow.jsx`
+- `calculator/src/components/CategorySection.jsx`
+- `calculator/src/components/SpecificationView.jsx`
+- `calculator/src/pages/calculator/CalculatorPage.jsx`
+- `calculator/src/components/project/CalculatorModal.jsx`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-per-item-order-type.md`
+📄 `memory-bank/reflection/reflection-per-item-order-type.md`
+
+---
+
+## Specification Settings Inheritance — ARCHIVED ✅
+
+### Date: 2026-02-07
+
+### Summary
+Наследование Visual Style, Usage Rights, Payment Model из первой оплаченной спецификации проекта. Locked UI.
+
+### Files Modified
+- `calculator/src/hooks/useInheritedSettings.js` (new)
+- `calculator/src/hooks/useMinimumOrder.js`
+- `calculator/src/hooks/useSpecifications.js`
+- `calculator/src/components/StyleSelector.jsx`
+- `calculator/src/components/SettingsSection.jsx`
+- `calculator/src/pages/calculator/CalculatorPage.jsx`
+- `calculator/src/components/project/CalculatorModal.jsx`
+
+---
+
 ## Minimum Order Amount — ARCHIVED ✅
 
 ### Date: 2026-02-07

@@ -3,9 +3,9 @@ import { Select } from './Select';
 import { ANIMATIONS } from '../data';
 
 const ORDER_TYPES = [
-  { id: 'art_and_anim', label: 'Art+Anim', title: 'Art + Animation' },
   { id: 'art_only', label: 'Art Only', title: 'Art Only — no animation' },
   { id: 'anim_only', label: 'Anim Only', title: 'Animation Only — client provides art' },
+  { id: 'art_and_anim', label: 'Art+Anim', title: 'Art + Animation' },
 ];
 
 export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
@@ -13,18 +13,27 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
   const orderType = state.orderType || 'art_and_anim';
   const isAnimDisabled = !active || orderType === 'art_only';
 
-  const animOptions = ANIMATIONS.map(anim => ({
-    value: anim.id,
-    label: `${anim.short} (x${anim.coeff})`
-  }));
+  // Special flags
+  const hideOrderType = !!item.noOrderType;
+  const hideAnimation = !!item.noAnimation;
+  const maxQty = item.maxQty || Infinity;
+  const isRecommended = !!item.recommended;
+  const hasSurcharge = !!item.surchargePercent;
+
+  const animOptions = ANIMATIONS
+    .filter(anim => orderType === 'art_only' || anim.id !== 'none')
+    .map(anim => ({
+      value: anim.id,
+      label: `${anim.short} (x${anim.coeff})`
+    }));
 
   const handleOrderTypeChange = (newType) => {
     onUpdate(item.id, 'orderType', newType);
     // Auto-adjust animation when switching types
     if (newType === 'art_only') {
       onUpdate(item.id, 'anim', 'none');
-    } else if (newType === 'anim_only' && state.anim === 'none') {
-      // Anim Only requires animation — set to Light by default
+    } else if (state.anim === 'none') {
+      // Art+Anim and Anim Only both require animation — set to Light by default
       onUpdate(item.id, 'anim', 'AN-L');
     }
   };
@@ -43,6 +52,11 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
             <div className={`font-medium truncate ${active ? 'text-neutral-900' : 'text-neutral-600'}`}>
               {item.name}
             </div>
+            {isRecommended && (
+              <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 rounded">
+                Recommended
+              </span>
+            )}
             {item.details && (
               <button
                 onClick={() => onToggleDetails(item.id)}
@@ -53,47 +67,60 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
             )}
           </div>
           <div className="text-xs text-neutral-400 font-mono mt-0.5 flex gap-3">
-            <span>Base: ${item.base}</span>
-            <span className="text-emerald-600">Anim Cplx: x{item.complexity}</span>
+            <span>Base: ${item.base.toLocaleString()}</span>
+            {hasSurcharge && (
+              <span className="text-amber-600">+ {item.surchargePercent * 100}% of spec</span>
+            )}
+            {!hideAnimation && (
+              <span className="text-emerald-600">Anim Cplx: x{item.complexity}</span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2 justify-between sm:justify-end w-full sm:w-auto shrink-0">
-          {/* Order Type Selector */}
-          <div className="sm:hidden">
-            <label className="text-[10px] text-neutral-400">Type</label>
-          </div>
-          <div className={`flex rounded border overflow-hidden h-8 text-[11px] font-medium ${!active ? 'opacity-40 pointer-events-none' : ''}`}>
-            {ORDER_TYPES.map((type) => (
-              <button
-                key={type.id}
-                type="button"
-                title={type.title}
-                onClick={() => handleOrderTypeChange(type.id)}
-                className={`px-2 transition-colors duration-100 cursor-pointer border-r last:border-r-0 border-neutral-200 ${
-                  orderType === type.id
-                    ? type.id === 'anim_only'
-                      ? 'bg-violet-500 text-white'
-                      : type.id === 'art_only'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-emerald-500 text-white'
-                    : 'bg-white text-neutral-500 hover:bg-neutral-50'
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
-          {/* Animation Selector */}
-          <div className="sm:hidden">
-            <label className="text-[10px] text-neutral-400">Anim</label>
-          </div>
-          <Select
-            value={state.anim}
-            options={animOptions}
-            onChange={(value) => onUpdate(item.id, 'anim', value)}
-            disabled={isAnimDisabled}
-            className="w-36"
-          />
+          {/* Order Type Selector — hidden for noOrderType items */}
+          {!hideOrderType && (
+            <>
+              <div className="sm:hidden">
+                <label className="text-[10px] text-neutral-400">Type</label>
+              </div>
+              <div className={`flex rounded border overflow-hidden h-8 text-[11px] font-medium ${!active ? 'opacity-40 pointer-events-none' : ''}`}>
+                {ORDER_TYPES.map((type) => (
+                  <button
+                    key={type.id}
+                    type="button"
+                    title={type.title}
+                    onClick={() => handleOrderTypeChange(type.id)}
+                    className={`px-2 transition-colors duration-100 cursor-pointer border-r last:border-r-0 border-neutral-200 ${
+                      orderType === type.id
+                        ? type.id === 'anim_only'
+                          ? 'bg-violet-500 text-white'
+                          : type.id === 'art_only'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-emerald-500 text-white'
+                        : 'bg-white text-neutral-500 hover:bg-neutral-50'
+                    }`}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {/* Animation Selector — hidden for noAnimation items */}
+          {!hideAnimation && (
+            <>
+              <div className="sm:hidden">
+                <label className="text-[10px] text-neutral-400">Anim</label>
+              </div>
+              <Select
+                value={state.anim}
+                options={animOptions}
+                onChange={(value) => onUpdate(item.id, 'anim', value)}
+                disabled={isAnimDisabled}
+                className="w-36"
+              />
+            </>
+          )}
           {/* Quantity Controls */}
           <div className="sm:hidden">
             <label className="text-[10px] text-neutral-400">Qty</label>
@@ -107,8 +134,17 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
             </button>
             <div className="w-8 text-center font-mono text-sm text-neutral-900 font-medium">{state.qty}</div>
             <button
-              className="px-3 text-neutral-500 hover:text-white hover:bg-emerald-500 h-full cursor-pointer transition-all duration-150 font-medium"
-              onClick={() => onUpdate(item.id, 'qty', state.qty + 1)}
+              className={`px-3 h-full cursor-pointer transition-all duration-150 font-medium ${
+                state.qty >= maxQty
+                  ? 'text-neutral-300 cursor-not-allowed'
+                  : 'text-neutral-500 hover:text-white hover:bg-emerald-500'
+              }`}
+              onClick={() => {
+                if (state.qty < maxQty) {
+                  onUpdate(item.id, 'qty', state.qty + 1);
+                }
+              }}
+              disabled={state.qty >= maxQty}
             >
               +
             </button>

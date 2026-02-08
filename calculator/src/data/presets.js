@@ -35,6 +35,7 @@ export const PRESETS = [
     styleId: 'S6',
     animId: 'AN-F',
     items: {
+      'concept_doc': 1,
       'sym_low': 5,
       'sym_mid': 4,
       'sym_spec': 3,

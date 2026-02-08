@@ -403,21 +403,29 @@ export function SpecificationView({
                       </div>
                     </td>
                     <td className="py-4 text-center text-sm align-top">
-                      <span className={`px-2 py-1 rounded text-xs font-medium inline-block ${typeBadge.cls}`}>
-                        {typeBadge.label}
-                      </span>
+                      {!item.noOrderType ? (
+                        <span className={`px-2 py-1 rounded text-xs font-medium inline-block ${typeBadge.cls}`}>
+                          {typeBadge.label}
+                        </span>
+                      ) : (
+                        <span className="text-neutral-300">—</span>
+                      )}
                     </td>
                     <td className="py-4 text-center text-sm align-top">
-                      <span
-                        className={`px-2 py-1 rounded text-xs inline-block ${
-                          item.anim.id !== 'none'
-                            ? 'bg-emerald-50 text-emerald-700 font-bold'
-                            : 'text-neutral-400'
-                        }`}
-                      >
-                        {item.anim.short}{' '}
-                        {item.anim.id !== 'none' && `(x${item.anim.coeff})`}
-                      </span>
+                      {!item.noAnimation ? (
+                        <span
+                          className={`px-2 py-1 rounded text-xs inline-block ${
+                            item.anim.id !== 'none'
+                              ? 'bg-emerald-50 text-emerald-700 font-bold'
+                              : 'text-neutral-400'
+                          }`}
+                        >
+                          {item.anim.short}{' '}
+                          {item.anim.id !== 'none' && `(x${item.anim.coeff})`}
+                        </span>
+                      ) : (
+                        <span className="text-neutral-300">—</span>
+                      )}
                     </td>
                     <td className="py-4 text-center text-sm font-mono align-top">
                       {item.qty}

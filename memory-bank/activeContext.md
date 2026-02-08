@@ -5,6 +5,33 @@
 
 ## Recently Completed Tasks
 
+### Concept Document — автозадача + сортировка по весам (8 Февраля 2026) — ARCHIVED ✅
+Автозадача для concept_doc. Система sort_order для spec item templates. Дефолтные веса. UI в админке.
+- **Archive:** `memory-bank/archive/archive-concept-doc-task-and-sort-order.md`
+- **Reflection:** `memory-bank/reflection/reflection-concept-doc-task-and-sort-order.md`
+
+---
+
+### Concept Document в калькуляторе (8 Февраля 2026) — ARCHIVED ✅
+Новая категория "Concept Document" с уникальной моделью ценообразования ($1000 + 1% от spec). Флаговая архитектура. Двухпроходный расчёт.
+- **Archive:** `memory-bank/archive/archive-concept-document.md`
+- **Reflection:** `memory-bank/reflection/reflection-concept-document.md`
+
+---
+
+### Per-item Order Type (7 Февраля 2026) — ARCHIVED ✅
+Переключатель типа заказа per-item: Art Only / Anim Only / Art+Anim. Глобальный дефолт. Фильтрация None.
+- **Archive:** `memory-bank/archive/archive-per-item-order-type.md`
+- **Reflection:** `memory-bank/reflection/reflection-per-item-order-type.md`
+
+---
+
+### Specification Settings Inheritance (7 Февраля 2026) — ARCHIVED ✅
+Наследование Visual Style, Usage Rights, Payment Model из первой оплаченной спецификации. Locked UI.
+- **Archive:** `memory-bank/archive/archive-specification-inheritance.md`
+
+---
+
 ### Minimum Order Amount (7 Февраля 2026) — ARCHIVED ✅
 Минимальная сумма заказа ($1000) для первого заказа в проекте. Промо capping. Настройка в админке. Предупреждения в UI.
 - **Archive:** `memory-bank/archive/archive-minimum-order-amount.md`

@@ -1,6 +1,53 @@
 # Tasks
 
 ## Recent Task
+**Concept Document — автозадача + сортировка задач по весам** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-08
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-concept-doc-task-and-sort-order.md`
+- **Reflection:** `memory-bank/reflection/reflection-concept-doc-task-and-sort-order.md`
+
+---
+
+## Recent Task
+**Concept Document в калькуляторе** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-08
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-concept-document.md`
+- **Reflection:** `memory-bank/reflection/reflection-concept-document.md`
+
+---
+
+## Recent Task
+**Per-item Order Type (Art / Animation / Both)** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-per-item-order-type.md`
+- **Reflection:** `memory-bank/reflection/reflection-per-item-order-type.md`
+
+---
+
+## Recent Task
+**Specification Settings Inheritance** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-07
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-specification-inheritance.md`
+
+---
+
+## Recent Task
 **Minimum Order Amount** — ARCHIVED ✅
 
 ### Complexity: Level 2

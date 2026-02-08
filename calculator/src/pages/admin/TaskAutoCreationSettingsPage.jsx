@@ -473,7 +473,11 @@ export function TaskAutoCreationSettingsPage() {
           </div>
 
           <div className="space-y-3">
-            {ALL_ITEMS.map((item) => {
+            {[...ALL_ITEMS].sort((a, b) => {
+              const tplA = specTemplates?.find(t => t.item_id === a.id);
+              const tplB = specTemplates?.find(t => t.item_id === b.id);
+              return (tplA?.sort_order ?? 999) - (tplB?.sort_order ?? 999);
+            }).map((item) => {
               // Ищем существующий шаблон для этого item_id
               const existingTemplate = specTemplates?.find(t => t.item_id === item.id);
               const editingKey = `new-${item.id}`;
@@ -593,6 +597,32 @@ export function TaskAutoCreationSettingsPage() {
                             placeholder="Задача по созданию анимации для {item_name}: {anim_name}"
                           />
                         </div>
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Порядок создания (вес)
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="number"
+                              min="0"
+                              value={template.sort_order ?? 999}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 0;
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], sort_order: val }
+                                  }));
+                                } else {
+                                  const updated = { ...template, sort_order: val };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              className="w-32 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            />
+                            <span className="text-xs text-neutral-500">Меньше = выше приоритет. Briefing (шаблон) идёт первым.</span>
+                          </div>
+                        </div>
                         <TemplateChecklistEditor
                           checklistItems={template.checklist_items || []}
                           onChange={(items) => {
@@ -636,6 +666,7 @@ export function TaskAutoCreationSettingsPage() {
                                 animation_task_title_template: newTemplateData.animation_task_title_template || template.animation_task_title_template,
                                 animation_task_description_template: newTemplateData.animation_task_description_template || template.animation_task_description_template,
                                 checklist_items: newTemplateData.checklist_items || template.checklist_items || [],
+                                sort_order: newTemplateData.sort_order ?? template.sort_order ?? 999,
                               } : template;
                               
                               await handleSaveSpecTemplate(templateToSave);
@@ -677,8 +708,9 @@ export function TaskAutoCreationSettingsPage() {
                             <p className="text-sm text-neutral-600 mb-2">{template.task_description}</p>
                           )}
                           {existingTemplate && (
-                            <div className="text-xs text-neutral-500">
-                              Анимация: {template.animation_task_title_template || 'По умолчанию'}
+                            <div className="flex items-center gap-4 text-xs text-neutral-500">
+                              <span>Порядок: {template.sort_order ?? '—'}</span>
+                              <span>Анимация: {template.animation_task_title_template || 'По умолчанию'}</span>
                             </div>
                           )}
                         </div>

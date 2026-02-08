@@ -13,6 +13,7 @@ export function useTaskSpecItemTemplates() {
       const { data, error } = await supabase
         .from('task_spec_item_templates')
         .select('*')
+        .order('sort_order', { ascending: true })
         .order('item_id', { ascending: true });
 
       if (error) throw error;

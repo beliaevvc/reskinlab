@@ -6,6 +6,7 @@ import { logPriceChange } from '../../lib/auditLog';
 // Category icons
 const CATEGORY_ICONS = {
   'Minimum Order': '🛡️',
+  'Concept Document': '📋',
   'Symbols': '🎰',
   'Backgrounds': '🖼️',
   'Pop-ups': '💥',
@@ -24,6 +25,7 @@ const CATEGORY_ICONS = {
 // Category order
 const CATEGORY_ORDER = [
   'Minimum Order',
+  'Concept Document',
   'Symbols',
   'Backgrounds', 
   'Pop-ups',

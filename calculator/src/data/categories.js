@@ -1,5 +1,40 @@
 export const CATEGORIES = [
   {
+    name: "Concept Document",
+    items: [
+      {
+        id: 'concept_doc',
+        name: 'Concept Document',
+        base: 1000,
+        complexity: 0,
+        surchargePercent: 0.01,
+        noOrderType: true,
+        noAnimation: true,
+        noStyleCoeff: true,
+        maxQty: 1,
+        recommended: true,
+        addonExcluded: true,
+        details: {
+          desc: "Полный концепт-документ проекта — фундамент визуального направления слота. Включает тематическую концепцию, стилистический мудборд, цветовую палитру, эскизы ключевых элементов (символы, фоны, UI), референсную подборку и текстовое описание арт-направления. Создаёт единое визуальное видение до начала производства и минимизирует количество правок на последующих этапах.",
+          descEn: "Full project concept document — the foundation of the slot's visual direction. Includes thematic concept, stylistic moodboard, color palette, key element sketches (symbols, backgrounds, UI), reference collection and art direction description. Creates a unified visual vision before production begins and minimizes revisions at later stages.",
+          examples: "Мудборд из 20+ референсов, палитра из 5–7 основных цветов, скетчи 3 Low + 2 High символов, эскиз базового фона, стилевые пробы UI-элементов, описание атмосферы и настроения.",
+          examplesEn: "Moodboard of 20+ references, palette of 5–7 main colors, sketches of 3 Low + 2 High symbols, base background sketch, UI element style probes, atmosphere and mood description.",
+          tech: [
+            "Мудборд: 20+ тематических референсов с аннотациями",
+            "Цветовая палитра: основные, акцентные и фоновые цвета (5–7 оттенков)",
+            "Стилистические пробы: 2–3 варианта ключевого символа в разных подходах",
+            "Эскизы: скетчи основных символов (Low, High, Special), базового фона и UI",
+            "Текстовое описание: тема, настроение, визуальный язык, материалы, освещение",
+            "Референсы конкурентов и аналогов (по запросу)",
+            "Формат: PDF/Figma + исходники PSD/AI (по ТЗ)",
+            "1 раунд обсуждения и корректировок направления",
+            "Финальный документ: согласованный арт-дирекшн для запуска производства"
+          ]
+        }
+      }
+    ]
+  },
+  {
     name: "Символы (Symbols)",
     items: [
       { 
