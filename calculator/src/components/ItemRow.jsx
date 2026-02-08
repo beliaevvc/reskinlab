@@ -1,6 +1,6 @@
 import { Icon } from './Icon';
 import { Select } from './Select';
-import { ANIMATIONS } from '../data';
+import { ANIMATIONS as LOCAL_ANIMATIONS } from '../data';
 
 const ORDER_TYPES = [
   { id: 'art_only', label: 'Art Only', title: 'Art Only — no animation' },
@@ -8,7 +8,7 @@ const ORDER_TYPES = [
   { id: 'art_and_anim', label: 'Art+Anim', title: 'Art + Animation' },
 ];
 
-export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
+export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = LOCAL_ANIMATIONS }) {
   const active = state.qty > 0;
   const orderType = state.orderType || 'art_and_anim';
   const isAnimDisabled = !active || orderType === 'art_only';
@@ -20,7 +20,7 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails }) {
   const isRecommended = !!item.recommended;
   const hasSurcharge = !!item.surchargePercent;
 
-  const animOptions = ANIMATIONS
+  const animOptions = animations
     .filter(anim => orderType === 'art_only' || anim.id !== 'none')
     .map(anim => ({
       value: anim.id,

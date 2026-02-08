@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CATEGORIES } from '../../data';
+import { CATEGORIES as LOCAL_CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
+import { useDynamicPricing } from '../../hooks/useDynamicPricing';
 import { useMinimumOrder } from '../../hooks/useMinimumOrder';
 import { useInheritedSettings } from '../../hooks/useInheritedSettings';
 import { useSaveSpecification, useSpecification } from '../../hooks/useSpecifications';
@@ -22,6 +23,7 @@ import {
   DraftStatusBadge,
   SaveDraftButton,
 } from '../../components/calculator';
+import { ImportCodeModal } from '../../components/calculator/ImportCodeModal';
 
 /**
  * Calculator Page
@@ -30,9 +32,13 @@ import {
 export function CalculatorPage() {
   const [view, setView] = useState('editor');
   const [searchParams] = useSearchParams();
+  const [showImportModal, setShowImportModal] = useState(false);
 
-  // Calculator state
-  const calculator = useCalculator();
+  // Dynamic pricing from Supabase (falls back to local data)
+  const { data: pricingData, isLoading: pricingLoading, isUsingFallback } = useDynamicPricing();
+
+  // Calculator state (receives dynamic pricing data)
+  const calculator = useCalculator(pricingData);
   const {
     globalStyle,
     usageRights,
@@ -219,9 +225,31 @@ export function CalculatorPage() {
       {/* Calculator Header with Project Selector - Sticky under AppHeader, full width */}
       <div className="bg-white border-b border-neutral-200 shadow-sm sticky top-16 z-20 -mx-4 md:-mx-6 lg:-mx-8 -mt-4 md:-mt-6 lg:-mt-8 mb-4 md:mb-6 lg:mb-8 px-4 md:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          {/* Left: Project selector */}
+          {/* Left: Project selector + Import */}
           <div className="flex items-center gap-4">
             <ProjectSelector />
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="text-xs text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1 transition-colors"
+              title="Import a selection from a shared code"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Import Code
+            </button>
+            <a
+              href="/shared/calculator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-emerald-500 hover:text-emerald-600 font-medium flex items-center gap-1 transition-colors"
+              title="Open public calculator — share this link with anyone"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Public Calculator
+            </a>
             <DraftStatusBadge
               isSaving={saveSpec.isPending}
               lastSaved={useCalculatorStore.getState().lastSaved}
@@ -250,6 +278,7 @@ export function CalculatorPage() {
             globalStyle={globalStyle}
             onStyleChange={isSettingsLocked ? () => {} : setGlobalStyle}
             disabled={isSettingsLocked}
+            styles={pricingData?.styles}
           />
 
           {/* Order Type Selector */}
@@ -276,7 +305,7 @@ export function CalculatorPage() {
           </div>
 
           {/* Categories (filter out addonExcluded items for addon specs) */}
-          {CATEGORIES.map((category, index) => {
+          {(pricingData?.categories || LOCAL_CATEGORIES).map((category, index) => {
             const filteredCategory = isSettingsLocked
               ? {
                   ...category,
@@ -292,6 +321,7 @@ export function CalculatorPage() {
                 items={items}
                 onUpdate={updateItem}
                 onToggleDetails={toggleDetails}
+                animations={pricingData?.animations}
               />
             );
           })}
@@ -310,6 +340,8 @@ export function CalculatorPage() {
             onPaymentModelChange={isSettingsLocked ? () => {} : setPaymentModel}
             disabledUsageRights={isSettingsLocked}
             disabledPaymentModel={isSettingsLocked}
+            usageRightsList={pricingData?.usageRights}
+            paymentModelsList={pricingData?.paymentModels}
           />
 
           {/* Promo */}
@@ -336,6 +368,12 @@ export function CalculatorPage() {
         paymentModel={paymentModel}
         minimumOrder={minimumOrder}
         onViewSpecification={() => setView('specification')}
+      />
+
+      {/* Import Code Modal */}
+      <ImportCodeModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
       />
     </div>
   );

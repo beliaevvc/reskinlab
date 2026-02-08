@@ -1,5 +1,18 @@
 # Progress Log
 
+## Public Calculator + Dynamic Pricing — ARCHIVED ✅
+
+### Date: 2026-02-08
+
+### Summary
+Динамические цены из Supabase вместо захардкоженных. Публичный калькулятор с анонимным доступом. Система кодов для шеринга подборок. Авто-claim при регистрации. Импорт кода для существующих пользователей.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-public-calculator-dynamic-pricing.md`
+📄 `memory-bank/reflection/reflection-public-calculator-dynamic-pricing.md`
+
+---
+
 ## Concept Document — автозадача + сортировка по весам — ARCHIVED ✅
 
 ### Date: 2026-02-08

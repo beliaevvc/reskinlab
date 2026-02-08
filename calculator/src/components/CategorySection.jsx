@@ -1,6 +1,6 @@
 import { ItemRow } from './ItemRow';
 
-export function CategorySection({ category, items, onUpdate, onToggleDetails }) {
+export function CategorySection({ category, items, onUpdate, onToggleDetails, animations }) {
   // Check if all items in category have hidden controls
   const allNoOrderType = category.items.every((item) => item.noOrderType);
   const allNoAnimation = category.items.every((item) => item.noAnimation);
@@ -26,6 +26,7 @@ export function CategorySection({ category, items, onUpdate, onToggleDetails }) 
               state={state}
               onUpdate={onUpdate}
               onToggleDetails={onToggleDetails}
+              animations={animations}
             />
           );
         })}

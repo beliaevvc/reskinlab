@@ -1,6 +1,6 @@
 import { Icon } from './Icon';
 import { Select } from './Select';
-import { USAGE_RIGHTS, PAYMENT_MODELS } from '../data';
+import { USAGE_RIGHTS as LOCAL_USAGE_RIGHTS, PAYMENT_MODELS as LOCAL_PAYMENT_MODELS } from '../data';
 
 export function SettingsSection({
   usageRights,
@@ -9,24 +9,26 @@ export function SettingsSection({
   onPaymentModelChange,
   disabledUsageRights = false,
   disabledPaymentModel = false,
+  usageRightsList = LOCAL_USAGE_RIGHTS,
+  paymentModelsList = LOCAL_PAYMENT_MODELS,
 }) {
-  const rightsOptions = USAGE_RIGHTS.map(r => ({
+  const rightsOptions = usageRightsList.map(r => ({
     value: r.id,
     label: `${r.id} (x${r.coeff})`
   }));
 
-  const paymentOptions = PAYMENT_MODELS.map(p => ({
+  const paymentOptions = paymentModelsList.map(p => ({
     value: p.id,
     label: `${p.name} (x${p.coeff})`
   }));
 
   const handleRightsChange = (value) => {
-    const rights = USAGE_RIGHTS.find((u) => u.id === value);
+    const rights = usageRightsList.find((u) => u.id === value);
     if (rights) onUsageRightsChange(rights);
   };
 
   const handlePaymentChange = (value) => {
-    const model = PAYMENT_MODELS.find((p) => p.id === value);
+    const model = paymentModelsList.find((p) => p.id === value);
     if (model) onPaymentModelChange(model);
   };
 

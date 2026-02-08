@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Public Calculator + Dynamic Pricing** — ARCHIVED ✅
+
+### Complexity: Level 3
+### Date: 2026-02-08
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-public-calculator-dynamic-pricing.md`
+- **Reflection:** `memory-bank/reflection/reflection-public-calculator-dynamic-pricing.md`
+
+---
+
+## Recent Task
 **Concept Document — автозадача + сортировка задач по весам** — ARCHIVED ✅
 
 ### Complexity: Level 2

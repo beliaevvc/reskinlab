@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useClientActivity } from '../../hooks/useClientActivity';
 import { formatDistanceToNow } from '../../lib/utils';
 import { getHumanDescription, getActionIcon } from '../../components/audit-logs/auditLogHumanize';
+import { PendingCodeBanner } from '../../components/calculator/PendingCodeBanner';
 
 export function DashboardPage() {
   const { profile, client, isClient, isAM, isAdmin } = useAuth();
@@ -12,6 +13,9 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Pending shared code banner (auto-import from public calculator) */}
+      <PendingCodeBanner />
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-neutral-900">

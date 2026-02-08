@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CATEGORIES } from '../../data';
+import { CATEGORIES as LOCAL_CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
+import { useDynamicPricing } from '../../hooks/useDynamicPricing';
 import { useMinimumOrder } from '../../hooks/useMinimumOrder';
 import { useInheritedSettings } from '../../hooks/useInheritedSettings';
 import { useSaveSpecification, useSpecification } from '../../hooks/useSpecifications';
@@ -19,8 +20,11 @@ import { SpecificationView } from '../SpecificationView';
  * Calculator Modal - Opens calculator in a modal for creating/editing specifications
  */
 export function CalculatorModal({ isOpen, onClose, projectId, projectName, specificationId = null }) {
-  // Calculator state
-  const calculator = useCalculator();
+  // Dynamic pricing from Supabase (falls back to local data)
+  const { data: pricingData } = useDynamicPricing();
+
+  // Calculator state (receives dynamic pricing data)
+  const calculator = useCalculator(pricingData);
   const {
     globalStyle,
     usageRights,
@@ -313,6 +317,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
                 globalStyle={globalStyle}
                 onStyleChange={isSettingsLocked ? () => {} : setGlobalStyle}
                 disabled={isSettingsLocked}
+                styles={pricingData?.styles}
               />
 
               {/* Order Type Selector */}
@@ -339,7 +344,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
               </div>
 
               {/* Categories (filter out addonExcluded items for addon specs) */}
-              {CATEGORIES.map((category, index) => {
+              {(pricingData?.categories || LOCAL_CATEGORIES).map((category, index) => {
                 const filteredCategory = isSettingsLocked
                   ? {
                       ...category,
@@ -355,6 +360,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
                     items={items}
                     onUpdate={updateItem}
                     onToggleDetails={toggleDetails}
+                    animations={pricingData?.animations}
                   />
                 );
               })}
@@ -373,6 +379,8 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
                 onPaymentModelChange={isSettingsLocked ? () => {} : setPaymentModel}
                 disabledUsageRights={isSettingsLocked}
                 disabledPaymentModel={isSettingsLocked}
+                usageRightsList={pricingData?.usageRights}
+                paymentModelsList={pricingData?.paymentModels}
               />
 
               {/* Promo */}

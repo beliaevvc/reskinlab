@@ -16,6 +16,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 // App pages
 import DashboardPage from './pages/dashboard/DashboardPage';
 import CalculatorPage from './pages/calculator/CalculatorPage';
+import PublicCalculatorPage from './pages/calculator/PublicCalculatorPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectPage from './pages/projects/ProjectPage';
@@ -72,6 +73,8 @@ function AppContent() {
             {/* ==================== */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/shared/calculator" element={<PublicCalculatorPage />} />
+            <Route path="/shared/calculator/:code" element={<PublicCalculatorPage />} />
 
             {/* ==================== */}
             {/* CLIENT ROUTES */}

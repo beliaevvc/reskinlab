@@ -5,6 +5,13 @@
 
 ## Recently Completed Tasks
 
+### Public Calculator + Dynamic Pricing (8 Февраля 2026) — ARCHIVED ✅
+Динамические цены из Supabase (price_configs → useDynamicPricing). Публичный калькулятор /shared/calculator. Система кодов. Авто-claim. Импорт для зарегистрированных. Rate limiting. pg_cron cleanup.
+- **Archive:** `memory-bank/archive/archive-public-calculator-dynamic-pricing.md`
+- **Reflection:** `memory-bank/reflection/reflection-public-calculator-dynamic-pricing.md`
+
+---
+
 ### Concept Document — автозадача + сортировка по весам (8 Февраля 2026) — ARCHIVED ✅
 Автозадача для concept_doc. Система sort_order для spec item templates. Дефолтные веса. UI в админке.
 - **Archive:** `memory-bank/archive/archive-concept-doc-task-and-sort-order.md`

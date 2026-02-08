@@ -1,14 +1,14 @@
-import { STYLES } from '../data';
+import { STYLES as LOCAL_STYLES } from '../data';
 import { Select } from './Select';
 
-export function StyleSelector({ globalStyle, onStyleChange, disabled = false }) {
-  const options = STYLES.map(style => ({
+export function StyleSelector({ globalStyle, onStyleChange, disabled = false, styles = LOCAL_STYLES }) {
+  const options = styles.map(style => ({
     value: style.id,
     label: `${style.name} (x${style.coeff})`
   }));
 
   const handleChange = (value) => {
-    const style = STYLES.find((s) => s.id === value);
+    const style = styles.find((s) => s.id === value);
     if (style) onStyleChange(style);
   };
 

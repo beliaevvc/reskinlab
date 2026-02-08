@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+
+const PENDING_CODE_KEY = 'pending_shared_code';
 
 export function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -13,6 +15,10 @@ export function RegisterPage() {
 
   const { signUp, isConfigured } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Read shared calculator code from URL
+  const sharedCode = searchParams.get('code');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,6 +44,15 @@ export function RegisterPage() {
       if (error) {
         setError(error.message);
         return;
+      }
+
+      // Store shared code in localStorage for auto-claim after login
+      if (sharedCode) {
+        try {
+          localStorage.setItem(PENDING_CODE_KEY, sharedCode);
+        } catch {
+          // Ignore storage errors
+        }
       }
 
       // Show success message
@@ -81,6 +96,11 @@ export function RegisterPage() {
             <p className="text-neutral-600 mb-4">
               Your account has been created successfully. Redirecting to login...
             </p>
+            {sharedCode && (
+              <p className="text-sm text-blue-600 mb-4">
+                Your selection will be imported automatically after you log in.
+              </p>
+            )}
             <Link
               to="/login"
               className="text-emerald-600 hover:text-emerald-700 font-medium"
@@ -109,6 +129,21 @@ export function RegisterPage() {
           <h2 className="text-xl font-semibold text-neutral-900 mb-6">
             Create your account
           </h2>
+
+          {/* Shared code banner */}
+          {sharedCode && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded flex items-start gap-3">
+              <svg className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-blue-800">Your selection will be saved</p>
+                <p className="text-xs text-blue-600 mt-0.5">
+                  After registration and login, your calculator selection (code: <span className="font-mono font-bold">{sharedCode}</span>) will be automatically imported into a new project.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Configuration warning */}
           {!isConfigured && (
