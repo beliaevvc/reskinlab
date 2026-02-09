@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatDate, formatCurrency, formatDateTime } from '../../lib/utils';
+import UserAvatar from '../UserAvatar';
 
 const ROLE_BADGES = {
   admin: { label: 'Admin', color: 'bg-purple-100 text-purple-700' },
@@ -155,19 +156,13 @@ export function UsersTable({
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center flex-shrink-0">
-                      {user.avatar_url ? (
-                        <img
-                          src={user.avatar_url}
-                          alt=""
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-sm font-medium text-neutral-600">
-                          {user.full_name?.[0] || user.email?.[0]?.toUpperCase() || '?'}
-                        </span>
-                      )}
-                    </div>
+                    <UserAvatar
+                      name={user.full_name}
+                      email={user.email}
+                      avatarUrl={user.avatar_url}
+                      role={user.role}
+                      size="md"
+                    />
                     <div>
                       <p className="text-sm font-medium text-neutral-900">
                         {user.full_name || 'No name'}

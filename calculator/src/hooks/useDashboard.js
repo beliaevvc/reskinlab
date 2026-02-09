@@ -148,7 +148,7 @@ export function useRecentActivity(limit = 10) {
         .from('audit_logs')
         .select(`
           *,
-          user:profiles!user_id(id, email, full_name, avatar_url)
+          user:profiles!user_id(id, email, full_name, avatar_url, role)
         `)
         .not('action', 'eq', 'page_view')
         .order('created_at', { ascending: false })

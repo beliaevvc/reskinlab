@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useDashboardStats, useRecentActivity, useRevenueChart, useProjectsChart } from '../../hooks/useDashboard';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { getHumanDescription, getActionIcon } from '../../components/audit-logs/auditLogHumanize';
+import UserAvatar from '../../components/UserAvatar';
 
 // Simple bar chart component
 function BarChart({ data, dataKey, label, color = 'emerald' }) {
@@ -91,13 +92,13 @@ function ActivityItem({ log }) {
   const desc = getHumanDescription(log);
   return (
     <div className="flex items-center gap-3 py-3">
-      {log.user?.avatar_url ? (
-        <img src={log.user.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-      ) : (
-        <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-sm">
-          {getActionIcon(log.action)}
-        </div>
-      )}
+      <UserAvatar
+        name={log.user?.full_name}
+        email={log.user?.email}
+        avatarUrl={log.user?.avatar_url}
+        role={log.user?.role}
+        size="md"
+      />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium text-neutral-900 truncate">

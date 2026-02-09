@@ -36,7 +36,8 @@ export function useTasks(projectId) {
           assignee:profiles (
             id,
             full_name,
-            avatar_url
+            avatar_url,
+            role
           ),
           source_specification:specifications (
             id,
@@ -147,7 +148,8 @@ export function useTasksByStage(stageId) {
           assignee:profiles (
             id,
             full_name,
-            avatar_url
+            avatar_url,
+            role
           )
         `)
         .eq('stage_id', stageId)
@@ -181,7 +183,8 @@ export function useTask(taskId) {
           assignee:profiles (
             id,
             full_name,
-            avatar_url
+            avatar_url,
+            role
           ),
           project:projects (
             id,

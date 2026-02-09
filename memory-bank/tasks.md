@@ -1,6 +1,21 @@
 # Tasks
 
 ## Recent Task
+**User Card Redesign & Inline Editing** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-09
+
+### Summary
+Редизайн Profile/Company табов в карточке юзера (AdminPanel): list + grid 2x2. Инлайн-редактирование: Full Name, Phone, Role (профиль); Company Name, Phone, Country, Address (компания).
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-user-card-inline-editing.md`
+- **Reflection:** `memory-bank/reflection/reflection-user-card-inline-editing.md`
+
+---
+
+## Recent Task
 **Notification Center** — ARCHIVED ✅
 
 ### Complexity: Level 3

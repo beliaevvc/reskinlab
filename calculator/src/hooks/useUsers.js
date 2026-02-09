@@ -183,7 +183,7 @@ export function useUser(userId) {
       // Get all clients to map client_id -> user_id
       const { data: allClients } = await supabase
         .from('clients')
-        .select('id, user_id, company_name, contact_phone');
+        .select('id, user_id, company_name, contact_phone, contact_name, country, address, notes');
 
       const clientData = allClients?.find(c => c.user_id === userId) || null;
 
@@ -214,11 +214,20 @@ export function useUser(userId) {
         pending_invoices: 0,
       };
 
+      let allInvoices = [];
       if (allProjectIds.length > 0) {
         const { data: invoices } = await supabase
           .from('invoices')
-          .select('status, amount_usd, paid_at')
-          .in('project_id', allProjectIds);
+          .select(`
+            id, number, status, amount_usd, currency, milestone_name,
+            due_date, paid_at, created_at, project_id, rejection_reason, offer_id,
+            project:projects ( id, name ),
+            offer:offers ( id, number, specification:specifications ( id, version, number ) )
+          `)
+          .in('project_id', allProjectIds)
+          .order('created_at', { ascending: false });
+
+        allInvoices = invoices || [];
 
         if (invoices) {
           const paidInvoices = invoices.filter(i => i.status === 'paid');
@@ -229,6 +238,40 @@ export function useUser(userId) {
             pending_revenue: pendingInvoices.reduce((sum, i) => sum + parseFloat(i.amount_usd || 0), 0),
             pending_invoices: pendingInvoices.length,
           };
+        }
+      }
+
+      // Get specifications and their offers for this user's projects
+      let allSpecs = [];
+      if (allProjectIds.length > 0) {
+        const { data: specs } = await supabase
+          .from('specifications')
+          .select('id, number, version, version_number, status, is_addon, created_at, project_id, totals_json')
+          .in('project_id', allProjectIds)
+          .order('created_at', { ascending: false });
+
+        allSpecs = specs || [];
+        const specIds = allSpecs.map(s => s.id);
+
+        if (specIds.length > 0) {
+          const { data: offers } = await supabase
+            .from('offers')
+            .select(`
+              id, number, status, created_at, specification_id,
+              invoices ( id, status, amount_usd )
+            `)
+            .in('specification_id', specIds)
+            .order('created_at', { ascending: false });
+
+          // Attach offers to their specs
+          const offersBySpec = {};
+          (offers || []).forEach(o => {
+            if (!offersBySpec[o.specification_id]) offersBySpec[o.specification_id] = [];
+            offersBySpec[o.specification_id].push(o);
+          });
+          allSpecs.forEach(s => {
+            s.offers = offersBySpec[s.id] || [];
+          });
         }
       }
 
@@ -245,6 +288,8 @@ export function useUser(userId) {
         client: clientData,
         projects,
         finance,
+        invoices: allInvoices,
+        specifications: allSpecs,
         audit_logs: auditLogs || [],
       };
     },
@@ -291,6 +336,44 @@ export function useUpdateUserRole() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['user-stats'] });
+    },
+  });
+}
+
+/**
+ * Admin: update user profile fields (full_name, phone)
+ */
+export function useAdminUpdateProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, updates }) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', userId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      try {
+        await logAuditEvent({
+          action: 'update_profile',
+          entity_type: 'profile',
+          entity_id: userId,
+          details: { changes: updates },
+        });
+      } catch (e) {
+        console.warn('Failed to log audit event:', e);
+      }
+
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['user', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     },
   });
 }

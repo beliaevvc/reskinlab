@@ -1,5 +1,23 @@
 # Progress Log
 
+## User Card Redesign & Inline Editing — ARCHIVED ✅
+
+### Date: 2026-02-09
+
+### Summary
+Редизайн Profile/Company табов в карточке юзера (AdminPanel). Инлайн-редактирование: Full Name, Phone, Role (профиль); Company Name, Phone, Country, Address (компания). Мутации: `useAdminUpdateProfile`, `useUpdateClient`. Кэш инвалидируется корректно.
+
+### Files Modified
+- `calculator/src/components/admin/UserDetailModal.jsx`
+- `calculator/src/hooks/useUsers.js`
+- `calculator/src/hooks/useClients.js`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-user-card-inline-editing.md`
+📄 `memory-bank/reflection/reflection-user-card-inline-editing.md`
+
+---
+
 ## Notification Center — ARCHIVED ✅
 
 ### Date: 2026-02-09

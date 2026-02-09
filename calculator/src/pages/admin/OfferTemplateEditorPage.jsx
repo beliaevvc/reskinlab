@@ -13,6 +13,7 @@ import {
 } from '../../hooks/useOfferTemplates';
 import { OfferTemplateEditor } from '../../components/admin/offer-templates/OfferTemplateEditor';
 import { OfferPreview } from '../../components/admin/offer-templates/OfferPreview';
+import UserAvatar from '../../components/UserAvatar';
 // ── Settings Modal ──────────────────────────────────
 function SettingsModal({ isOpen, onClose, templateId, meta, onMetaChange }) {
   if (!isOpen) return null;
@@ -187,13 +188,13 @@ function AudienceSettings({ templateId, audienceType, onAudienceTypeChange }) {
                   key={a.id}
                   className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full pl-1 pr-1.5 py-0.5 hover:border-red-300 transition-colors group"
                 >
-                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] font-bold shrink-0">
-                    {a.client?.avatar_url ? (
-                      <img src={a.client.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
-                    ) : (
-                      (a.client?.full_name || a.client?.email || '?').charAt(0).toUpperCase()
-                    )}
-                  </div>
+                  <UserAvatar
+                    name={a.client?.full_name}
+                    email={a.client?.email}
+                    avatarUrl={a.client?.avatar_url}
+                    role="client"
+                    size="xs"
+                  />
                   <span className="text-xs font-medium text-emerald-800 max-w-[120px] truncate">
                     {a.client?.full_name || a.client?.email || 'Unknown'}
                   </span>
@@ -238,13 +239,13 @@ function AudienceSettings({ templateId, audienceType, onAudienceTypeChange }) {
                     disabled={assignClient.isPending}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-emerald-50/50 transition-colors text-left disabled:opacity-50"
                   >
-                    <div className="w-7 h-7 rounded-full bg-neutral-100 text-neutral-600 flex items-center justify-center text-xs font-bold shrink-0">
-                      {profile.avatar_url ? (
-                        <img src={profile.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
-                      ) : (
-                        (profile.full_name || profile.email || '?').charAt(0).toUpperCase()
-                      )}
-                    </div>
+                    <UserAvatar
+                      name={profile.full_name}
+                      email={profile.email}
+                      avatarUrl={profile.avatar_url}
+                      role={profile.role}
+                      size="sm"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-neutral-900 truncate">{profile.full_name || 'Без имени'}</p>
                       <p className="text-xs text-neutral-400 truncate">{profile.email}</p>

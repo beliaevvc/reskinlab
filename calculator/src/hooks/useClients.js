@@ -15,7 +15,7 @@ export function useClients(filters = {}) {
         .from('clients')
         .select(`
           *,
-          user:profiles!user_id(id, email, full_name, avatar_url),
+          user:profiles!user_id(id, email, full_name, avatar_url, role),
           projects:projects(id, status)
         `)
         .order('created_at', { ascending: false });
@@ -137,6 +137,10 @@ export function useUpdateClient() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['client', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      if (data.user_id) {
+        queryClient.invalidateQueries({ queryKey: ['user', data.user_id] });
+      }
       logClientEvent('update_client', data.id, { company_name: data.company_name });
     },
   });

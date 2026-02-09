@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Select } from '../../components/Select';
+import UserAvatar from '../../components/UserAvatar';
 
 export function ProfilePage() {
   const {
@@ -344,11 +345,13 @@ export function ProfilePage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-emerald-100 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-emerald-700">
-                        {getInitials()}
-                      </span>
-                    </div>
+                    <UserAvatar
+                      name={profile?.full_name}
+                      email={profile?.email}
+                      role={profile?.role}
+                      size="2xl"
+                      className="w-full h-full"
+                    />
                   )}
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import UserAvatar from '../UserAvatar';
 
 const STORAGE_KEY = 'reskin_saved_accounts';
 
@@ -439,21 +440,20 @@ export function AccountSwitcher() {
           className={`flex items-center gap-3 p-1.5 pr-3 rounded-md hover:bg-neutral-100 transition-colors ${isOpen ? 'bg-neutral-100' : ''} ${isSwitching ? 'opacity-50' : ''}`}
         >
           {/* Avatar */}
-          <div className={`w-9 h-9 rounded-full ${roleBadge.color} flex items-center justify-center ring-2 ${roleBadge.ring}`}>
-            {isSwitching ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
-            ) : profile?.avatar_url ? (
-              <img
-                src={profile.avatar_url}
-                alt=""
-                className="w-9 h-9 rounded-full object-cover"
-              />
-            ) : (
-              <span className="text-sm font-semibold">
-                {profile?.full_name?.[0] || profile?.email?.[0]?.toUpperCase() || '?'}
-              </span>
-            )}
-          </div>
+          {isSwitching ? (
+            <div className={`w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center`}>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-neutral-400 border-t-transparent" />
+            </div>
+          ) : (
+            <UserAvatar
+              name={profile?.full_name}
+              email={profile?.email}
+              avatarUrl={profile?.avatar_url}
+              role={profile?.role}
+              size="md"
+              ring
+            />
+          )}
 
           {/* Name & Role (hidden on mobile) */}
           <div className="hidden md:block text-left">
@@ -480,15 +480,14 @@ export function AccountSwitcher() {
             {/* Current account header */}
             <div className="p-4 bg-gradient-to-br from-neutral-50 to-neutral-100/50">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full ${roleBadge.color} flex items-center justify-center ring-2 ${roleBadge.ring} overflow-hidden`}>
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
-                  ) : (
-                    <span className="text-lg font-semibold">
-                      {profile?.full_name?.[0] || profile?.email?.[0]?.toUpperCase() || '?'}
-                    </span>
-                  )}
-                </div>
+                <UserAvatar
+                  name={profile?.full_name}
+                  email={profile?.email}
+                  avatarUrl={profile?.avatar_url}
+                  role={profile?.role}
+                  size="lg"
+                  ring
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-neutral-900">
                     {profile?.full_name || 'User'}
@@ -531,15 +530,13 @@ export function AccountSwitcher() {
                         isCurrent ? 'bg-emerald-50/50' : ''
                       } ${isSwitching ? 'opacity-50 pointer-events-none' : ''}`}
                     >
-                      <div className={`w-9 h-9 rounded-full flex items-center justify-center overflow-hidden ${accountBadge ? accountBadge.color : 'bg-neutral-200'}`}>
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover" />
-                        ) : (
-                          <span className={`text-sm font-medium ${accountBadge ? '' : 'text-neutral-600'}`}>
-                            {displayName[0].toUpperCase()}
-                          </span>
-                        )}
-                      </div>
+                      <UserAvatar
+                        name={displayName}
+                        email={account.email}
+                        avatarUrl={avatarUrl}
+                        role={accountRole}
+                        size="md"
+                      />
                       <div className="flex-1 min-w-0 text-left">
                         <p className="text-sm font-medium text-neutral-900 truncate">
                           {displayName}

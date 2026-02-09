@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useTaskChecklist, useUpdateChecklistItem } from '../../hooks/useTaskChecklist';
+import UserAvatar from '../UserAvatar';
 
 export function TaskListRow({ task, onClick, isDragging, canToggleComplete = false, onToggleComplete, canEdit = false }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -167,21 +168,14 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
 
           {/* Assignee avatar */}
           {task.assignee && (
-            <div
-              className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold overflow-hidden"
-              title={task.assignee.full_name}
-            >
-              {task.assignee.avatar_url ? (
-                <img
-                  src={task.assignee.avatar_url}
-                  alt={task.assignee.full_name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-neutral-200 text-neutral-600 flex items-center justify-center">
-                  {getInitials(task.assignee.full_name)}
-                </div>
-              )}
+            <div title={task.assignee.full_name}>
+              <UserAvatar
+                name={task.assignee.full_name}
+                email={task.assignee.email}
+                avatarUrl={task.assignee.avatar_url}
+                role={task.assignee.role}
+                size="xs"
+              />
             </div>
           )}
 

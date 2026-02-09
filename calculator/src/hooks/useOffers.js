@@ -31,6 +31,7 @@ export function useOffers() {
           *,
           specification:specifications (
             id,
+            number,
             version,
             totals_json,
             project:projects (
@@ -69,6 +70,7 @@ export function useAllOffers() {
           *,
           specification:specifications (
             id,
+            number,
             version,
             totals_json,
             project:projects (
@@ -108,6 +110,7 @@ export function useOffer(offerId) {
           *,
           specification:specifications (
             id,
+            number,
             version,
             status,
             state_json,

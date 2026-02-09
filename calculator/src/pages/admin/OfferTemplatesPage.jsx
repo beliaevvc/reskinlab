@@ -10,6 +10,7 @@ import {
   useClientOfferAssignments,
 } from '../../hooks/useOfferTemplates';
 import { formatDate } from '../../lib/utils';
+import UserAvatar from '../../components/UserAvatar';
 // ============================================
 // Create Template Modal
 // ============================================
@@ -130,16 +131,14 @@ function AudienceBadge({ template, assignments }) {
       {count > 0 && (
         <div className="flex -space-x-1.5">
           {templateAssignments.slice(0, 4).map((a) => (
-            <div
-              key={a.id}
-              title={a.client?.full_name || a.client?.email}
-              className="w-5 h-5 rounded-full border-2 border-white bg-emerald-100 text-emerald-700 flex items-center justify-center text-[8px] font-bold"
-            >
-              {a.client?.avatar_url ? (
-                <img src={a.client.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
-              ) : (
-                (a.client?.full_name || a.client?.email || '?').charAt(0).toUpperCase()
-              )}
+            <div key={a.id} title={a.client?.full_name || a.client?.email} className="border-2 border-white rounded-full">
+              <UserAvatar
+                name={a.client?.full_name}
+                email={a.client?.email}
+                avatarUrl={a.client?.avatar_url}
+                role="client"
+                size="xs"
+              />
             </div>
           ))}
           {count > 4 && (
@@ -444,13 +443,13 @@ export function OfferTemplatesPage() {
               {filteredAssignments.map((a) => (
                 <div key={a.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 transition-colors">
                   {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
-                    {a.client?.avatar_url ? (
-                      <img src={a.client.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
-                    ) : (
-                      (a.client?.full_name || a.client?.email || '?').charAt(0).toUpperCase()
-                    )}
-                  </div>
+                  <UserAvatar
+                    name={a.client?.full_name}
+                    email={a.client?.email}
+                    avatarUrl={a.client?.avatar_url}
+                    role="client"
+                    size="md"
+                  />
 
                   {/* User info */}
                   <div className="min-w-0 flex-1">

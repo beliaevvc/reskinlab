@@ -5,6 +5,13 @@
 
 ## Recently Completed Tasks
 
+### User Card Redesign & Inline Editing (9 Февраля 2026) — ARCHIVED ✅
+Редизайн Profile/Company табов. Инлайн-редактирование (Full Name, Phone, Role, Company Name, Country, Address). Мутации + кэш-инвалидация.
+- **Archive:** `memory-bank/archive/archive-user-card-inline-editing.md`
+- **Reflection:** `memory-bank/reflection/reflection-user-card-inline-editing.md`
+
+---
+
 ### Notification Center (9 Февраля 2026) — ARCHIVED ✅
 Полная система in-app уведомлений: 14 DB-триггеров, батч-RPC для стадий, поллинг 15с, deep-linking (offer/invoice/spec/task/comment → модалки), карточный UI, фильтры. Фикс стадий (плейсхолдеры + RPC). Z-index fix. 3 роли.
 - **Archive:** `memory-bank/archive/archive-notification-center.md`

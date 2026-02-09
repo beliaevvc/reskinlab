@@ -21,7 +21,8 @@ export function useComments(entityType, entityId) {
           author:profiles (
             id,
             full_name,
-            avatar_url
+            avatar_url,
+            role
           )
         `)
         .eq('entity_type', entityType)
@@ -42,7 +43,8 @@ export function useComments(entityType, entityId) {
             author:profiles (
               id,
               full_name,
-              avatar_url
+              avatar_url,
+              role
             )
           `)
           .in('parent_comment_id', commentIds)
@@ -121,7 +123,8 @@ export function useAddComment() {
           author:profiles (
             id,
             full_name,
-            avatar_url
+            avatar_url,
+            role
           )
         `)
         .single();

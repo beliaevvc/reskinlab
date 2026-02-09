@@ -37,6 +37,7 @@ export function useInvoices() {
               status,
               specification:specifications (
                 id,
+                number,
                 version
               )
             )
@@ -65,6 +66,7 @@ export function useInvoices() {
             status,
             specification:specifications (
               id,
+              number,
               version
             )
           )
@@ -139,6 +141,7 @@ export function useInvoice(invoiceId) {
             status,
             specification:specifications (
               id,
+              number,
               version,
               totals_json
             )
