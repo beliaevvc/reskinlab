@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDeleteComment } from '../../hooks/useComments';
@@ -52,6 +53,7 @@ const parseTextWithLinks = (text) => {
 };
 
 export function CommentItem({ comment, entityType, entityId, onReply, onUserClick, isReply = false, isHighlighted = false, highlightRef }) {
+  const { t } = useTranslation('comments');
   const { user, isAdmin } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
@@ -125,11 +127,11 @@ export function CommentItem({ comment, entityType, entityId, onReply, onUserClic
                 onClick={() => onUserClick(comment.author_id)}
                 className={`font-semibold text-neutral-900 hover:text-emerald-600 transition-colors ${isReply ? 'text-[13px]' : 'text-sm'}`}
               >
-                {comment.author?.full_name || 'Unknown'}
+                {comment.author?.full_name || t('common:unknown')}
               </button>
             ) : (
               <span className={`font-semibold text-neutral-900 ${isReply ? 'text-[13px]' : 'text-sm'}`}>
-                {comment.author?.full_name || 'Unknown'}
+                {comment.author?.full_name || t('common:unknown')}
               </span>
             )}
             <span className="text-neutral-400">·</span>
@@ -188,7 +190,7 @@ export function CommentItem({ comment, entityType, entityId, onReply, onUserClic
                 onClick={() => onReply(comment)}
                 className="text-xs text-neutral-400 hover:text-neutral-600"
               >
-                Reply
+                {t('item.reply')}
               </button>
             )}
           </div>

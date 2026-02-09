@@ -1,0 +1,29 @@
+{
+  "dashboard": "Панель",
+  "calculator": "Калькулятор",
+  "projects": "Проекты",
+  "specifications": "Спецификации",
+  "offers": "Оферты",
+  "invoices": "Счета",
+  "clients": "Клиенты",
+  "users": "Пользователи",
+  "profile": "Профиль",
+  "settings": "Настройки",
+  "signOut": "Выйти",
+  "admin": {
+    "title": "Админ",
+    "dashboard": "Панель администратора",
+    "users": "Пользователи",
+    "pricing": "Цены",
+    "promoCodes": "Промокоды",
+    "offerTemplates": "Шаблоны оферт",
+    "taskSettings": "Настройки задач",
+    "wallets": "Кошельки",
+    "auditLog": "Журнал действий"
+  },
+  "roles": {
+    "client": "Клиент",
+    "am": "Аккаунт-менеджер",
+    "admin": "Администратор"
+  }
+}

@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useActiveWallets, NETWORK_INFO, getWalletAddress } from '../../hooks/useCryptoWallets';
 
 export function PaymentInfo({ invoice, onNetworkChange }) {
+  const { t } = useTranslation('invoices');
   const { data: wallets, isLoading } = useActiveWallets();
   
   // Group wallets by currency
@@ -97,7 +99,7 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
     return (
       <div className="bg-white rounded-md border border-neutral-200 p-6">
         <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-          Payment Information
+          {t('payment.title')}
         </h3>
         <div className="bg-amber-50 border border-amber-200 rounded p-4">
           <div className="flex items-start gap-3">
@@ -105,9 +107,9 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <div>
-              <p className="font-medium text-amber-800">Payment methods not configured</p>
+              <p className="font-medium text-amber-800">{t('payment.notConfigured')}</p>
               <p className="text-sm text-amber-700 mt-1">
-                Please contact support for payment details.
+                {t('payment.contactSupport')}
               </p>
             </div>
           </div>
@@ -119,14 +121,14 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
   return (
     <div className="bg-white rounded-md border border-neutral-200 p-6">
       <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-        Payment Information
+        {t('payment.title')}
       </h3>
 
       {/* Currency selector (if multiple currencies available) */}
       {availableCurrencies.length > 1 && (
         <div className="mb-4">
           <label className="block text-sm font-medium text-neutral-700 mb-2">
-            Select Currency
+            {t('payment.selectCurrency')}
           </label>
           <div className="flex gap-2">
             {availableCurrencies.map(currency => (
@@ -149,7 +151,7 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
       {/* Network selector */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-neutral-700 mb-2">
-          Select Network
+          {t('payment.selectNetwork')}
         </label>
         <div className="flex flex-wrap gap-2">
           {availableNetworks.map(wallet => {
@@ -178,7 +180,7 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
       {/* Wallet address with QR code */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-neutral-700 mb-3">
-          Wallet Address ({selectedCurrency} - {selectedNetwork})
+          {t('payment.walletAddress')} ({selectedCurrency} - {selectedNetwork})
         </label>
         
         {walletAddress ? (
@@ -214,26 +216,26 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Copied!
+                      {t('payment.copied')}
                     </>
                   ) : (
                     <>
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                       </svg>
-                      Copy Address
+                      {t('payment.copyAddress')}
                     </>
                   )}
                 </button>
               </div>
               <p className="text-xs text-neutral-500 mt-2 text-center sm:text-left">
-                Scan QR code or copy address to your wallet
+                {t('payment.scanQR')}
               </p>
             </div>
           </div>
         ) : (
           <div className="bg-neutral-100 rounded-lg px-4 py-3 text-neutral-500">
-            No wallet configured for this network
+            {t('payment.noWallet')}
           </div>
         )}
       </div>
@@ -243,9 +245,13 @@ export function PaymentInfo({ invoice, onNetworkChange }) {
         <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <span className="text-amber-800">
-          Send exactly <strong>{invoice?.amount_usd} {selectedCurrency}</strong> via <strong>{selectedNetwork}</strong> — wrong network = lost funds
-        </span>
+        <span className="text-amber-800" dangerouslySetInnerHTML={{
+          __html: t('payment.sendExactly', { 
+            amount: invoice?.amount_usd, 
+            currency: selectedCurrency, 
+            network: selectedNetwork 
+          })
+        }} />
       </div>
     </div>
   );

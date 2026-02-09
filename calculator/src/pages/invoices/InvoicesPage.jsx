@@ -1,12 +1,15 @@
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useInvoices } from '../../hooks/useInvoices';
 import { useAuth } from '../../contexts/AuthContext';
 import { InvoiceCard, InvoicesTable } from '../../components/invoices';
 import { InvoiceModal } from '../../components/project';
 import { Select } from '../../components/Select';
 import { formatInvoiceAmount, isInvoiceOverdue } from '../../lib/invoiceUtils';
+
 export function InvoicesPage() {
+  const { t } = useTranslation('invoices');
   const { isAdmin, isStaff } = useAuth();
   const location = useLocation();
   const { data: invoices, isLoading, error } = useInvoices();
@@ -113,7 +116,7 @@ export function InvoicesPage() {
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-          <p className="text-sm text-neutral-500">Loading invoices...</p>
+          <p className="text-sm text-neutral-500">{t('page.loading')}</p>
         </div>
       </div>
     );
@@ -122,7 +125,7 @@ export function InvoicesPage() {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-6">
-        <p className="text-red-800">Failed to load invoices: {error.message}</p>
+        <p className="text-red-800">{t('page.loadError', { error: error.message })}</p>
       </div>
     );
   }
@@ -146,9 +149,9 @@ export function InvoicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Invoices</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('page.title')}</h1>
           <p className="text-neutral-500 mt-1">
-            Track and pay your project invoices
+            {t('page.subtitle')}
           </p>
         </div>
         {/* View Toggle */}
@@ -160,7 +163,7 @@ export function InvoicesPage() {
                 ? 'bg-white text-neutral-900 shadow-sm' 
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
-            title="Grid view"
+            title={t('page.gridView')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -173,7 +176,7 @@ export function InvoicesPage() {
                 ? 'bg-white text-neutral-900 shadow-sm' 
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
-            title="List view"
+            title={t('page.listView')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -186,29 +189,29 @@ export function InvoicesPage() {
       {invoices && invoices.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg border border-neutral-200 p-4">
-            <p className="text-sm text-neutral-500">{hasActiveFilters ? 'Filtered' : 'Total'} Invoices</p>
+            <p className="text-sm text-neutral-500">{hasActiveFilters ? t('page.filteredInvoices') : t('page.totalInvoices')}</p>
             <p className="text-2xl font-bold text-neutral-900 mt-1">{filteredInvoices.length}</p>
             {hasActiveFilters && (
-              <p className="text-xs text-neutral-400 mt-1">of {invoices.length} total</p>
+              <p className="text-xs text-neutral-400 mt-1">{t('page.ofTotal', { total: invoices.length })}</p>
             )}
           </div>
           <div className="bg-white rounded-lg border border-amber-200 p-4">
-            <p className="text-sm text-amber-600">Pending</p>
+            <p className="text-sm text-amber-600">{t('page.pending')}</p>
             <p className="text-2xl font-bold text-amber-600 mt-1">
               {formatInvoiceAmount(filteredPendingAmount)}
             </p>
-            <p className="text-xs text-neutral-400 mt-1">{pendingInvoices.length} invoices</p>
+            <p className="text-xs text-neutral-400 mt-1">{t('page.invoicesCount', { count: pendingInvoices.length })}</p>
           </div>
           <div className="bg-white rounded-lg border border-emerald-200 p-4">
-            <p className="text-sm text-emerald-600">Paid</p>
+            <p className="text-sm text-emerald-600">{t('page.paid')}</p>
             <p className="text-2xl font-bold text-emerald-600 mt-1">
               {formatInvoiceAmount(paidAmount)}
             </p>
-            <p className="text-xs text-neutral-400 mt-1">{paidInvoices.length} invoices</p>
+            <p className="text-xs text-neutral-400 mt-1">{t('page.invoicesCount', { count: paidInvoices.length })}</p>
           </div>
           {awaitingConfirmation.length > 0 && (
             <div className="bg-white rounded-lg border border-blue-200 p-4">
-              <p className="text-sm text-blue-600">Awaiting Confirmation</p>
+              <p className="text-sm text-blue-600">{t('page.awaitingConfirmation')}</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{awaitingConfirmation.length}</p>
             </div>
           )}
@@ -222,12 +225,12 @@ export function InvoicesPage() {
             {/* Client filter (admin/staff only) */}
             {showClient && clients.length > 0 && (
               <div className="w-52">
-                <label className="block text-xs font-medium text-neutral-500 mb-1.5">Client</label>
+                <label className="block text-xs font-medium text-neutral-500 mb-1.5">{t('page.client')}</label>
                 <Select
                   value={clientFilter}
                   onChange={handleClientChange}
                   options={[
-                    { value: '', label: 'All clients' },
+                    { value: '', label: t('page.allClients') },
                     ...clients.map(c => ({ value: c.id, label: c.name }))
                   ]}
                 />
@@ -237,12 +240,12 @@ export function InvoicesPage() {
             {/* Project filter */}
             {projects.length > 0 && (
               <div className="w-52">
-                <label className="block text-xs font-medium text-neutral-500 mb-1.5">Project</label>
+                <label className="block text-xs font-medium text-neutral-500 mb-1.5">{t('page.project')}</label>
                 <Select
                   value={projectFilter}
                   onChange={handleProjectChange}
                   options={[
-                    { value: '', label: 'All projects' },
+                    { value: '', label: t('page.allProjects') },
                     ...projects.map(p => ({ value: p.id, label: p.name }))
                   ]}
                 />
@@ -252,12 +255,12 @@ export function InvoicesPage() {
             {/* Offer filter (only when project selected) */}
             {projectFilter && offers.length > 0 && (
               <div className="w-60">
-                <label className="block text-xs font-medium text-neutral-500 mb-1.5">Offer / Spec</label>
+                <label className="block text-xs font-medium text-neutral-500 mb-1.5">{t('page.offerSpec')}</label>
                 <Select
                   value={offerFilter}
                   onChange={setOfferFilter}
                   options={[
-                    { value: '', label: 'All offers' },
+                    { value: '', label: t('page.allOffers') },
                     ...offers.map(o => ({
                       value: o.id,
                       label: `${o.number}${o.specVersion ? ` (${o.specVersion})` : ''}`
@@ -271,7 +274,7 @@ export function InvoicesPage() {
             {hasActiveFilters && (
               <div className="flex items-center gap-3 ml-auto">
                 <span className="text-sm text-neutral-400">
-                  {filteredInvoices.length} of {invoices.length}
+                  {filteredInvoices.length} / {invoices.length}
                 </span>
                 <button
                   onClick={() => {
@@ -281,7 +284,7 @@ export function InvoicesPage() {
                   }}
                   className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                 >
-                  Clear
+                  {t('page.clear')}
                 </button>
               </div>
             )}
@@ -306,23 +309,23 @@ export function InvoicesPage() {
             />
           </svg>
           <h2 className="mt-4 text-lg font-semibold text-neutral-900">
-            No invoices yet
+            {t('emptyState.title')}
           </h2>
           <p className="mt-2 text-neutral-500 max-w-md mx-auto">
-            Invoices will appear here after you accept an offer.
+            {t('emptyState.subtitle')}
           </p>
           <div className="flex items-center justify-center gap-3 mt-6">
             <Link
               to={location.pathname.startsWith('/admin') ? '/admin/calculator' : location.pathname.startsWith('/am') ? '/am/calculator' : '/calculator'}
               className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
             >
-              Go to Calculator
+              {t('emptyState.goToCalculator')}
             </Link>
             <Link
               to={location.pathname.startsWith('/admin') ? '/admin/offers' : location.pathname.startsWith('/am') ? '/am/offers' : '/offers'}
               className="inline-flex items-center gap-2 bg-white hover:bg-neutral-50 text-neutral-700 font-medium px-6 py-2.5 rounded border border-neutral-200 transition-colors"
             >
-              View Offers
+              {t('emptyState.viewOffers')}
             </Link>
           </div>
         </div>
@@ -345,10 +348,10 @@ export function InvoicesPage() {
             />
           </svg>
           <h2 className="mt-4 text-lg font-semibold text-neutral-900">
-            No invoices match your filters
+            {t('emptyState.noMatch')}
           </h2>
           <p className="mt-2 text-neutral-500">
-            Try adjusting your filters to see more results.
+            {t('emptyState.adjustFilters')}
           </p>
           <button
             onClick={() => {
@@ -358,7 +361,7 @@ export function InvoicesPage() {
             }}
             className="mt-6 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
           >
-            Clear all filters
+            {t('page.clearAllFilters')}
           </button>
         </div>
       )}
@@ -370,7 +373,7 @@ export function InvoicesPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            Overdue ({overdueInvoices.length})
+            {t('page.overdue')} ({overdueInvoices.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -391,7 +394,7 @@ export function InvoicesPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            Awaiting Confirmation ({awaitingConfirmation.length})
+            {t('page.awaitingConfirmation')} ({awaitingConfirmation.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -412,7 +415,7 @@ export function InvoicesPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-neutral-400" />
-            Pending Payment ({normalPending.length})
+            {t('page.pendingPayment')} ({normalPending.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -433,7 +436,7 @@ export function InvoicesPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-emerald-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Paid ({paidInvoices.length})
+            {t('page.paid')} ({paidInvoices.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -453,7 +456,7 @@ export function InvoicesPage() {
       {cancelledInvoices.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide">
-            Cancelled ({cancelledInvoices.length})
+            {t('page.cancelled')} ({cancelledInvoices.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 opacity-60">

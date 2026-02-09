@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFileUrl, getFileCategory, formatFileSize, downloadFile } from '../../hooks/useFiles';
 import { formatDate } from '../../lib/utils';
 
 export function FilePreviewModal({ file, url: initialUrl, onClose }) {
+  const { t } = useTranslation('files');
   const [zoom, setZoom] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -98,7 +100,7 @@ export function FilePreviewModal({ file, url: initialUrl, onClose }) {
           <button
             onClick={onClose}
             className="p-2 text-white/60 hover:text-white"
-            title="Close (Esc)"
+            title={t('preview.close')}
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -150,12 +152,12 @@ export function FilePreviewModal({ file, url: initialUrl, onClose }) {
           <div className="bg-white/10 rounded-md p-8 text-center">
             <div className="text-6xl mb-4">📎</div>
             <h3 className="text-white text-lg font-medium mb-2">{file.filename}</h3>
-            <p className="text-white/60 mb-4">Preview not available for this file type</p>
+            <p className="text-white/60 mb-4">{t('preview.previewNotAvailable')}</p>
             <button
               onClick={handleDownload}
               className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2 rounded"
             >
-              Download File
+              {t('preview.download')}
             </button>
           </div>
         )}
@@ -166,11 +168,11 @@ export function FilePreviewModal({ file, url: initialUrl, onClose }) {
         className="px-4 py-2 bg-black/50 text-white/60 text-sm flex items-center gap-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <span>Type: {file.mime_type || 'Unknown'}</span>
-        <span>Size: {formatFileSize(file.size_bytes)}</span>
-        <span>Uploaded: {formatDate(file.created_at)}</span>
+        <span>{file.mime_type || t('common:unknown')}</span>
+        <span>{formatFileSize(file.size_bytes)}</span>
+        <span>{t('card.uploaded')}: {formatDate(file.created_at)}</span>
         {file.uploader && (
-          <span>By: {file.uploader.full_name || file.uploader.email}</span>
+          <span>{t('card.by')}: {file.uploader.full_name || file.uploader.email}</span>
         )}
       </div>
     </div>

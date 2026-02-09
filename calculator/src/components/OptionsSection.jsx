@@ -1,16 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
 
 export function OptionsSection({ revisionRounds, onRevisionChange }) {
+  const { t } = useTranslation('calculator');
+  
   return (
     <div className="border-t border-neutral-200 pt-8 mt-10">
       <h2 className="text-lg font-semibold text-neutral-900 mb-5 flex items-center gap-2">
-        <Icon name="edit" className="text-emerald-500" /> Options
+        <Icon name="edit" className="text-emerald-500" /> {t('options.title')}
       </h2>
       <div className="bg-white border border-neutral-200 p-4 rounded-md flex flex-col md:flex-row items-center gap-6">
         <div className="flex-grow">
-          <label className="text-sm font-medium text-neutral-900">Revision Rounds</label>
+          <label className="text-sm font-medium text-neutral-900">{t('options.revisions')}</label>
           <p className="text-xs text-neutral-500">
-            Extra rounds (+2.5% budget each)
+            {t('options.revisionsDesc', { defaultValue: 'Extra rounds (+2.5% budget each)' })}
           </p>
         </div>
         <div className="flex items-center bg-neutral-100 border border-neutral-200 rounded h-11 overflow-hidden">

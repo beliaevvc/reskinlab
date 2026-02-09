@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { usePriceConfigs, useUpdatePriceConfig } from '../../hooks/usePricing';
 import { formatCurrency } from '../../lib/utils';
 import { logPriceChange } from '../../lib/auditLog';
@@ -26,6 +27,25 @@ const CATEGORY_ORDER = [
 
 // Categories that have base price + complexity/surcharge pairs
 const PAIRED_CATEGORIES = ['Concept Document', 'Symbols', 'Backgrounds', 'Pop-ups', 'UI Menus', 'Marketing'];
+
+// Mapping category names to translation keys
+const CATEGORY_KEYS = {
+  'Minimum Order': 'minimumOrder',
+  'Concept Document': 'conceptDocument',
+  'Symbols': 'symbols',
+  'Backgrounds': 'backgrounds',
+  'Pop-ups': 'popups',
+  'UI Menus': 'uiMenus',
+  'Marketing': 'marketing',
+  'Styles': 'styles',
+  'Animations': 'animations',
+  'Usage Rights': 'usageRights',
+  'Payment': 'payment',
+  'Revisions': 'revisions',
+  'Urgency': 'urgency',
+  'Volume Discounts': 'volumeDiscounts',
+  'Global': 'global',
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -166,6 +186,7 @@ function TableIcon({ className }) {
 // ─── Edit Modal ───────────────────────────────────────────────────────────────
 
 function EditModal({ config, onSave, onClose, isSaving }) {
+  const { t } = useTranslation('admin');
   const type = getConfigType(config.name);
   const humanName = getHumanName(config);
   
@@ -190,10 +211,13 @@ function EditModal({ config, onSave, onClose, isSaving }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose, onSave, config.id, value, displayName]);
 
-  const typeLabel = type === 'price' ? 'Base Price' 
-    : type === 'coefficient' ? 'Coefficient' 
-    : type === 'percent' ? 'Percent' 
-    : 'Setting';
+  const typeLabel = type === 'price' ? t('pricing.types.basePrice')
+    : type === 'coefficient' ? t('pricing.types.coefficient')
+    : type === 'percent' ? t('pricing.types.percent')
+    : t('pricing.types.setting');
+  
+  const categoryKey = CATEGORY_KEYS[config.category] || config.category;
+  const categoryLabel = t(`pricing.categories.${categoryKey}`, config.category);
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -204,7 +228,7 @@ function EditModal({ config, onSave, onClose, isSaving }) {
         <div className="px-6 py-4 bg-neutral-50 border-b border-neutral-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-neutral-400 mb-1">{config.category} · {typeLabel}</p>
+              <p className="text-xs text-neutral-400 mb-1">{categoryLabel} · {typeLabel}</p>
               <h3 className="text-lg font-semibold text-neutral-900">{humanName}</h3>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-neutral-200 transition-colors">
@@ -216,7 +240,7 @@ function EditModal({ config, onSave, onClose, isSaving }) {
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
           <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
-            <span className="text-xs text-neutral-500">Current:</span>
+            <span className="text-xs text-neutral-500">{t('pricing.modal.current')}</span>
             <span className="text-lg font-bold text-emerald-600">
               {formatConfigValue(config.value, type)}
             </span>
@@ -224,8 +248,8 @@ function EditModal({ config, onSave, onClose, isSaving }) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-2">
-              Display Name
-              <span className="ml-1 text-xs font-normal text-neutral-400">(shown in calculator)</span>
+              {t('pricing.modal.displayName')}
+              <span className="ml-1 text-xs font-normal text-neutral-400">{t('pricing.modal.displayNameHint')}</span>
             </label>
             <input
               type="text"
@@ -237,7 +261,7 @@ function EditModal({ config, onSave, onClose, isSaving }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">Value</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-2">{t('pricing.modal.value')}</label>
             <div className="flex items-center gap-2">
               {type === 'price' && <span className="text-lg text-neutral-400 font-medium">$</span>}
               {type === 'coefficient' && <span className="text-lg text-neutral-400 font-medium">×</span>}
@@ -256,17 +280,17 @@ function EditModal({ config, onSave, onClose, isSaving }) {
 
         {/* Footer */}
         <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between">
-          <span className="text-xs text-neutral-400">⌘+Enter to save</span>
+          <span className="text-xs text-neutral-400">⌘+Enter</span>
           <div className="flex items-center gap-3">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200 rounded-lg transition-colors">
-              Cancel
+              {t('pricing.modal.cancel')}
             </button>
             <button
               onClick={() => onSave(config.id, parseFloat(value), displayName.trim() || null)}
               disabled={isSaving}
               className="px-5 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-medium text-sm disabled:opacity-50 transition-colors"
             >
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? t('pricing.modal.saving') : t('pricing.modal.save')}
             </button>
           </div>
         </div>
@@ -279,6 +303,7 @@ function EditModal({ config, onSave, onClose, isSaving }) {
 // ─── Paired Edit Modal (base + secondary in one) ──────────────────────────────
 
 function PairedEditModal({ pair, onSave, onClose, isSaving }) {
+  const { t } = useTranslation('admin');
   const { base, secondary, secondaryType } = pair;
   const displayConfig = base || secondary;
   const humanName = getHumanName(displayConfig);
@@ -329,12 +354,15 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
     });
   };
 
-  const secondaryLabel = isSurcharge ? 'Surcharge' : 'Complexity Coefficient';
+  const secondaryLabel = isSurcharge ? t('pricing.types.surcharge') : t('pricing.types.complexity');
   const secondaryPrefix = isSurcharge ? '' : '×';
   const secondarySuffix = isSurcharge ? '%' : '';
   const secondaryCurrentDisplay = isSurcharge 
     ? `${(secondary?.value < 1 ? secondary.value * 100 : secondary?.value)}%`
     : `×${secondary?.value}`;
+  
+  const categoryKey = CATEGORY_KEYS[displayConfig.category] || displayConfig.category;
+  const categoryLabel = t(`pricing.categories.${categoryKey}`, displayConfig.category);
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -345,7 +373,7 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
         <div className="px-6 py-4 bg-neutral-50 border-b border-neutral-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-neutral-400 mb-1">{displayConfig.category}</p>
+              <p className="text-xs text-neutral-400 mb-1">{categoryLabel}</p>
               <h3 className="text-lg font-semibold text-neutral-900">{humanName}</h3>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-neutral-200 transition-colors">
@@ -359,8 +387,8 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
           {/* Display Name */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-2">
-              Display Name
-              <span className="ml-1 text-xs font-normal text-neutral-400">(shown in calculator)</span>
+              {t('pricing.modal.displayName')}
+              <span className="ml-1 text-xs font-normal text-neutral-400">{t('pricing.modal.displayNameHint')}</span>
             </label>
             <input
               type="text"
@@ -374,7 +402,7 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
           {/* Base Price */}
           {base && (
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">Base Price</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">{t('pricing.types.basePrice')}</label>
               <div className="flex items-center gap-2">
                 <span className="text-lg text-neutral-400 font-medium">$</span>
                 <input
@@ -386,7 +414,7 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
                   className="flex-1 px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-lg font-mono text-right transition-shadow"
                 />
               </div>
-              <p className="text-xs text-neutral-400 mt-1">Current: {formatCurrency(base.value)}</p>
+              <p className="text-xs text-neutral-400 mt-1">{t('pricing.modal.current')} {formatCurrency(base.value)}</p>
             </div>
           )}
 
@@ -405,24 +433,24 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
                 />
                 {secondarySuffix && <span className="text-lg text-neutral-400 font-medium">{secondarySuffix}</span>}
               </div>
-              <p className="text-xs text-neutral-400 mt-1">Current: {secondaryCurrentDisplay}</p>
+              <p className="text-xs text-neutral-400 mt-1">{t('pricing.modal.current')} {secondaryCurrentDisplay}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
         <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between">
-          <span className="text-xs text-neutral-400">⌘+Enter to save</span>
+          <span className="text-xs text-neutral-400">⌘+Enter</span>
           <div className="flex items-center gap-3">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200 rounded-lg transition-colors">
-              Cancel
+              {t('pricing.modal.cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
               className="px-5 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-medium text-sm disabled:opacity-50 transition-colors"
             >
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? t('pricing.modal.saving') : t('pricing.modal.save')}
             </button>
           </div>
         </div>
@@ -435,12 +463,13 @@ function PairedEditModal({ pair, onSave, onClose, isSaving }) {
 // ─── Paired Card (base price + secondary in one) ──────────────────────────────
 
 function PairedCard({ pair, onEdit }) {
+  const { t } = useTranslation('admin');
   const { base, secondary, secondaryType } = pair;
   const displayConfig = base || secondary;
   const humanName = getHumanName(displayConfig);
   
   const isSurcharge = secondaryType === 'surcharge';
-  const secondaryLabel = isSurcharge ? 'Surcharge' : 'Complexity';
+  const secondaryLabel = isSurcharge ? t('pricing.types.surcharge') : t('pricing.types.complexity');
   const secondaryDisplay = isSurcharge 
     ? `${secondary?.value < 1 ? (secondary.value * 100) : secondary?.value}%`
     : `×${secondary?.value}`;
@@ -458,7 +487,7 @@ function PairedCard({ pair, onEdit }) {
       <div className="space-y-1.5">
         {base && (
           <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-500">Base Price</span>
+            <span className="text-xs text-neutral-500">{t('pricing.types.basePrice')}</span>
             <span className="text-base font-semibold text-emerald-600 font-mono">
               {formatCurrency(base.value)}
             </span>
@@ -503,12 +532,14 @@ function ValueCard({ config, onEdit }) {
 // ─── Settings Table (table view) ──────────────────────────────────────────────
 
 function SettingsTable({ configs, isPairedCategory, onEdit, onEditPair }) {
+  const { t } = useTranslation('admin');
+  
   if (isPairedCategory) {
     const { pairs, standalone } = groupByItemId(configs);
     
     // Determine if we have surcharges or complexities
     const hasSurcharge = pairs.some(p => p.secondaryType === 'surcharge');
-    const secondaryHeader = hasSurcharge ? 'Surcharge' : 'Complexity';
+    const secondaryHeader = hasSurcharge ? t('pricing.types.surcharge') : t('pricing.types.complexity');
     
     return (
       <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
@@ -516,10 +547,10 @@ function SettingsTable({ configs, isPairedCategory, onEdit, onEditPair }) {
           <thead>
             <tr className="border-b border-neutral-200 bg-neutral-50">
               <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                Name
+                {t('pricing.table.name')}
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                Base Price
+                {t('pricing.types.basePrice')}
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
                 {secondaryHeader}
@@ -592,10 +623,10 @@ function SettingsTable({ configs, isPairedCategory, onEdit, onEditPair }) {
         <thead>
           <tr className="border-b border-neutral-200 bg-neutral-50">
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Name
+              {t('pricing.table.name')}
             </th>
             <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Value
+              {t('pricing.table.value')}
             </th>
           </tr>
         </thead>
@@ -628,27 +659,44 @@ function SettingsTable({ configs, isPairedCategory, onEdit, onEditPair }) {
 
 // ─── Minimum Order Section ────────────────────────────────────────────────────
 
-function MinimumOrderSection({ configs, onSaveConfig }) {
+function MinimumOrderSection({ configs, onSaveConfig, onSaveConfigData }) {
+  const { t } = useTranslation('admin');
   const enabledConfig = configs.find(c => c.name === 'min_order_enabled');
   const amountConfig = configs.find(c => c.name === 'min_order_amount');
   const messageConfig = configs.find(c => c.name === 'min_order_message');
 
+  // Get bilingual messages from config_data
+  const configData = messageConfig?.config_data || {};
+  const initialMessageEn = configData.message_en || messageConfig?.description || '';
+  const initialMessageRu = configData.message_ru || '';
+
   const [isEnabled, setIsEnabled] = useState(enabledConfig?.value === 1);
   const [amount, setAmount] = useState(amountConfig?.value?.toString() || '1000');
-  const [message, setMessage] = useState(messageConfig?.description || '');
+  const [messageEn, setMessageEn] = useState(initialMessageEn);
+  const [messageRu, setMessageRu] = useState(initialMessageRu);
   const [isDirty, setIsDirty] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const handleToggle = () => { setIsEnabled(!isEnabled); setIsDirty(true); };
   const handleAmountChange = (e) => { setAmount(e.target.value); setIsDirty(true); };
-  const handleMessageChange = (e) => { setMessage(e.target.value); setIsDirty(true); };
+  const handleMessageEnChange = (e) => { setMessageEn(e.target.value); setIsDirty(true); };
+  const handleMessageRuChange = (e) => { setMessageRu(e.target.value); setIsDirty(true); };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      if (enabledConfig) await onSaveConfig(enabledConfig.id, isEnabled ? 1 : 0, enabledConfig.description);
-      if (amountConfig) await onSaveConfig(amountConfig.id, parseFloat(amount) || 0, amountConfig.description);
-      if (messageConfig) await onSaveConfig(messageConfig.id, messageConfig.value, message.trim() || null);
+      if (enabledConfig) await onSaveConfig(enabledConfig.id, isEnabled ? 1 : 0);
+      if (amountConfig) await onSaveConfig(amountConfig.id, parseFloat(amount) || 0);
+      if (messageConfig) {
+        // Save bilingual messages in config_data
+        const newConfigData = {
+          ...configData,
+          type: 'message',
+          message_en: messageEn.trim(),
+          message_ru: messageRu.trim(),
+        };
+        await onSaveConfigData(messageConfig.id, newConfigData);
+      }
       setIsDirty(false);
     } catch (err) {
       alert('Failed to save: ' + err.message);
@@ -661,19 +709,19 @@ function MinimumOrderSection({ configs, onSaveConfig }) {
     <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
       <div className="px-6 py-4 bg-neutral-50 border-b border-neutral-200 flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-neutral-900">Minimum Order</h3>
-          <p className="text-sm text-neutral-500">First order minimum amount</p>
+          <h3 className="font-semibold text-neutral-900">{t('pricing.minimumOrder.title')}</h3>
+          <p className="text-sm text-neutral-500">{t('pricing.minimumOrder.subtitle')}</p>
         </div>
         <span className={`text-xs font-medium px-3 py-1 rounded-full ${isEnabled ? 'bg-emerald-100 text-emerald-700' : 'bg-neutral-100 text-neutral-500'}`}>
-          {isEnabled ? 'Active' : 'Disabled'}
+          {isEnabled ? t('pricing.minimumOrder.active') : t('pricing.minimumOrder.disabled')}
         </span>
       </div>
 
       <div className="p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-neutral-900">Enable Minimum Order</p>
-            <p className="text-xs text-neutral-500 mt-0.5">First order in every project must meet the minimum</p>
+            <p className="text-sm font-medium text-neutral-900">{t('pricing.minimumOrder.enable')}</p>
+            <p className="text-xs text-neutral-500 mt-0.5">{t('pricing.minimumOrder.enableHint')}</p>
           </div>
           <button
             onClick={handleToggle}
@@ -684,41 +732,94 @@ function MinimumOrderSection({ configs, onSaveConfig }) {
         </div>
 
         <div className={`transition-all duration-200 ${isEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-          <label className="block text-sm font-medium text-neutral-900 mb-2">Minimum Amount</label>
+          <label className="block text-sm font-medium text-neutral-900 mb-2">{t('pricing.minimumOrder.amount')}</label>
           <div className="flex items-center gap-2">
             <span className="text-neutral-400 text-lg font-medium">$</span>
             <input type="number" value={amount} onChange={handleAmountChange} min="0" step="100"
               className="w-44 px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-right text-lg font-mono transition-shadow" />
           </div>
-          <p className="text-xs text-neutral-500 mt-1.5">Applies only to the first order (before any paid invoices)</p>
+          <p className="text-xs text-neutral-500 mt-1.5">{t('pricing.minimumOrder.amountHint')}</p>
         </div>
 
+        {/* Bilingual Messages */}
         <div className={`transition-all duration-200 ${isEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-          <label className="block text-sm font-medium text-neutral-900 mb-2">Client Message</label>
-          <input type="text" value={message} onChange={handleMessageChange}
-            placeholder="e.g. Minimum order amount is $1,000 for your first order"
-            className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-shadow" />
+          <label className="block text-sm font-medium text-neutral-900 mb-3">{t('pricing.minimumOrder.messages')}</label>
+          
+          <div className="space-y-3">
+            {/* English Message */}
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs font-medium text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded">EN</span>
+                <span className="text-xs text-neutral-400">{t('pricing.minimumOrder.messageEn')}</span>
+              </div>
+              <input 
+                type="text" 
+                value={messageEn} 
+                onChange={handleMessageEnChange}
+                placeholder={t('pricing.minimumOrder.messagePlaceholderEn')}
+                className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-shadow" 
+              />
+            </div>
+            
+            {/* Russian Message */}
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs font-medium text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded">RU</span>
+                <span className="text-xs text-neutral-400">{t('pricing.minimumOrder.messageRu')}</span>
+              </div>
+              <input 
+                type="text" 
+                value={messageRu} 
+                onChange={handleMessageRuChange}
+                placeholder={t('pricing.minimumOrder.messagePlaceholderRu')}
+                className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-shadow" 
+              />
+            </div>
+          </div>
         </div>
 
         {isDirty && (
           <div className="pt-3 border-t border-neutral-100">
             <button onClick={handleSave} disabled={saving}
               className="px-5 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-medium text-sm disabled:opacity-50 transition-colors">
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? t('pricing.modal.saving') : t('pricing.modal.save')}
             </button>
           </div>
         )}
 
-        {isEnabled && (
+        {isEnabled && (messageEn || messageRu) && (
           <div className="pt-3 border-t border-neutral-100">
-            <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Preview</p>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2.5">
-              <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <p className="text-xs text-amber-700">
-                {message || `Min. $${parseInt(amount || 0).toLocaleString()} for first order`}
-              </p>
+            <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-3">{t('pricing.minimumOrder.preview')}</p>
+            <div className="space-y-2">
+              {/* English Preview */}
+              {messageEn && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-medium text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">EN</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p className="text-xs text-amber-700">{messageEn}</p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Russian Preview */}
+              {messageRu && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-medium text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">RU</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p className="text-xs text-amber-700">{messageRu}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -730,6 +831,7 @@ function MinimumOrderSection({ configs, onSaveConfig }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export function PricingPage() {
+  const { t } = useTranslation('admin');
   const { data: configs, isLoading } = usePriceConfigs();
   const updateConfig = useUpdatePriceConfig();
 
@@ -841,27 +943,37 @@ export function PricingPage() {
     await logPriceChange({ configId: id, configName: config?.name, oldValue: config?.value, newValue: value, oldDescription: config?.description, newDescription: description });
   };
 
+  const handleSaveConfigData = async (id, configData) => {
+    await updateConfig.mutateAsync({ id, value: 0, config_data: configData });
+  };
+
   // Stats
   const totalConfigs = configs?.length || 0;
   const priceCount = configs?.filter(c => getConfigType(c.name) === 'price').length || 0;
   const coeffCount = configs?.filter(c => getConfigType(c.name) === 'coefficient').length || 0;
 
+  // Helper to get localized category name
+  const getCategoryLabel = (category) => {
+    const key = CATEGORY_KEYS[category];
+    return key ? t(`pricing.categories.${key}`, category) : category;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Calculator Settings</h1>
-        <p className="text-neutral-500 mt-1">Manage prices, coefficients, and calculator configuration</p>
+        <h1 className="text-2xl font-bold text-neutral-900">{t('pricing.title')}</h1>
+        <p className="text-neutral-500 mt-1">{t('pricing.subtitle')}</p>
       </div>
 
       {/* Stats + Search */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4 text-sm text-neutral-500">
-          <span>{totalConfigs} settings</span>
+          <span>{totalConfigs} {t('pricing.stats.settings')}</span>
           <span className="text-neutral-300">·</span>
-          <span>{priceCount} prices</span>
+          <span>{priceCount} {t('pricing.stats.prices')}</span>
           <span className="text-neutral-300">·</span>
-          <span>{coeffCount} coefficients</span>
+          <span>{coeffCount} {t('pricing.stats.coefficients')}</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -898,7 +1010,7 @@ export function PricingPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search settings..."
+              placeholder={t('pricing.search')}
               className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
             />
             {searchQuery && (
@@ -915,7 +1027,7 @@ export function PricingPage() {
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-emerald-200 border-t-emerald-500" />
-            <p className="text-sm text-neutral-500">Loading settings...</p>
+            <p className="text-sm text-neutral-500">{t('pricing.loading')}</p>
           </div>
         </div>
       ) : filteredCategories.length === 0 ? (
@@ -925,9 +1037,9 @@ export function PricingPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-neutral-900 font-semibold text-lg">No price configurations found</p>
+          <p className="text-neutral-900 font-semibold text-lg">{t('pricing.noConfigs')}</p>
           <p className="text-sm text-neutral-500 mt-2 max-w-sm mx-auto">
-            {searchQuery ? 'Try a different search term' : 'Run the migration to populate calculator settings'}
+            {searchQuery ? t('pricing.tryDifferentSearch') : t('pricing.noConfigsHint')}
           </p>
         </div>
       ) : viewMode === 'table' ? (
@@ -936,15 +1048,17 @@ export function PricingPage() {
           {filteredCategories.map((category) => {
             const categoryConfigs = filteredGroups[category];
             const isPaired = PAIRED_CATEGORIES.includes(category);
+            const categoryLabel = getCategoryLabel(category);
             
             // Skip Minimum Order in table view (it has special UI)
             if (category === 'Minimum Order') {
               return (
                 <div key={category}>
-                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">{category}</h2>
+                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">{categoryLabel}</h2>
                   <MinimumOrderSection
                     configs={categoryConfigs}
                     onSaveConfig={handleSaveConfig}
+                    onSaveConfigData={handleSaveConfigData}
                   />
                 </div>
               );
@@ -952,7 +1066,7 @@ export function PricingPage() {
             
             return (
               <div key={category}>
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">{category}</h2>
+                <h2 className="text-lg font-semibold text-neutral-900 mb-4">{categoryLabel}</h2>
                 <SettingsTable
                   configs={categoryConfigs}
                   isPairedCategory={isPaired}
@@ -972,6 +1086,7 @@ export function PricingPage() {
               {filteredCategories.map((category) => {
                 const isActive = category === activeCategory;
                 const stats = getCategoryStats(filteredGroups[category]);
+                const categoryLabel = getCategoryLabel(category);
                 
                 return (
                   <button
@@ -986,7 +1101,7 @@ export function PricingPage() {
                         : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                     }`}
                   >
-                    <span className="text-sm truncate">{category}</span>
+                    <span className="text-sm truncate">{categoryLabel}</span>
                     <span className={`text-xs tabular-nums ${isActive ? 'text-emerald-600' : 'text-neutral-400'}`}>
                       {stats.total}
                     </span>
@@ -1002,20 +1117,21 @@ export function PricingPage() {
               <MinimumOrderSection
                 configs={activeConfigs}
                 onSaveConfig={handleSaveConfig}
+                onSaveConfigData={handleSaveConfigData}
               />
             ) : activeConfigs.length > 0 ? (
               <div className="space-y-6">
                 {/* Category header */}
                 <div>
-                  <h2 className="text-xl font-semibold text-neutral-900">{activeCategory}</h2>
+                  <h2 className="text-xl font-semibold text-neutral-900">{getCategoryLabel(activeCategory)}</h2>
                   <p className="text-sm text-neutral-500 mt-0.5">
                     {(() => {
                       const s = getCategoryStats(activeConfigs);
                       const parts = [];
-                      if (s.prices) parts.push(`${s.prices} price${s.prices > 1 ? 's' : ''}`);
-                      if (s.coeffs) parts.push(`${s.coeffs} coefficient${s.coeffs > 1 ? 's' : ''}`);
-                      if (s.percents) parts.push(`${s.percents} percent${s.percents > 1 ? 's' : ''}`);
-                      return parts.join(' · ') || `${s.total} settings`;
+                      if (s.prices) parts.push(`${s.prices} ${s.prices > 1 ? t('pricing.statsLabel.prices') : t('pricing.statsLabel.price')}`);
+                      if (s.coeffs) parts.push(`${s.coeffs} ${s.coeffs > 1 ? t('pricing.statsLabel.coefficients') : t('pricing.statsLabel.coefficient')}`);
+                      if (s.percents) parts.push(`${s.percents} ${s.percents > 1 ? t('pricing.statsLabel.percents') : t('pricing.statsLabel.percent')}`);
+                      return parts.join(' · ') || `${s.total} ${t('pricing.statsLabel.settings')}`;
                     })()}
                   </p>
                 </div>
@@ -1045,7 +1161,7 @@ export function PricingPage() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-64 text-neutral-400">
-                <p>Select a category from the sidebar</p>
+                <p>{t('pricing.selectCategory')}</p>
               </div>
             )}
           </div>

@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../hooks/useLanguage';
 import { Icon } from './Icon';
 import { Select } from './Select';
 import { ANIMATIONS as LOCAL_ANIMATIONS } from '../data';
 
-const ORDER_TYPES = [
-  { id: 'art_only', label: 'Art Only', title: 'Art Only — no animation' },
-  { id: 'anim_only', label: 'Anim Only', title: 'Animation Only — client provides art' },
-  { id: 'art_and_anim', label: 'Art+Anim', title: 'Art + Animation' },
-];
-
 export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = LOCAL_ANIMATIONS }) {
+  const { t } = useTranslation('calculator');
+  const { isRussian, getLocalized } = useLanguage();
+  
+  const ORDER_TYPES = [
+    { id: 'art_only', label: t('orderTypes.artOnly'), title: t('orderTypes.artOnlyDesc', { defaultValue: 'Art Only — no animation' }) },
+    { id: 'anim_only', label: t('orderTypes.animOnly'), title: t('orderTypes.animOnlyDesc', { defaultValue: 'Animation Only — client provides art' }) },
+    { id: 'art_and_anim', label: t('orderTypes.artAndAnim'), title: t('orderTypes.artAndAnimDesc', { defaultValue: 'Art + Animation' }) },
+  ];
   const active = state.qty > 0;
   const orderType = state.orderType || 'art_and_anim';
   const isAnimDisabled = !active || orderType === 'art_only';
@@ -54,7 +58,7 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = L
             </div>
             {isRecommended && (
               <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 rounded">
-                Recommended
+                {t('item.recommended', { defaultValue: 'Recommended' })}
               </span>
             )}
             {item.details && (
@@ -67,12 +71,12 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = L
             )}
           </div>
           <div className="text-xs text-neutral-400 font-mono mt-0.5 flex gap-3">
-            <span>Base: ${item.base.toLocaleString()}</span>
+            <span>{t('item.base', { defaultValue: 'Base' })}: ${item.base.toLocaleString()}</span>
             {hasSurcharge && (
-              <span className="text-amber-600">+ {item.surchargePercent * 100}% of spec</span>
+              <span className="text-amber-600">+ {item.surchargePercent * 100}% {t('item.ofSpec', { defaultValue: 'of spec' })}</span>
             )}
             {!hideAnimation && (
-              <span className="text-emerald-600">Anim Cplx: x{item.complexity}</span>
+              <span className="text-emerald-600">{t('item.animComplexity', { defaultValue: 'Anim Cplx' })}: x{item.complexity}</span>
             )}
           </div>
         </div>
@@ -81,7 +85,7 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = L
           {!hideOrderType && (
             <>
               <div className="sm:hidden">
-                <label className="text-[10px] text-neutral-400">Type</label>
+                <label className="text-[10px] text-neutral-400">{t('options.orderType')}</label>
               </div>
               <div className={`flex rounded border overflow-hidden h-8 text-[11px] font-medium ${!active ? 'opacity-40 pointer-events-none' : ''}`}>
                 {ORDER_TYPES.map((type) => (
@@ -110,7 +114,7 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = L
           {!hideAnimation && (
             <>
               <div className="sm:hidden">
-                <label className="text-[10px] text-neutral-400">Anim</label>
+                <label className="text-[10px] text-neutral-400">{t('options.animation')}</label>
               </div>
               <Select
                 value={state.anim}
@@ -123,7 +127,7 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = L
           )}
           {/* Quantity Controls */}
           <div className="sm:hidden">
-            <label className="text-[10px] text-neutral-400">Qty</label>
+            <label className="text-[10px] text-neutral-400">{t('item.quantity')}</label>
           </div>
           <div className="flex items-center bg-neutral-100 border border-neutral-200 rounded h-9 overflow-hidden">
             <button
@@ -153,18 +157,18 @@ export function ItemRow({ item, state, onUpdate, onToggleDetails, animations = L
       </div>
       {state.expanded && item.details && (
         <div className="mt-4 pt-4 border-t border-neutral-200 text-sm text-neutral-600">
-          <p className="mb-2">{item.details.desc}</p>
-          {item.details.examples && (
+          <p className="mb-2">{getLocalized(item.details, 'desc')}</p>
+          {(item.details.examples || item.details.examplesEn) && (
             <p className="mb-3 text-xs italic text-neutral-400">
-              Ex: {item.details.examples}
+              {t('item.examples')}: {getLocalized(item.details, 'examples')}
             </p>
           )}
-          {item.details.tech && (
+          {(item.details.tech || item.details.techEn) && (
             <ul className="space-y-1 bg-neutral-50 p-3 rounded border border-neutral-200">
-              {item.details.tech.map((tech, index) => (
+              {(getLocalized(item.details, 'tech') || []).map((techItem, index) => (
                 <li key={index} className="flex gap-2 text-xs text-neutral-600">
                   <span className="text-emerald-500">•</span>
-                  {tech}
+                  {techItem}
                 </li>
               ))}
             </ul>

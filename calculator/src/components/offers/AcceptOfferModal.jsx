@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAcceptOffer } from '../../hooks/useOffers';
 import { LegalDocument } from './LegalTextModal';
 import { printLegalText } from '../../lib/printUtils';
 
 export function AcceptOfferModal({ isOpen, onClose, offer }) {
+  const { t } = useTranslation('offers');
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [hasAgreed, setHasAgreed] = useState(false);
   const { mutate: acceptOffer, isPending } = useAcceptOffer();
@@ -79,10 +81,10 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
               </div>
               <div>
                 <h2 className="text-base font-semibold text-neutral-900">
-                  Accept Offer {offer.number}
+                  {t('accept.title')} {offer.number}
                 </h2>
                 <p className="text-xs text-neutral-400">
-                  Please read the terms carefully before accepting
+                  {t('accept.description', { defaultValue: 'Please read the terms carefully before accepting' })}
                 </p>
               </div>
             </div>
@@ -94,7 +96,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Print
+                {t('common:print', { defaultValue: 'Print' })}
               </button>
               <button
                 onClick={onClose}
@@ -122,7 +124,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
                 ) : '1'}
               </div>
               <span className={`text-xs font-medium ${hasScrolledToBottom ? 'text-emerald-600' : 'text-neutral-500'}`}>
-                Read terms
+                {t('accept.readTerms', { defaultValue: 'Read terms' })}
               </span>
             </div>
 
@@ -141,7 +143,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
                 ) : '2'}
               </div>
               <span className={`text-xs font-medium ${hasAgreed ? 'text-emerald-600' : 'text-neutral-500'}`}>
-                Confirm agreement
+                {t('accept.confirmAgreement', { defaultValue: 'Confirm agreement' })}
               </span>
             </div>
 
@@ -152,7 +154,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
                 3
               </div>
               <span className="text-xs font-medium text-neutral-500">
-                Accept
+                {t('accept.accept', { defaultValue: 'Accept' })}
               </span>
             </div>
           </div>
@@ -177,7 +179,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
-                Scroll to read all terms
+                {t('accept.scrollToRead', { defaultValue: 'Scroll to read all terms' })}
               </div>
             </div>
           </div>
@@ -194,8 +196,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
               className="mt-0.5 h-5 w-5 rounded border-neutral-300 text-emerald-500 focus:ring-emerald-500 disabled:opacity-50"
             />
             <span className="text-sm text-neutral-700 leading-relaxed">
-              I have read and understood the terms of this offer. I agree to all conditions
-              and confirm my intention to proceed with the order as specified.
+              {t('accept.agreementText', { defaultValue: 'I have read and understood the terms of this offer. I agree to all conditions and confirm my intention to proceed with the order as specified.' })}
             </span>
           </label>
         </div>
@@ -206,7 +207,7 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
             onClick={onClose}
             className="px-4 py-2.5 text-neutral-700 font-medium hover:bg-neutral-200 rounded-lg transition-colors text-sm"
           >
-            Cancel
+            {t('accept.cancel')}
           </button>
 
           <button
@@ -221,14 +222,14 @@ export function AcceptOfferModal({ isOpen, onClose, offer }) {
             {isPending ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
-                Processing...
+                {t('accept.accepting')}
               </>
             ) : (
               <>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Accept Offer
+                {t('accept.submit')}
               </>
             )}
           </button>

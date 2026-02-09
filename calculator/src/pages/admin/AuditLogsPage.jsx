@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuditLogs, exportAuditLogsCSV, exportAuditLogsJSON } from '../../hooks/useAuditLogs';
 import {
   AuditLogsHeader,
@@ -81,6 +82,7 @@ function filtersToParams(filters) {
  * - Full mobile adaptation
  */
 export function AuditLogsPage() {
+  const { t } = useTranslation('admin');
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(() => filtersFromParams(searchParams));
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('audit-view') || 'table');
@@ -175,7 +177,7 @@ export function AuditLogsPage() {
       <div className="flex items-center justify-between print:hidden">
         <div className="text-sm text-neutral-500">
           {totalCount > 0 && (
-            <span>{totalCount.toLocaleString()} total log{totalCount !== 1 ? 's' : ''}</span>
+            <span>{t('auditLog.totalLogs', { count: totalCount })}</span>
           )}
         </div>
         <div className="flex items-center gap-1 bg-neutral-100 rounded-lg p-0.5">
@@ -190,7 +192,7 @@ export function AuditLogsPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            Table
+            {t('auditLog.viewMode.table')}
           </button>
           <button
             onClick={() => handleViewChange('timeline')}
@@ -203,7 +205,7 @@ export function AuditLogsPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Timeline
+            {t('auditLog.viewMode.timeline')}
           </button>
         </div>
       </div>

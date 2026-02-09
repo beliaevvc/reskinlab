@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClientDetails } from '../../hooks/useClients';
 import { formatDate, formatCurrency } from '../../lib/utils';
 
@@ -12,6 +13,7 @@ const STATUS_STYLES = {
 };
 
 export function ClientDetailModal({ clientId, isOpen, onClose }) {
+  const { t } = useTranslation('admin');
   const { data: client, isLoading } = useClientDetails(clientId);
 
   if (!isOpen) return null;
@@ -56,17 +58,17 @@ export function ClientDetailModal({ clientId, isOpen, onClose }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xl font-bold text-neutral-900">
-                    {client.company_name || 'No company name'}
+                    {client.company_name || t('clientDetail.noCompanyName')}
                   </h3>
                   <p className="text-neutral-500 mt-1">{client.contact_email || client.user?.email || '—'}</p>
                   <div className="flex flex-wrap gap-4 mt-3 text-sm">
                     <div>
-                      <span className="text-neutral-500">Contact: </span>
+                      <span className="text-neutral-500">{t('clientDetail.contact')} </span>
                       <span className="text-neutral-900">{client.contact_person || '—'}</span>
                     </div>
                     {client.phone && (
                       <div>
-                        <span className="text-neutral-500">Phone: </span>
+                        <span className="text-neutral-500">{t('clientDetail.phone')} </span>
                         <span className="text-neutral-900">{client.phone}</span>
                       </div>
                     )}
@@ -77,19 +79,19 @@ export function ClientDetailModal({ clientId, isOpen, onClose }) {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-neutral-50 rounded-md p-4">
-                  <p className="text-sm text-neutral-500">Total Projects</p>
+                  <p className="text-sm text-neutral-500">{t('clientDetail.totalProjects')}</p>
                   <p className="text-2xl font-bold text-neutral-900 mt-1">
                     {client.projectCount}
                   </p>
                 </div>
                 <div className="bg-neutral-50 rounded-md p-4">
-                  <p className="text-sm text-neutral-500">Total Revenue</p>
+                  <p className="text-sm text-neutral-500">{t('clientDetail.totalRevenue')}</p>
                   <p className="text-2xl font-bold text-emerald-600 mt-1">
                     {formatCurrency(client.totalRevenue)}
                   </p>
                 </div>
                 <div className="bg-neutral-50 rounded-md p-4">
-                  <p className="text-sm text-neutral-500">Member Since</p>
+                  <p className="text-sm text-neutral-500">{t('clientDetail.memberSince')}</p>
                   <p className="text-lg font-bold text-neutral-900 mt-1">
                     {formatDate(client.created_at)}
                   </p>
@@ -118,7 +120,7 @@ export function ClientDetailModal({ clientId, isOpen, onClose }) {
 
               {/* Projects List */}
               <div>
-                <h4 className="text-sm font-medium text-neutral-700 mb-3">Projects</h4>
+                <h4 className="text-sm font-medium text-neutral-700 mb-3">{t('clientDetail.projects')}</h4>
                 {client.projects?.length > 0 ? (
                   <div className="space-y-2">
                     {client.projects.map((project) => (
@@ -145,7 +147,7 @@ export function ClientDetailModal({ clientId, isOpen, onClose }) {
                             className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
                             onClick={onClose}
                           >
-                            View →
+                            {t('clientDetail.view')}
                           </Link>
                         </div>
                       </div>
@@ -153,14 +155,14 @@ export function ClientDetailModal({ clientId, isOpen, onClose }) {
                   </div>
                 ) : (
                   <p className="text-sm text-neutral-500 text-center py-4">
-                    No projects yet
+                    {t('clientDetail.noProjects')}
                   </p>
                 )}
               </div>
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500">
-              Client not found
+              {t('clientDetail.clientNotFound')}
             </div>
           )}
         </div>
@@ -171,7 +173,7 @@ export function ClientDetailModal({ clientId, isOpen, onClose }) {
             onClick={onClose}
             className="w-full px-4 py-2 text-neutral-700 hover:bg-neutral-100 font-medium rounded transition-colors"
           >
-            Close
+            {t('clientDetail.close')}
           </button>
         </div>
       </div>

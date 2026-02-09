@@ -208,7 +208,7 @@ export function useCreateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, stageId, title, description, dueDate }) => {
+    mutationFn: async ({ projectId, stageId, title, title_ru, title_en, description, description_ru, description_en, dueDate }) => {
       // Get max order for this project
       const { data: maxOrderData } = await supabase
         .from('tasks')
@@ -225,7 +225,11 @@ export function useCreateTask() {
           project_id: projectId,
           stage_id: stageId || null,
           title,
+          title_ru: title_ru || null,
+          title_en: title_en || null,
           description: description || null,
+          description_ru: description_ru || null,
+          description_en: description_en || null,
           due_date: dueDate || null,
           status: 'backlog', // Tasks start in backlog
           order: nextOrder,

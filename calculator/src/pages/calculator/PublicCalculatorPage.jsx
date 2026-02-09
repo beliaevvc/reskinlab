@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CATEGORIES as LOCAL_CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
 import { useDynamicPricing } from '../../hooks/useDynamicPricing';
 import { useSaveSharedSession, useLoadSharedSession } from '../../hooks/useSharedSessions';
 import { printSpecification } from '../../lib/printUtils';
+import { useLanguage } from '../../hooks/useLanguage';
 import {
   PresetBundles,
   StyleSelector,
@@ -13,6 +15,7 @@ import {
   SettingsSection,
   PromoSection,
   SpecificationView,
+  LanguageSwitcher,
 } from '../../components';
 
 /**
@@ -21,6 +24,8 @@ import {
  * Route: /shared/calculator and /shared/calculator/:code
  */
 export function PublicCalculatorPage() {
+  const { t } = useTranslation('calculator');
+  const { getLocalized } = useLanguage();
   const { code: urlCode } = useParams();
   const navigate = useNavigate();
   const [view, setView] = useState('editor'); // 'editor' | 'specification'
@@ -150,7 +155,7 @@ export function PublicCalculatorPage() {
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-          <p className="text-sm text-neutral-500">Loading selection...</p>
+          <p className="text-sm text-neutral-500">{t('public.loadingSelection')}</p>
         </div>
       </div>
     );
@@ -166,13 +171,13 @@ export function PublicCalculatorPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h2 className="text-lg font-bold text-neutral-900 mb-2">Invalid Code</h2>
+          <h2 className="text-lg font-bold text-neutral-900 mb-2">{t('public.invalidCode')}</h2>
           <p className="text-neutral-500 mb-6">{sessionError.message}</p>
           <button
             onClick={() => navigate('/shared/calculator')}
             className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md font-medium transition-colors"
           >
-            Start Fresh Calculator
+            {t('actions.startFresh')}
           </button>
         </div>
       </div>
@@ -193,9 +198,10 @@ export function PublicCalculatorPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
               </svg>
-              Back to Editor
+              {t('actions.backToEditor')}
             </button>
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               <button
                 onClick={printSpecification}
                 className="flex items-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-md font-medium transition-colors"
@@ -203,14 +209,14 @@ export function PublicCalculatorPage() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Print
+                {t('actions.print')}
               </button>
               <button
                 onClick={handleGetCode}
                 disabled={saveSession.isPending || totals.grandTotal === 0}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-md font-medium transition-colors"
               >
-                {saveSession.isPending ? 'Generating...' : 'Get Code'}
+                {saveSession.isPending ? t('actions.generating') : t('actions.getCode')}
               </button>
             </div>
           </div>
@@ -239,15 +245,18 @@ export function PublicCalculatorPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
             <span className="text-sm font-medium">
-              ReSkin Lab Calculator — Build your selection and get a shareable code
+              {t('public.banner')}
             </span>
           </div>
-          <button
-            onClick={handleRegister}
-            className="text-sm font-medium px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-md transition-colors whitespace-nowrap"
-          >
-            Register to Save
-          </button>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher className="text-white/90 hover:text-white hover:bg-white/20 [&_svg]:text-white/80" />
+            <button
+              onClick={handleRegister}
+              className="text-sm font-medium px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-md transition-colors whitespace-nowrap"
+            >
+              {t('actions.registerToSave')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -258,7 +267,7 @@ export function PublicCalculatorPage() {
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
-            <span>Using cached prices. Some values may not reflect latest changes.</span>
+            <span>{t('public.fallbackWarning')}</span>
           </div>
         </div>
       )}
@@ -267,7 +276,7 @@ export function PublicCalculatorPage() {
       <div className="bg-white border-b border-neutral-200 shadow-sm sticky top-0 z-20 px-4 md:px-6 lg:px-8 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold text-neutral-900">Calculator</h1>
+            <h1 className="text-lg font-bold text-neutral-900">{t('public.calculatorTitle')}</h1>
             {urlCode && (
               <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-md font-mono">
                 {urlCode}
@@ -285,7 +294,7 @@ export function PublicCalculatorPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Specification
+              {t('public.specification')}
             </button>
             {/* Get Code */}
             <button
@@ -296,14 +305,14 @@ export function PublicCalculatorPage() {
               {saveSession.isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Generating...
+                  {t('actions.generating')}
                 </>
               ) : (
                 <>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
-                  Get Code
+                  {t('actions.getCode')}
                 </>
               )}
             </button>
@@ -335,12 +344,12 @@ export function PublicCalculatorPage() {
 
           {/* Order Type Selector */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-500 font-medium">Order type:</span>
+            <span className="text-xs text-neutral-500 font-medium">{t('options.orderType')}:</span>
             <div className="flex rounded-md border border-neutral-200 overflow-hidden">
               {[
-                { id: 'art_only', label: 'Art Only', activeCls: 'bg-blue-500 text-white' },
-                { id: 'anim_only', label: 'Anim Only', activeCls: 'bg-violet-500 text-white' },
-                { id: 'art_and_anim', label: 'Art+Anim', activeCls: 'bg-emerald-500 text-white' },
+                { id: 'art_only', labelKey: 'orderTypes.artOnly', activeCls: 'bg-blue-500 text-white' },
+                { id: 'anim_only', labelKey: 'orderTypes.animOnly', activeCls: 'bg-violet-500 text-white' },
+                { id: 'art_and_anim', labelKey: 'orderTypes.artAndAnim', activeCls: 'bg-emerald-500 text-white' },
               ].map((type) => (
                 <button
                   key={type.id}
@@ -350,7 +359,7 @@ export function PublicCalculatorPage() {
                     defaultOrderType === type.id ? type.activeCls : 'bg-white text-neutral-500 hover:bg-neutral-50'
                   }`}
                 >
-                  {type.label}
+                  {t(type.labelKey)}
                 </button>
               ))}
             </div>
@@ -396,7 +405,7 @@ export function PublicCalculatorPage() {
           <div className="sticky top-20 space-y-4">
             {/* Total */}
             <div className="bg-white border border-neutral-200 rounded-lg p-5">
-              <div className="text-sm text-neutral-500 mb-1">Estimated Total</div>
+              <div className="text-sm text-neutral-500 mb-1">{t('sidebar.estimatedTotal')}</div>
               <div className={`text-3xl font-bold font-mono ${totals.appliedPromo && totals.discountAmount > 0 ? 'text-emerald-600' : 'text-neutral-900'}`}>
                 ${(totals.grandTotal || 0).toLocaleString()}
               </div>
@@ -409,26 +418,26 @@ export function PublicCalculatorPage() {
               {/* Breakdown */}
               <div className="mt-4 space-y-2 text-sm">
                 <div className="flex justify-between text-neutral-500">
-                  <span>Production</span>
+                  <span>{t('sidebar.production')}</span>
                   <span className="font-mono">${(totals.productionSum || 0).toLocaleString()}</span>
                 </div>
                 {totals.revisionCost > 0 && (
                   <div className="flex justify-between text-neutral-500">
-                    <span>Revisions ({totals.revisionRounds}x)</span>
+                    <span>{t('sidebar.revisions')} ({totals.revisionRounds}x)</span>
                     <span className="font-mono">+${(totals.revisionCost || 0).toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-neutral-500">
-                  <span>Usage Rights ({usageRights.id})</span>
+                  <span>{t('sidebar.usageRights')} ({usageRights.id})</span>
                   <span className="font-mono">x{usageRights.coeff}</span>
                 </div>
                 <div className="flex justify-between text-neutral-500">
-                  <span>Payment ({paymentModel.name})</span>
+                  <span>{t('sidebar.payment')} ({getLocalized(paymentModel, 'name')})</span>
                   <span className="font-mono">x{paymentModel.coeff}</span>
                 </div>
                 {totals.discountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Discount</span>
+                    <span>{t('sidebar.discount')}</span>
                     <span className="font-mono">-${(totals.discountAmount || 0).toLocaleString()}</span>
                   </div>
                 )}
@@ -442,20 +451,20 @@ export function PublicCalculatorPage() {
                 disabled={saveSession.isPending || totals.grandTotal === 0}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-lg font-medium transition-colors"
               >
-                {saveSession.isPending ? 'Generating...' : 'Get Selection Code'}
+                {saveSession.isPending ? t('actions.generating') : t('actions.getSelectionCode')}
               </button>
               <button
                 onClick={() => setView('specification')}
                 disabled={totals.grandTotal === 0}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-neutral-300 hover:bg-neutral-50 disabled:opacity-50 text-neutral-700 rounded-lg font-medium transition-colors"
               >
-                View Specification
+                {t('sidebar.viewSpecification')}
               </button>
               <button
                 onClick={handleRegister}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors"
               >
-                Register to Save
+                {t('actions.registerToSave')}
               </button>
             </div>
           </div>
@@ -466,7 +475,7 @@ export function PublicCalculatorPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 shadow-lg lg:hidden z-30 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs text-neutral-500">Total</div>
+            <div className="text-xs text-neutral-500">{t('sidebar.total')}</div>
             <div className="text-xl font-bold font-mono text-neutral-900">
               ${(totals.grandTotal || 0).toLocaleString()}
             </div>
@@ -477,14 +486,14 @@ export function PublicCalculatorPage() {
               disabled={totals.grandTotal === 0}
               className="px-3 py-2 border border-neutral-300 hover:bg-neutral-50 disabled:opacity-50 text-neutral-700 rounded-md text-sm font-medium transition-colors"
             >
-              Spec
+              {t('public.spec')}
             </button>
             <button
               onClick={handleGetCode}
               disabled={saveSession.isPending || totals.grandTotal === 0}
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-md text-sm font-medium transition-colors"
             >
-              {saveSession.isPending ? '...' : 'Get Code'}
+              {saveSession.isPending ? '...' : t('actions.getCode')}
             </button>
           </div>
         </div>
@@ -512,9 +521,9 @@ export function PublicCalculatorPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-neutral-900 mb-2">Your Selection Code</h3>
+              <h3 className="text-lg font-bold text-neutral-900 mb-2">{t('public.yourSelectionCode')}</h3>
               <p className="text-sm text-neutral-500 mb-6">
-                Share this code or link. It expires in 30 days.
+                {t('public.codeExpires')}
               </p>
 
               {/* Code */}
@@ -526,13 +535,13 @@ export function PublicCalculatorPage() {
                   onClick={handleCopyCode}
                   className="text-sm text-blue-500 hover:text-blue-600 font-medium"
                 >
-                  {copied ? 'Copied!' : 'Copy Code'}
+                  {copied ? t('share.copied') : t('public.copyCode')}
                 </button>
               </div>
 
               {/* Share Link */}
               <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-3 mb-6">
-                <div className="text-xs text-neutral-400 mb-1">Share Link</div>
+                <div className="text-xs text-neutral-400 mb-1">{t('public.shareLink')}</div>
                 <div className="text-sm text-neutral-700 font-mono break-all mb-2">
                   {window.location.origin}/shared/calculator/{generatedCode}
                 </div>
@@ -540,7 +549,7 @@ export function PublicCalculatorPage() {
                   onClick={handleCopyLink}
                   className="text-sm text-blue-500 hover:text-blue-600 font-medium"
                 >
-                  Copy Link
+                  {t('public.copyLink')}
                 </button>
               </div>
 
@@ -549,10 +558,10 @@ export function PublicCalculatorPage() {
                 onClick={handleRegister}
                 className="w-full px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors mb-2"
               >
-                Register to Save Your Selection
+                {t('actions.registerToSaveSelection')}
               </button>
               <p className="text-xs text-neutral-400">
-                Already have an account? Log in and enter the code in your dashboard.
+                {t('public.alreadyHaveAccount')}
               </p>
             </div>
           </div>

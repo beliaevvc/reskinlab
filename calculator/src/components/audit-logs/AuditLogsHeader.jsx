@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * AuditLogsHeader — page title, export buttons, auto-refresh toggle
  */
 export function AuditLogsHeader({ onExportCSV, onExportJSON, onPrint, autoRefresh, onToggleAutoRefresh, humanMode, onToggleHumanMode }) {
+  const { t } = useTranslation('admin');
   const [isExporting, setIsExporting] = useState(null); // 'csv' | 'json' | null
 
   const handleExport = async (type) => {
@@ -20,8 +22,8 @@ export function AuditLogsHeader({ onExportCSV, onExportJSON, onPrint, autoRefres
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Audit Logs</h1>
-        <p className="text-neutral-500 mt-1">Track all important actions in the system</p>
+        <h1 className="text-2xl font-bold text-neutral-900">{t('auditLog.title')}</h1>
+        <p className="text-neutral-500 mt-1">{t('auditLog.subtitle')}</p>
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -33,7 +35,7 @@ export function AuditLogsHeader({ onExportCSV, onExportJSON, onPrint, autoRefres
               ? 'bg-blue-100 text-blue-700'
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
-          title={humanMode ? 'Human-readable mode' : 'Raw technical mode'}
+          title={humanMode ? t('auditLog.header.humanModeTitle') : t('auditLog.header.rawModeTitle')}
         >
           {humanMode ? (
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,7 +47,7 @@ export function AuditLogsHeader({ onExportCSV, onExportJSON, onPrint, autoRefres
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           )}
-          {humanMode ? 'Human' : 'Raw'}
+          {humanMode ? t('auditLog.header.humanMode') : t('auditLog.header.rawMode')}
         </button>
 
         {/* Auto-refresh toggle */}
@@ -56,12 +58,12 @@ export function AuditLogsHeader({ onExportCSV, onExportJSON, onPrint, autoRefres
               ? 'bg-emerald-100 text-emerald-700'
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
-          title={autoRefresh ? 'Auto-refresh ON (30s)' : 'Auto-refresh OFF'}
+          title={autoRefresh ? t('auditLog.header.liveOn') : t('auditLog.header.liveOff')}
         >
           <svg className={`w-4 h-4 ${autoRefresh ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          {autoRefresh ? 'Live' : 'Auto'}
+          {t('auditLog.header.live')}
         </button>
 
         {/* Export CSV */}
@@ -104,7 +106,7 @@ export function AuditLogsHeader({ onExportCSV, onExportJSON, onPrint, autoRefres
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
-          Print
+          {t('auditLog.header.print')}
         </button>
       </div>
     </div>

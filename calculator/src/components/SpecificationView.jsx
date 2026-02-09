@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
+import { useLanguage } from '../hooks/useLanguage';
 
 // Payment schedule component - разбивка по этапам
-function PaymentSchedule({ paymentModel, grandTotal, activeStages }) {
+function PaymentSchedule({ paymentModel, grandTotal, activeStages, t }) {
+  const { getLocalized } = useLanguage();
+  
   // Этапы для milestone-платежей (исключаем Briefing и Revisions)
   const payableStages = activeStages.filter(
     (s) => !['briefing', 'revisions'].includes(s.id)
@@ -55,9 +59,9 @@ function PaymentSchedule({ paymentModel, grandTotal, activeStages }) {
             </span>
             <div>
               <div className="font-medium text-sm">
-                {paymentModel.id === 'FullPre' ? 'Full Prepayment' : 'Upfront Payment'}
+                {paymentModel.id === 'FullPre' ? t('view.fullPrepayment') : t('view.upfrontPayment')}
               </div>
-              <div className="text-xs text-neutral-500">Before project start</div>
+              <div className="text-xs text-neutral-500">{t('view.beforeProjectStart')}</div>
             </div>
           </div>
           <div className="text-right">
@@ -77,8 +81,8 @@ function PaymentSchedule({ paymentModel, grandTotal, activeStages }) {
               ✓
             </span>
             <div>
-              <div className="font-medium text-sm">Project Start</div>
-              <div className="text-xs text-neutral-500">No upfront payment required</div>
+              <div className="font-medium text-sm">{t('view.projectStart')}</div>
+              <div className="text-xs text-neutral-500">{t('view.noUpfrontRequired')}</div>
             </div>
           </div>
           <div className="text-right">
@@ -100,8 +104,8 @@ function PaymentSchedule({ paymentModel, grandTotal, activeStages }) {
               {paymentIndex++}
             </span>
             <div>
-              <div className="font-medium text-sm">{stage.name}</div>
-              <div className="text-xs text-neutral-500">After stage approval</div>
+              <div className="font-medium text-sm">{getLocalized(stage, 'name')}</div>
+              <div className="text-xs text-neutral-500">{t('view.afterStageApproval')}</div>
             </div>
           </div>
           <div className="text-right">
@@ -115,7 +119,7 @@ function PaymentSchedule({ paymentModel, grandTotal, activeStages }) {
       
       {/* Total verification */}
       <div className="flex justify-between items-center pt-3 mt-2 border-t border-neutral-300">
-        <div className="font-bold text-sm">Total</div>
+        <div className="font-bold text-sm">{t('view.total')}</div>
         <div className="font-bold font-mono">${Math.round(grandTotal).toLocaleString()}</div>
       </div>
     </div>
@@ -123,45 +127,57 @@ function PaymentSchedule({ paymentModel, grandTotal, activeStages }) {
 }
 
 // Production workflow stages
+// Note: field naming follows getLocalized convention:
+// - 'field' = Russian (base), 'fieldEn' = English
 const WORKFLOW_STAGES = [
   {
     id: 'briefing',
     name: 'Briefing',
     nameRu: 'Брифинг',
-    duration: '1-2 days',
-    description: 'Requirements gathering, references, source game analysis',
+    duration: '1-2 дня',
+    durationEn: '1-2 days',
+    description: 'Сбор требований, референсы, анализ игры',
+    descriptionEn: 'Requirements gathering, references, source game analysis',
     always: true,
   },
   {
     id: 'moodboard',
     name: 'Moodboard & Concept',
     nameRu: 'Мудборд и концепция',
-    duration: '2-3 days',
-    description: 'Visual direction, color palette, overall concept',
+    duration: '2-3 дня',
+    durationEn: '2-3 days',
+    description: 'Визуальное направление, цветовая палитра, общая концепция',
+    descriptionEn: 'Visual direction, color palette, overall concept',
     always: true,
   },
   {
     id: 'symbols',
     name: 'Symbol Design',
     nameRu: 'Разработка символов',
-    duration: '3-5 days',
-    description: 'Game symbols production (low, high, special)',
+    duration: '3-5 дней',
+    durationEn: '3-5 days',
+    description: 'Производство символов игры (low, high, special)',
+    descriptionEn: 'Game symbols production (low, high, special)',
     condition: 'hasSymbols',
   },
   {
     id: 'ui',
     name: 'UI & Layout',
     nameRu: 'UI и интерфейс',
-    duration: '2-4 days',
-    description: 'Interface elements, buttons, panels, backgrounds',
+    duration: '2-4 дня',
+    durationEn: '2-4 days',
+    description: 'Элементы интерфейса, кнопки, панели, фоны',
+    descriptionEn: 'Interface elements, buttons, panels, backgrounds',
     always: true,
   },
   {
     id: 'animation',
     name: 'Animation Production',
     nameRu: 'Анимация',
-    duration: '3-5 days',
-    description: 'Symbol and UI animation',
+    duration: '3-5 дней',
+    durationEn: '3-5 days',
+    description: 'Анимация символов и UI',
+    descriptionEn: 'Symbol and UI animation',
     condition: 'hasAnimation',
   },
   {
@@ -169,15 +185,19 @@ const WORKFLOW_STAGES = [
     name: 'Revisions',
     nameRu: 'Корректировки',
     duration: 'TBD',
-    description: 'Feedback implementation and adjustments',
+    durationEn: 'TBD',
+    description: 'Внесение правок и корректировок',
+    descriptionEn: 'Feedback implementation and adjustments',
     always: true,
   },
   {
     id: 'delivery',
     name: 'Final Delivery',
     nameRu: 'Сдача проекта',
-    duration: '1 day',
-    description: 'Source files and final assets handover',
+    duration: '1 день',
+    durationEn: '1 day',
+    description: 'Передача исходников и финальных ассетов',
+    descriptionEn: 'Source files and final assets handover',
     always: true,
   },
 ];
@@ -192,6 +212,8 @@ export function SpecificationView({
   specNumber,
   specDate,
 }) {
+  const { t } = useTranslation('specs');
+  const { getLocalized } = useLanguage();
   const [workflowExpanded, setWorkflowExpanded] = useState(false);
   
   // Use provided specNumber or fallback to empty
@@ -222,13 +244,13 @@ export function SpecificationView({
             onClick={onBack}
             className="flex items-center gap-2 text-neutral-500 hover:text-neutral-900 cursor-pointer transition-colors duration-150"
           >
-            <Icon name="arrowLeft" /> Back
+            <Icon name="arrowLeft" /> {t('view.back')}
           </button>
           <button
             onClick={() => window.print()}
             className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-md flex items-center gap-2 cursor-pointer transition-colors duration-150 font-medium"
           >
-            <Icon name="printer" /> Print / Export
+            <Icon name="printer" /> {t('view.print')}
           </button>
         </div>
       )}
@@ -240,12 +262,12 @@ export function SpecificationView({
               ReSkin Lab.
             </h1>
             <p className="text-neutral-500 font-medium text-sm sm:text-base">
-              Boutique iGaming Production
+              {t('view.tagline')}
             </p>
           </div>
           <div className="text-left sm:text-right">
             <h2 className="text-xl font-bold text-emerald-600 uppercase">
-              Specification
+              {t('view.header')}
             </h2>
             <p className="font-mono text-neutral-500">#{displayNumber}</p>
             <p className="font-mono text-neutral-500">{displayDate}</p>
@@ -256,24 +278,24 @@ export function SpecificationView({
         <div className="bg-neutral-50 p-4 sm:p-6 rounded-md grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mb-8">
           <div>
             <h3 className="text-xs font-medium text-neutral-400 uppercase mb-1">
-              Visual Style
+              {t('view.visualStyle')}
             </h3>
             <div className="text-base sm:text-lg font-bold">
-              {globalStyle.name}
+              {getLocalized(globalStyle, 'name')}
             </div>
             <div className="text-xs sm:text-sm text-neutral-500 font-mono">
-              Multiplier: x{globalStyle.coeff}
+              {t('view.multiplier')}: x{globalStyle.coeff}
             </div>
           </div>
           <div>
             <h3 className="text-xs font-medium text-neutral-400 uppercase mb-1">
-              Usage Rights
+              {t('view.usageRights')}
             </h3>
             <div className="text-base sm:text-lg font-bold">
-              {usageRights.name}
+              {getLocalized(usageRights, 'name')}
             </div>
             <div className="text-xs sm:text-sm text-neutral-500 font-mono">
-              Multiplier: x{usageRights.coeff}
+              {t('view.multiplier')}: x{usageRights.coeff}
             </div>
           </div>
         </div>
@@ -288,9 +310,9 @@ export function SpecificationView({
               <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded flex items-center justify-center text-xs font-bold">
                 ⟳
               </span>
-              Production Workflow
+              {t('view.workflow')}
               <span className="text-sm font-normal text-neutral-500">
-                ({activeStages.length} stages)
+                ({t('view.stages', { count: activeStages.length })})
               </span>
             </div>
             <svg
@@ -322,14 +344,14 @@ export function SpecificationView({
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
                         <div>
                           <h3 className="font-bold text-neutral-900">
-                            {stage.name}
+                            {getLocalized(stage, 'name')}
                           </h3>
                           <p className="text-xs text-neutral-500 mt-0.5">
-                            {stage.description}
+                            {getLocalized(stage, 'description')}
                           </p>
                         </div>
                         <div className="text-xs font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded whitespace-nowrap self-start sm:self-auto">
-                          {stage.duration}
+                          {getLocalized(stage, 'duration')}
                         </div>
                       </div>
                     </div>
@@ -342,7 +364,7 @@ export function SpecificationView({
 
         {/* Table Scroll Hint (Mobile) */}
         <div className="sm:hidden text-xs text-neutral-400 mb-2 flex items-center justify-center gap-2 italic">
-          <Icon name="arrowLeft" size={14} /> <span>Scroll table</span>{' '}
+          <Icon name="arrowLeft" size={14} /> <span>{t('view.scrollTable')}</span>{' '}
           <Icon name="arrowRight" size={14} />
         </div>
 
@@ -352,7 +374,7 @@ export function SpecificationView({
             <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded flex items-center justify-center text-xs font-bold">
               ✦
             </span>
-            Assets & Services
+            {t('view.assetsServices')}
           </h2>
         </div>
 
@@ -361,19 +383,19 @@ export function SpecificationView({
             <thead>
               <tr className="border-b border-neutral-300">
                 <th className="text-left py-2 text-xs uppercase text-neutral-500 w-4/12">
-                  Item
+                  {t('view.tableItem')}
                 </th>
                 <th className="text-center py-2 text-xs uppercase text-neutral-500 w-2/12">
-                  Type
+                  {t('view.tableType')}
                 </th>
                 <th className="text-center py-2 text-xs uppercase text-neutral-500 w-2/12">
-                  Anim
+                  {t('view.tableAnim')}
                 </th>
                 <th className="text-center py-2 text-xs uppercase text-neutral-500 w-1/12">
-                  Qty
+                  {t('view.tableQty')}
                 </th>
                 <th className="text-right py-2 text-xs uppercase text-neutral-500 w-3/12">
-                  Total
+                  {t('view.tableTotal')}
                 </th>
               </tr>
             </thead>
@@ -381,25 +403,25 @@ export function SpecificationView({
               {totals.lineItems.map((item, index) => {
                 const orderType = item.orderType || 'art_and_anim';
                 const typeBadge = orderType === 'art_only'
-                  ? { label: 'Art Only', cls: 'bg-blue-50 text-blue-700' }
+                  ? { label: t('view.artOnly'), cls: 'bg-blue-50 text-blue-700' }
                   : orderType === 'anim_only'
-                  ? { label: 'Anim Only', cls: 'bg-violet-50 text-violet-700' }
-                  : { label: 'Art+Anim', cls: 'bg-neutral-100 text-neutral-600' };
+                  ? { label: t('view.animOnly'), cls: 'bg-violet-50 text-violet-700' }
+                  : { label: t('view.artAndAnim'), cls: 'bg-neutral-100 text-neutral-600' };
 
                 return (
                   <tr key={index} className="border-b border-neutral-100">
                     <td className="py-4 align-top">
                       <div className="font-bold text-sm">{item.name}</div>
-                      {item.details && item.details.descEn && (
+                      {item.details && (item.details.desc || item.details.descEn) && (
                         <div className="text-[10px] text-neutral-500 mt-1 leading-relaxed opacity-80 max-w-prose">
-                          {item.details.descEn}{' '}
+                          {getLocalized(item.details, 'desc')}{' '}
                           <span className="italic text-neutral-400">
-                            Ex: {item.details.examplesEn}
+                            {t('view.ex')}: {getLocalized(item.details, 'examples')}
                           </span>
                         </div>
                       )}
                       <div className="text-xs text-neutral-400 font-mono mt-1">
-                        Base: ${item.base}
+                        {t('view.base')}: ${item.base}
                       </div>
                     </td>
                     <td className="py-4 text-center text-sm align-top">
@@ -439,7 +461,7 @@ export function SpecificationView({
               {totals.revisionRounds > 0 && (
                 <tr className="border-b border-neutral-100 bg-neutral-50/50">
                   <td className="py-4 pl-2 font-bold text-sm text-emerald-900">
-                    Extra Revisions (+2.5%/round)
+                    {t('view.extraRevisions')}
                   </td>
                   <td className="py-4 text-center text-sm">-</td>
                   <td className="py-4 text-center text-sm">-</td>
@@ -459,17 +481,17 @@ export function SpecificationView({
         <div className="flex justify-end">
           <div className="w-full sm:w-1/2 space-y-2">
             <div className="flex justify-between text-neutral-500 text-sm">
-              <span>Production:</span>
+              <span>{t('view.production')}:</span>
               <span className="font-mono">
                 ${Math.round(totals.productionSum).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between text-neutral-500 text-sm">
-              <span>Rights ({usageRights.id}):</span>
+              <span>{t('view.rights')} ({usageRights.id}):</span>
               <span className="font-mono">x{usageRights.coeff}</span>
             </div>
             <div className="flex justify-between text-neutral-900 font-bold border-t border-neutral-200 pt-2">
-              <span>Subtotal:</span>
+              <span>{t('view.subtotal')}:</span>
               <span className="font-mono">
                 ${Math.round(totals.withRights).toLocaleString()}
               </span>
@@ -481,7 +503,7 @@ export function SpecificationView({
                   : 'bg-amber-50 text-amber-700'
               }`}
             >
-              <span className="text-sm font-medium">{paymentModel.name}:</span>
+              <span className="text-sm font-medium">{getLocalized(paymentModel, 'name')}:</span>
               <span className="font-mono font-bold">
                 {paymentModel.coeff < 1 ? '-' : '+'}
                 {Math.abs(
@@ -492,7 +514,7 @@ export function SpecificationView({
             {totals.appliedPromo && (
               <div className="flex justify-between p-2 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
                 <span className="text-sm font-bold">
-                  PROMO ({totals.appliedPromo.code})
+                  {t('view.promo')} ({totals.appliedPromo.code})
                 </span>
                 <span className="font-mono font-bold">
                   -{Math.round(totals.discountAmount).toLocaleString()}
@@ -500,7 +522,7 @@ export function SpecificationView({
               </div>
             )}
             <div className="flex justify-between text-3xl font-bold text-neutral-900 pt-4 border-t-2 border-neutral-900">
-              <span>Total:</span>
+              <span>{t('view.total')}:</span>
               <span>${Math.round(totals.grandTotal).toLocaleString()}</span>
             </div>
           </div>
@@ -512,7 +534,7 @@ export function SpecificationView({
             <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded flex items-center justify-center text-xs font-bold">
               $
             </span>
-            Payment Terms
+            {t('view.paymentTerms')}
           </h2>
           <div className="bg-neutral-50 rounded-md p-5">
             <div className="flex items-center gap-3 mb-4">
@@ -523,16 +545,16 @@ export function SpecificationView({
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-neutral-200 text-neutral-700'
               }`}>
-                {paymentModel.name}
+                {getLocalized(paymentModel, 'name')}
               </span>
               {paymentModel.coeff < 1 && (
                 <span className="text-xs text-emerald-600 font-medium">
-                  {Math.round((1 - paymentModel.coeff) * 100)}% discount applied
+                  {t('view.discountApplied', { percent: Math.round((1 - paymentModel.coeff) * 100) })}
                 </span>
               )}
               {paymentModel.coeff > 1 && (
                 <span className="text-xs text-amber-600 font-medium">
-                  +{Math.round((paymentModel.coeff - 1) * 100)}% flexibility fee
+                  {t('view.flexibilityFee', { percent: Math.round((paymentModel.coeff - 1) * 100) })}
                 </span>
               )}
             </div>
@@ -542,10 +564,11 @@ export function SpecificationView({
               paymentModel={paymentModel}
               grandTotal={totals.grandTotal}
               activeStages={activeStages}
+              t={t}
             />
             
             <div className="mt-4 pt-3 border-t border-neutral-200 text-xs text-neutral-500">
-              Payment methods: Bank transfer, PayPal, Crypto (USDT/USDC)
+              {t('view.paymentMethods')}
             </div>
           </div>
         </div>
@@ -553,10 +576,9 @@ export function SpecificationView({
         {/* Footer Note */}
         <div className="mt-12 pt-6 border-t border-neutral-200 text-center text-xs text-neutral-400">
           <p>
-            This specification is valid for 30 days. Prices may vary based on
-            final requirements.
+            {t('view.validFor30Days')}
           </p>
-          <p className="mt-1">ReSkin Lab. — Boutique iGaming Production</p>
+          <p className="mt-1">ReSkin Lab. — {t('view.tagline')}</p>
         </div>
     </>
   );

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useViewAsRole } from '../../contexts/ViewAsRoleContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUpdateProject } from '../../hooks/useProjects';
@@ -15,17 +16,6 @@ const STATUS_STYLES = {
   completed: 'bg-blue-50 text-blue-700',
   cancelled: 'bg-red-50 text-red-700',
   archived: 'bg-neutral-100 text-neutral-500',
-};
-
-const STATUS_LABELS = {
-  draft: 'Draft',
-  pending_payment: 'Pending Payment',
-  active: 'Active',
-  in_production: 'In Production',
-  on_hold: 'On Hold',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-  archived: 'Archived',
 };
 
 function useProjectBasePath() {
@@ -111,6 +101,7 @@ function ActionsMenu({
   canCompleteOrArchive,
   isArchiving,
 }) {
+  const { t } = useTranslation('projects');
   const [isOpen, setIsOpen] = useState(false);
 
   const showArchive = canCompleteOrArchive && 
@@ -127,7 +118,7 @@ function ActionsMenu({
           <button
             onClick={onOpenFilesGallery}
             className="p-1.5 hover:bg-neutral-100 rounded-md text-neutral-400 hover:text-neutral-600 transition-colors"
-            title="Files"
+            title={t('files.title')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -140,7 +131,7 @@ function ActionsMenu({
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="p-1.5 hover:bg-neutral-100 rounded-md text-neutral-400 hover:text-neutral-600 transition-colors"
-            title="More actions"
+            title={t('common:actions.more', { defaultValue: 'More actions' })}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01" />
@@ -160,7 +151,7 @@ function ActionsMenu({
                 disabled={isArchiving}
                 className="w-full text-left px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-50"
               >
-                {isArchiving ? 'Archiving...' : 'Archive project'}
+                {isArchiving ? t('common:loading', { defaultValue: 'Archiving...' }) : t('actions.archiveProject')}
               </button>
             )}
           </div>
@@ -184,6 +175,7 @@ export function ProjectHeader({
   isCompleting = false,
   isArchiving = false,
 }) {
+  const { t } = useTranslation('projects');
   const basePath = useProjectBasePath();
   const updateProject = useUpdateProject();
   const { 
@@ -213,13 +205,13 @@ export function ProjectHeader({
       {isViewingAs && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-1.5 flex items-center justify-between">
           <span className="text-xs text-amber-800">
-            <strong>Preview:</strong> Viewing as {viewAsRole === 'client' ? 'Client' : 'AM'}
+            <strong>{t('common:preview', { defaultValue: 'Preview' })}:</strong> {t('common:viewingAs', { role: viewAsRole === 'client' ? 'Client' : 'AM', defaultValue: `Viewing as ${viewAsRole === 'client' ? 'Client' : 'AM'}` })}
           </span>
           <button
             onClick={() => setViewAs(null)}
             className="text-xs text-amber-700 hover:text-amber-900 font-medium"
           >
-            Exit
+            {t('common:exit', { defaultValue: 'Exit' })}
           </button>
         </div>
       )}
@@ -236,7 +228,7 @@ export function ProjectHeader({
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Projects
+            {t('title')}
           </Link>
 
           <span className="hidden sm:block text-neutral-300 text-xs">/</span>
@@ -246,7 +238,7 @@ export function ProjectHeader({
             <InlineEdit
               value={project.name}
               onSave={(value) => handleSave('name', value)}
-              placeholder="Project name"
+              placeholder={t('create.namePlaceholder')}
               inputClassName="text-sm font-semibold"
             />
           </h1>
@@ -255,7 +247,7 @@ export function ProjectHeader({
           <span className={`flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium tracking-wide uppercase ${
             STATUS_STYLES[project.status] || STATUS_STYLES.draft
           }`}>
-            {STATUS_LABELS[project.status] || project.status}
+            {t(`status.${project.status}`, { defaultValue: project.status })}
           </span>
         </div>
 
@@ -306,7 +298,7 @@ export function ProjectHeader({
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              {isCompleting ? 'Completing...' : 'Complete'}
+              {isCompleting ? t('common:loading', { defaultValue: 'Completing...' }) : t('actions.complete')}
             </button>
           )}
 

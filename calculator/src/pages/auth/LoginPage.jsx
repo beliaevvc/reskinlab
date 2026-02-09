@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 
 export function LoginPage() {
+  const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,6 +50,11 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
       <div className="max-w-md w-full">
+        {/* Language Switcher */}
+        <div className="flex justify-end mb-4">
+          <LanguageSwitcher />
+        </div>
+
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-neutral-900">
@@ -58,7 +66,7 @@ export function LoginPage() {
         {/* Card */}
         <div className="bg-white rounded-md shadow-sm border border-neutral-200 p-6 md:p-8">
           <h2 className="text-xl font-semibold text-neutral-900 mb-6">
-            Sign in to your account
+            {t('login.title')}
           </h2>
 
           {/* Configuration warning */}
@@ -85,7 +93,7 @@ export function LoginPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-neutral-700 mb-1.5"
               >
-                Email address
+                {t('login.email')}
               </label>
               <input
                 id="email"
@@ -104,7 +112,7 @@ export function LoginPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-neutral-700 mb-1.5"
               >
-                Password
+                {t('login.password')}
               </label>
               <input
                 id="password"
@@ -126,22 +134,22 @@ export function LoginPage() {
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Signing in...
+                  {t('login.submit')}...
                 </>
               ) : (
-                'Sign in'
+                t('login.submit')
               )}
             </button>
           </form>
 
           {/* Register link */}
           <p className="mt-6 text-center text-sm text-neutral-600">
-            Don't have an account?{' '}
+            {t('login.noAccount')}{' '}
             <Link
               to="/register"
               className="text-emerald-600 hover:text-emerald-700 font-medium"
             >
-              Create account
+              {t('login.signUp')}
             </Link>
           </p>
         </div>

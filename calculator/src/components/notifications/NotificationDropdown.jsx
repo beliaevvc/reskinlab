@@ -1,24 +1,19 @@
 import { useState, memo } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { useNotifications, useMarkAllNotificationsRead, useNotificationNavigation, NOTIFICATION_CATEGORIES } from '../../hooks/useNotifications';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationItem } from './NotificationItem';
 
-// ─── Category labels ────────────────────────────────────────────────
-const CATEGORY_LABELS = {
-  all: 'All',
-  comments: 'Comments',
-  tasks: 'Tasks',
-  payments: 'Payments',
-  projects: 'Projects',
-  users: 'Users',
-};
+// ─── Category keys (translated in component) ────────────────────────────────────────────────
+const CATEGORY_KEYS = ['all', 'comments', 'tasks', 'payments', 'projects', 'users'];
 
 /**
  * Dropdown panel showing the notification list with tabs and category filters.
  * Rendered absolutely below the bell icon.
  */
 function NotificationDropdownRaw({ onClose }) {
+  const { t } = useTranslation('notifications');
   const { isAdmin } = useAuth();
 
   // ─── State ──────────────────────────────────────────────────────
@@ -36,7 +31,7 @@ function NotificationDropdownRaw({ onClose }) {
   const { handleNotificationClick } = useNotificationNavigation();
 
   // ─── Available categories (hide "users" for non-admins) ─────────
-  const availableCategories = Object.keys(CATEGORY_LABELS).filter(
+  const availableCategories = CATEGORY_KEYS.filter(
     (cat) => cat === 'all' || (cat !== 'users' || isAdmin)
   );
 
@@ -54,14 +49,14 @@ function NotificationDropdownRaw({ onClose }) {
     <div className="absolute right-0 top-full mt-2 w-[400px] max-h-[520px] bg-white rounded-xl shadow-xl border border-neutral-200 flex flex-col z-50 overflow-hidden">
       {/* ─── Header ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
-        <h3 className="text-sm font-semibold text-neutral-900">Notifications</h3>
+        <h3 className="text-sm font-semibold text-neutral-900">{t('title')}</h3>
         <button
           type="button"
           onClick={handleMarkAllRead}
           disabled={markAllRead.isPending}
           className="text-xs text-emerald-600 hover:text-emerald-700 font-medium transition-colors disabled:opacity-50"
         >
-          Mark all as read
+          {t('markAllRead')}
         </button>
       </div>
 
@@ -79,7 +74,7 @@ function NotificationDropdownRaw({ onClose }) {
                 : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700'
             )}
           >
-            {tab === 'all' ? 'All' : 'Unread'}
+            {tab === 'all' ? t('all') : t('unread')}
           </button>
         ))}
       </div>
@@ -101,7 +96,7 @@ function NotificationDropdownRaw({ onClose }) {
                 : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
             )}
           >
-            {CATEGORY_LABELS[cat]}
+            {t(`categories.${cat}`)}
           </button>
         ))}
       </div>
@@ -124,11 +119,11 @@ function NotificationDropdownRaw({ onClose }) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-neutral-600">No notifications</p>
+            <p className="text-sm font-medium text-neutral-600">{t('noNotifications')}</p>
             <p className="text-xs text-neutral-400 mt-1">
               {readFilter === 'unread'
-                ? "You're all caught up!"
-                : 'Nothing here yet'}
+                ? t('allCaughtUp')
+                : t('nothingYet')}
             </p>
           </div>
         )}

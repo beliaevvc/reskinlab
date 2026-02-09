@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useTask, useUpdateTask, useDeleteTask, useMarkCommentsAsRead, TASK_STATUSES } from '../../hooks/useTasks';
 import { useSpecifications } from '../../hooks/useSpecifications';
@@ -71,12 +72,32 @@ const parseTextWithLinks = (text) => {
 };
 
 export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpecification, onOpenOffer, highlightCommentId }) {
+  const { t, i18n } = useTranslation('tasks');
+  const currentLang = i18n.language?.substring(0, 2) || 'en';
   const { data: task, isLoading } = useTask(taskId);
   const { data: specifications } = useSpecifications(projectId);
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
   const { mutate: markCommentsAsRead } = useMarkCommentsAsRead();
   const { isClient, isAdmin, isAM } = useAuth();
+
+  // Get localized title based on current language
+  const getLocalizedTitle = (taskData) => {
+    if (!taskData) return '';
+    if (currentLang === 'ru') {
+      return taskData.title_ru || taskData.title || '';
+    }
+    return taskData.title_en || taskData.title || '';
+  };
+
+  // Get localized description based on current language
+  const getLocalizedDescription = (taskData) => {
+    if (!taskData) return '';
+    if (currentLang === 'ru') {
+      return taskData.description_ru || taskData.description || '';
+    }
+    return taskData.description_en || taskData.description || '';
+  };
 
   const [editingField, setEditingField] = useState(null); // 'title' | 'description' | null
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
@@ -136,6 +157,37 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
     const trimmedValue = value.trim();
     // Don't save empty title
     if (field === 'title' && !trimmedValue) return;
+    
+    // Handle bilingual title fields
+    if (field === 'title') {
+      const titleField = currentLang === 'ru' ? 'title_ru' : 'title_en';
+      const currentValue = currentLang === 'ru' ? task.title_ru : task.title_en;
+      if (currentValue === trimmedValue) return;
+      
+      updateTask({
+        id: taskId,
+        projectId,
+        [titleField]: trimmedValue,
+        title: trimmedValue, // Also update main title for backward compatibility
+      });
+      return;
+    }
+    
+    // Handle bilingual description fields
+    if (field === 'description') {
+      const descField = currentLang === 'ru' ? 'description_ru' : 'description_en';
+      const currentValue = currentLang === 'ru' ? task.description_ru : task.description_en;
+      if (currentValue === trimmedValue) return;
+      
+      updateTask({
+        id: taskId,
+        projectId,
+        [descField]: trimmedValue,
+        description: trimmedValue, // Also update main description for backward compatibility
+      });
+      return;
+    }
+    
     // Only update if value changed
     if (task[field] === trimmedValue) return;
     
@@ -156,7 +208,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
   };
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
+    if (window.confirm(t('detail.deleteConfirm'))) {
       deleteTask(
         { taskId: task.id, projectId },
         { onSuccess: onClose }
@@ -275,7 +327,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                       style={{ backgroundColor: getStatusColor(task.status).dot }}
                     />
                     <span style={{ color: getStatusColor(task.status).text }}>
-                      {TASK_STATUSES.find(s => s.id === task.status)?.label || task.status}
+                      {t(`status.${task.status}`)}
                     </span>
                     <svg className="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -301,7 +353,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                               className="w-2.5 h-2.5 rounded-full"
                               style={{ backgroundColor: getStatusColor(status.id).dot }}
                             />
-                            {status.label}
+                            {t(`status.${status.id}`)}
                           </button>
                         ))}
                       </div>
@@ -318,7 +370,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                title="Delete Task"
+                title={t('detail.deleteTask')}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -380,7 +432,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                       {editingField === 'title' && !isClient ? (
                         <input
                           type="text"
-                          defaultValue={task.title}
+                          defaultValue={getLocalizedTitle(task)}
                           autoFocus
                           onBlur={(e) => {
                             handleUpdateField('title', e.target.value);
@@ -394,7 +446,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                             }
                           }}
                           className="w-full text-xl font-semibold text-neutral-900 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-1 py-0.5 -mx-1"
-                          placeholder="Название задачи"
+                          placeholder={t('create.titlePlaceholder')}
                         />
                       ) : (
                         <h3 
@@ -403,7 +455,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                             task.status === 'done' ? 'text-neutral-400 line-through' : 'text-neutral-900'
                           } ${!isClient ? 'hover:bg-neutral-100 cursor-text' : ''}`}
                         >
-                          {task.title}
+                          {getLocalizedTitle(task)}
                         </h3>
                       )}
                     </div>
@@ -412,7 +464,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                   {/* Description - inline editable */}
                   {editingField === 'description' && !isClient ? (
                     <textarea
-                      defaultValue={task.description || ''}
+                      defaultValue={getLocalizedDescription(task)}
                       autoFocus
                       rows={4}
                       onBlur={(e) => {
@@ -429,18 +481,18 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                         e.target.style.height = e.target.scrollHeight + 'px';
                       }}
                       className="w-full text-sm text-neutral-600 bg-neutral-50 border border-neutral-200 focus:border-emerald-500 focus:outline-none rounded px-2 py-1.5 -mx-1 resize-none min-h-[80px]"
-                      placeholder="Добавить описание..."
+                      placeholder={t('detail.addDescription')}
                     />
                   ) : (
                     <div 
                       onClick={() => !isClient && setEditingField('description')}
                       className={`text-sm text-neutral-600 whitespace-pre-wrap break-words rounded px-1 py-0.5 -mx-1 border border-transparent ${
                         !isClient ? 'hover:bg-neutral-100 cursor-text' : ''
-                      } ${!task.description ? 'text-neutral-400 italic' : ''}`}
+                      } ${!getLocalizedDescription(task) ? 'text-neutral-400 italic' : ''}`}
                     >
-                      {task.description 
-                        ? parseTextWithLinks(task.description) 
-                        : (!isClient ? 'Добавить описание...' : '')
+                      {getLocalizedDescription(task) 
+                        ? parseTextWithLinks(getLocalizedDescription(task)) 
+                        : (!isClient ? t('detail.addDescription') : '')
                       }
                     </div>
                   )}
@@ -455,7 +507,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <span className="text-sm font-medium text-neutral-900">Дедлайн</span>
+                    <span className="text-sm font-medium text-neutral-900">{t('detail.deadline')}</span>
                   </div>
 
                   {deadlineEditing && !isClient ? (
@@ -463,17 +515,17 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                       {/* Type selector with icons */}
                       <div className="flex gap-2">
                         {[
-                          { id: 'date', label: 'Дата', icon: (
+                          { id: 'date', label: t('deadline.date', { defaultValue: 'Date' }), icon: (
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           )},
-                          { id: 'datetime', label: 'Дата и время', icon: (
+                          { id: 'datetime', label: t('deadline.datetime', { defaultValue: 'Date & time' }), icon: (
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           )},
-                          { id: 'range', label: 'Период', icon: (
+                          { id: 'range', label: t('deadline.range', { defaultValue: 'Range' }), icon: (
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
@@ -496,12 +548,12 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
 
                       {/* Quick actions */}
                       <div className="flex gap-2">
-                        <span className="text-xs text-neutral-400 py-1">Быстрый выбор:</span>
+                        <span className="text-xs text-neutral-400 py-1">{t('deadline.quickSelect', { defaultValue: 'Quick select:' })}</span>
                         {[
-                          { label: 'Сегодня', days: 0 },
-                          { label: 'Завтра', days: 1 },
-                          { label: 'Через неделю', days: 7 },
-                          { label: 'Через месяц', days: 30 },
+                          { label: t('deadline.today', { defaultValue: 'Today' }), days: 0 },
+                          { label: t('deadline.tomorrow', { defaultValue: 'Tomorrow' }), days: 1 },
+                          { label: t('deadline.nextWeek', { defaultValue: 'In a week' }), days: 7 },
+                          { label: t('deadline.nextMonth', { defaultValue: 'In a month' }), days: 30 },
                         ].map((quick) => {
                           const targetDate = new Date();
                           targetDate.setDate(targetDate.getDate() + quick.days);
@@ -542,7 +594,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                               <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
-                              {deadlineType === 'range' ? 'Начало' : 'Дата'}
+                              {deadlineType === 'range' ? t('deadline.start', { defaultValue: 'Start' }) : t('deadline.date', { defaultValue: 'Date' })}
                             </label>
                             <input
                               type="date"
@@ -558,7 +610,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                                 <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Время
+                                {t('deadline.time', { defaultValue: 'Time' })}
                               </label>
                               <input
                                 type="time"
@@ -575,7 +627,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                                 <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                 </svg>
-                                Окончание
+                                {t('deadline.end', { defaultValue: 'End' })}
                               </label>
                               <input
                                 type="date"
@@ -596,14 +648,14 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            Сохранить
+                            {t('actions.save')}
                           </button>
                           <button
                             type="button"
                             onClick={() => setDeadlineEditing(false)}
                             className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors"
                           >
-                            Отмена
+                            {t('actions.cancel')}
                           </button>
                           {task.due_date && (
                             <button
@@ -614,7 +666,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
-                              Убрать
+                              {t('detail.clearDeadline')}
                             </button>
                           )}
                         </div>
@@ -659,15 +711,15 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                   </svg>
-                                  Просрочено
+                                  {t('detail.overdue')}
                                 </span>
                               ) : (
                                 (() => {
                                   const daysLeft = Math.ceil((new Date(task.due_date_end || task.due_date) - new Date()) / (1000 * 60 * 60 * 24));
-                                  if (daysLeft === 0) return 'Сегодня';
-                                  if (daysLeft === 1) return 'Завтра';
-                                  if (daysLeft < 7) return `Через ${daysLeft} дн.`;
-                                  return `Через ${Math.ceil(daysLeft / 7)} нед.`;
+                                  if (daysLeft === 0) return t('deadline.today', { defaultValue: 'Today' });
+                                  if (daysLeft === 1) return t('deadline.tomorrow', { defaultValue: 'Tomorrow' });
+                                  if (daysLeft < 7) return t('deadline.inDays', { count: daysLeft, defaultValue: `In ${daysLeft} days` });
+                                  return t('deadline.inWeeks', { count: Math.ceil(daysLeft / 7), defaultValue: `In ${Math.ceil(daysLeft / 7)} weeks` });
                                 })()
                               )}
                             </div>
@@ -693,10 +745,10 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                             </div>
                             <div className="text-left">
                               <div className="text-sm font-medium text-neutral-600 group-hover:text-emerald-700 transition-colors">
-                                Добавить дедлайн
+                                {t('detail.setDeadline')}
                               </div>
                               <div className="text-xs text-neutral-400">
-                                Нажмите для установки срока
+                                {t('deadline.clickToSet', { defaultValue: 'Click to set deadline' })}
                               </div>
                             </div>
                           </button>
@@ -707,7 +759,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          Дедлайн не установлен
+                          {t('deadline.notSet', { defaultValue: 'Deadline not set' })}
                         </div>
                       )}
                     </div>
@@ -726,7 +778,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  Messages
+                  {t('detail.comments')}
                 </h4>
                 <div ref={commentsTopRef} />
                 <CommentThread 
@@ -740,7 +792,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500">
-              Task not found
+              {t('detail.notFound')}
             </div>
           )}
         </div>

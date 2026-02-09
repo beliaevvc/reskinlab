@@ -1,11 +1,14 @@
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useOffers, useAllOffers } from '../../hooks/useOffers';
 import { useAuth } from '../../contexts/AuthContext';
 import { OfferCard, OffersTable } from '../../components/offers';
 import { ClientFilter } from '../../components/offers/ClientFilter';
 import { OfferModal } from '../../components/project';
+
 export function OffersPage() {
+  const { t } = useTranslation('offers');
   const { isAdmin, isAM } = useAuth();
   const location = useLocation();
   const isStaff = isAdmin || isAM;
@@ -66,7 +69,7 @@ export function OffersPage() {
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-          <p className="text-sm text-neutral-500">Loading offers...</p>
+          <p className="text-sm text-neutral-500">{t('page.loading')}</p>
         </div>
       </div>
     );
@@ -75,7 +78,7 @@ export function OffersPage() {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-6">
-        <p className="text-red-800">Failed to load offers: {error.message}</p>
+        <p className="text-red-800">{t('page.loadError', { error: error.message })}</p>
       </div>
     );
   }
@@ -89,11 +92,11 @@ export function OffersPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Offers</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('page.title')}</h1>
           <p className="text-neutral-500 mt-1">
             {isStaff && isAdminOrAMView
-              ? 'View and manage all offers'
-              : 'Review and accept offers for your projects'}
+              ? t('page.subtitleAdmin', { defaultValue: 'View and manage all offers' })
+              : t('page.subtitle')}
           </p>
         </div>
         {/* View Toggle */}
@@ -105,7 +108,7 @@ export function OffersPage() {
                 ? 'bg-white text-neutral-900 shadow-sm' 
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
-            title="Grid view"
+            title={t('page.gridView')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -118,7 +121,7 @@ export function OffersPage() {
                 ? 'bg-white text-neutral-900 shadow-sm' 
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
-            title="List view"
+            title={t('page.listView')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -141,7 +144,7 @@ export function OffersPage() {
             {clientFilter && (
               <div className="flex items-end">
                 <span className="text-xs text-neutral-500">
-                  {filteredOffers.length} {filteredOffers.length === 1 ? 'offer' : 'offers'} found
+                  {filteredOffers.length} {t('common:found', { defaultValue: 'found' })}
                 </span>
               </div>
             )}
@@ -166,16 +169,16 @@ export function OffersPage() {
             />
           </svg>
           <h2 className="mt-4 text-lg font-semibold text-neutral-900">
-            No offers yet
+            {t('emptyState.title')}
           </h2>
           <p className="mt-2 text-neutral-500 max-w-md mx-auto">
-            Offers will appear here after you finalize a specification in the calculator.
+            {t('emptyState.subtitle')}
           </p>
           <Link
             to={location.pathname.startsWith('/admin') ? '/admin/calculator' : location.pathname.startsWith('/am') ? '/am/calculator' : '/calculator'}
             className="inline-flex items-center gap-2 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
           >
-            Go to Calculator
+            {t('emptyState.goToCalculator')}
           </Link>
         </div>
       )}
@@ -185,7 +188,7 @@ export function OffersPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-500" />
-            Pending Acceptance ({pendingOffers.length})
+            {t('page.pending')} ({pendingOffers.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -206,7 +209,7 @@ export function OffersPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-emerald-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Accepted ({acceptedOffers.length})
+            {t('page.accepted')} ({acceptedOffers.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -226,7 +229,7 @@ export function OffersPage() {
       {otherOffers.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide">
-            Expired / Cancelled ({otherOffers.length})
+            {t('status.expired')} / {t('status.cancelled')} ({otherOffers.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 opacity-60">

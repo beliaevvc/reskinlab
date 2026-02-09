@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function ClientFilter({ clients, value, onChange, className = '' }) {
+  const { t } = useTranslation('offers');
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
@@ -65,7 +67,7 @@ export function ClientFilter({ clients, value, onChange, className = '' }) {
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
       <label className="block text-xs font-medium text-neutral-500 mb-1">
-        Client
+        {t('page.filter.client')}
       </label>
       
       {/* Trigger Button */}
@@ -75,14 +77,14 @@ export function ClientFilter({ clients, value, onChange, className = '' }) {
         className="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm rounded border border-neutral-300 bg-white hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
       >
         <span className={value ? 'text-neutral-900' : 'text-neutral-500'}>
-          {selectedClient ? selectedClient.name : 'All Clients'}
+          {selectedClient ? selectedClient.name : t('page.filter.allClients')}
         </span>
         <div className="flex items-center gap-1">
           {value && (
             <button
               onClick={handleClear}
               className="p-0.5 hover:bg-neutral-100 rounded"
-              title="Clear filter"
+              title={t('page.clear')}
             >
               <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -110,7 +112,7 @@ export function ClientFilter({ clients, value, onChange, className = '' }) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search clients..."
+              placeholder={t('filter.searchClients', { defaultValue: 'Search clients...' })}
               className="w-full px-3 py-2 text-sm border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
@@ -127,7 +129,7 @@ export function ClientFilter({ clients, value, onChange, className = '' }) {
                   : 'text-neutral-700 hover:bg-neutral-50'
               }`}
             >
-              <span>All Clients</span>
+              <span>{t('page.filter.allClients')}</span>
               {!value && (
                 <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -158,7 +160,7 @@ export function ClientFilter({ clients, value, onChange, className = '' }) {
               ))
             ) : (
               <div className="px-3 py-2.5 text-sm text-neutral-500 text-center">
-                No clients found
+                {t('filter.noClientsFound', { defaultValue: 'No clients found' })}
               </div>
             )}
           </div>

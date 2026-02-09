@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { printLegalText } from '../../lib/printUtils';
 
 /**
@@ -224,6 +225,8 @@ function LegalDocument({ text }) {
 }
 
 export function LegalTextModal({ isOpen, onClose, text }) {
+  const { t } = useTranslation('offers');
+  
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -276,10 +279,10 @@ export function LegalTextModal({ isOpen, onClose, text }) {
             </div>
             <div>
               <h2 className="text-base font-semibold text-neutral-900">
-                Terms & Conditions
+                {t('legal.title')}
               </h2>
               <p className="text-xs text-neutral-400">
-                Official offer agreement
+                {t('legal.subtitle', { defaultValue: 'Official offer agreement' })}
               </p>
             </div>
           </div>
@@ -291,7 +294,7 @@ export function LegalTextModal({ isOpen, onClose, text }) {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
-              Print
+              {t('common:print', { defaultValue: 'Print' })}
             </button>
             <button
               onClick={onClose}
@@ -327,7 +330,7 @@ export function LegalTextModal({ isOpen, onClose, text }) {
             onClick={onClose}
             className="px-5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            Close
+            {t('legal.close')}
           </button>
         </div>
       </div>

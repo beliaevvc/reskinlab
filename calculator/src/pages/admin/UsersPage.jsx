@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUsers, useUpdateUserRole, useUserStats, useBulkUpdateRoles } from '../../hooks/useUsers';
 import { UsersTable, UserRoleModal, UserDetailModal } from '../../components/admin';
 
 export function UsersPage() {
+  const { t } = useTranslation('admin');
   const [filters, setFilters] = useState({ role: 'all', search: '' });
   const [selectedUser, setSelectedUser] = useState(null);
   const [detailUserId, setDetailUserId] = useState(null);
@@ -37,7 +39,7 @@ export function UsersPage() {
   };
 
   const handleBulkRoleChange = async (newRole) => {
-    if (!confirm(`Change role to ${newRole} for ${selectedIds.length} users?`)) return;
+    if (!confirm(t('users.confirmBulkRole', { role: newRole, count: selectedIds.length }))) return;
     
     try {
       await bulkUpdateRoles.mutateAsync({ userIds: selectedIds, role: newRole });
@@ -58,8 +60,8 @@ export function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Users</h1>
-          <p className="text-neutral-500 mt-1">Manage user accounts, roles, and companies</p>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('users.title')}</h1>
+          <p className="text-neutral-500 mt-1">{t('users.subtitle')}</p>
         </div>
       </div>
 
@@ -67,19 +69,19 @@ export function UsersPage() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-md border border-neutral-200 p-4">
-            <p className="text-sm text-neutral-500">Total Users</p>
+            <p className="text-sm text-neutral-500">{t('users.stats.total')}</p>
             <p className="text-2xl font-bold text-neutral-900 mt-1">{stats.total}</p>
           </div>
           <div className="bg-white rounded-md border border-neutral-200 p-4">
-            <p className="text-sm text-neutral-500">Admins</p>
+            <p className="text-sm text-neutral-500">{t('users.stats.admins')}</p>
             <p className="text-2xl font-bold text-purple-600 mt-1">{stats.admins}</p>
           </div>
           <div className="bg-white rounded-md border border-neutral-200 p-4">
-            <p className="text-sm text-neutral-500">Account Managers</p>
+            <p className="text-sm text-neutral-500">{t('users.stats.ams')}</p>
             <p className="text-2xl font-bold text-blue-600 mt-1">{stats.ams}</p>
           </div>
           <div className="bg-white rounded-md border border-neutral-200 p-4">
-            <p className="text-sm text-neutral-500">Clients</p>
+            <p className="text-sm text-neutral-500">{t('users.stats.clients')}</p>
             <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.clients}</p>
           </div>
         </div>
@@ -90,9 +92,9 @@ export function UsersPage() {
         <div className="bg-emerald-50 border border-emerald-200 rounded-md p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              {selectedIds.length} selected
+              {t('users.selected', { count: selectedIds.length })}
             </span>
-            <span className="text-emerald-700">Bulk actions:</span>
+            <span className="text-emerald-700">{t('users.bulkActions')}</span>
           </div>
           <div className="flex items-center gap-2">
             <select
@@ -103,10 +105,10 @@ export function UsersPage() {
               className="px-3 py-2 border border-emerald-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               disabled={bulkUpdateRoles.isPending}
             >
-              <option value="">Change Role to...</option>
-              <option value="admin">Admin</option>
-              <option value="am">Account Manager</option>
-              <option value="client">Client</option>
+              <option value="">{t('users.changeRoleTo')}</option>
+              <option value="admin">{t('users.roles.admin')}</option>
+              <option value="am">{t('users.roles.am')}</option>
+              <option value="client">{t('users.roles.client')}</option>
             </select>
             <button
               onClick={() => {
@@ -115,7 +117,7 @@ export function UsersPage() {
               }}
               className="px-3 py-2 text-emerald-700 hover:text-emerald-900"
             >
-              Clear selection
+              {t('users.clearSelection')}
             </button>
           </div>
         </div>
@@ -142,7 +144,7 @@ export function UsersPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Search by name, email, or company..."
+                placeholder={t('users.search')}
                 value={filters.search}
                 onChange={handleSearchChange}
                 className="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -162,7 +164,7 @@ export function UsersPage() {
                     : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 }`}
               >
-                {role === 'all' ? 'All' : role === 'am' ? 'AM' : role.charAt(0).toUpperCase() + role.slice(1)}
+                {t(`users.roles.${role}`)}
               </button>
             ))}
           </div>

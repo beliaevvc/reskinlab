@@ -1,0 +1,28 @@
+{
+  "thread": {
+    "noMessages": "No messages yet",
+    "beFirst": "Be the first to comment"
+  },
+  "input": {
+    "placeholder": "Write a comment...",
+    "send": "Send",
+    "sending": "Sending...",
+    "attachFile": "Attach file",
+    "cancel": "Cancel",
+    "replyTo": "Reply to {{name}}"
+  },
+  "item": {
+    "reply": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "edited": "edited",
+    "deleted": "This comment was deleted"
+  },
+  "attachments": {
+    "attachments": "Attachments",
+    "download": "Download"
+  },
+  "reactions": {
+    "addReaction": "Add reaction"
+  }
+}

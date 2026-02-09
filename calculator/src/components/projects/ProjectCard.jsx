@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency } from '../../lib/utils';
 import { useUpdateProject } from '../../hooks/useProjects';
 
@@ -12,15 +13,6 @@ const STATUS_STYLES = {
   cancelled: 'bg-red-100 text-red-800',
 };
 
-const STATUS_LABELS = {
-  draft: 'Draft',
-  pending_payment: 'Pending Payment',
-  active: 'Active',
-  on_hold: 'On Hold',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-};
-
 // Get base path for projects based on current location
 function useProjectBasePath() {
   const location = useLocation();
@@ -30,6 +22,7 @@ function useProjectBasePath() {
 }
 
 export function ProjectCard({ project, showClient = false }) {
+  const { t } = useTranslation('projects');
   const basePath = useProjectBasePath();
   const specCount = project.specifications?.[0]?.count || 0;
   const latestTotal = project.specifications?.[0]?.totals_json?.grandTotal;
@@ -60,7 +53,7 @@ export function ProjectCard({ project, showClient = false }) {
         });
       } catch (err) {
         console.error('Failed to update project:', err);
-        alert('Failed to update project name');
+        alert(t('card.updateFailed', { defaultValue: 'Failed to update project name' }));
       }
     }
     setIsEditing(false);
@@ -114,7 +107,7 @@ export function ProjectCard({ project, showClient = false }) {
                 <button
                   onClick={handleEdit}
                   className="p-1 hover:bg-neutral-100 rounded z-10"
-                  title="Rename project"
+                  title={t('card.rename')}
                 >
                   <svg
                     className="w-4 h-4 text-neutral-500"
@@ -144,7 +137,7 @@ export function ProjectCard({ project, showClient = false }) {
             STATUS_STYLES[project.status] || STATUS_STYLES.draft
           }`}
         >
-          {STATUS_LABELS[project.status] || project.status}
+          {t(`status.${project.status}`, { defaultValue: project.status })}
         </span>
       </div>
 
@@ -186,7 +179,7 @@ export function ProjectCard({ project, showClient = false }) {
             />
           </svg>
           <span>
-            {specCount} spec{specCount !== 1 ? 's' : ''}
+            {specCount} {t('card.specs')}
           </span>
         </div>
 

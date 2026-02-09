@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { parseLegalText } from '../../offers/LegalTextModal';
 
 // Special delimiters to mark variable values in rendered text
@@ -195,19 +196,28 @@ function PreviewDocument({ text }) {
  * OfferPreview — renders a live preview of the offer template
  * with variable highlighting in green.
  */
-export function OfferPreview({ content, variables, onPrint }) {
+export function OfferPreview({ content, variables, onPrint, contentLang = 'en' }) {
+  const { t } = useTranslation('admin');
   const [previewMode, setPreviewMode] = useState('placeholder');
+
+  // Helper to get localized label
+  const getLocalizedLabel = (v) => {
+    if (contentLang === 'en' && v.label_en) {
+      return v.label_en;
+    }
+    return v.label;
+  };
 
   const resolvedVars = useMemo(() => {
     if (previewMode === 'sample') {
-      return getSampleVariables(variables);
+      return getSampleVariables(variables, contentLang);
     }
     const placeholders = {};
     for (const v of variables || []) {
-      placeholders[v.key] = `${v.label}`;
+      placeholders[v.key] = getLocalizedLabel(v);
     }
     return placeholders;
-  }, [variables, previewMode]);
+  }, [variables, previewMode, contentLang]);
 
   const renderedText = useMemo(() => {
     const text = content?.text || '';
@@ -230,7 +240,7 @@ export function OfferPreview({ content, variables, onPrint }) {
                   : 'text-neutral-500 hover:text-neutral-700'
               }`}
             >
-              Переменные
+              {t('offerTemplates.editor.previewModes.variables')}
             </button>
             <button
               type="button"
@@ -241,10 +251,10 @@ export function OfferPreview({ content, variables, onPrint }) {
                   : 'text-neutral-500 hover:text-neutral-700'
               }`}
             >
-              Пример данных
+              {t('offerTemplates.editor.previewModes.sampleData')}
             </button>
           </div>
-          <span className="text-[11px] text-neutral-400">Так увидит клиент</span>
+          <span className="text-[11px] text-neutral-400">{t('offerTemplates.editor.previewModes.clientView')}</span>
         </div>
 
         {onPrint && (
@@ -256,7 +266,7 @@ export function OfferPreview({ content, variables, onPrint }) {
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            Печать
+            {t('offerTemplates.editor.previewModes.print')}
           </button>
         )}
       </div>
@@ -281,30 +291,52 @@ export function OfferPreview({ content, variables, onPrint }) {
   );
 }
 
-function getSampleVariables(variables) {
+function getSampleVariables(variables, contentLang = 'en') {
   const sampleDate = new Date();
   sampleDate.setDate(sampleDate.getDate() + 30);
 
-  const samples = {
+  const locale = contentLang === 'ru' ? 'ru-RU' : 'en-US';
+  const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+
+  const samplesRu = {
     client_name: 'ООО «Пример»',
     client_contact: 'Иван Иванов',
     project_name: 'Mobile Game UI Redesign',
     grand_total: '4,500.00 USD',
     currency: 'USDT',
-    valid_until: sampleDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    valid_until: sampleDate.toLocaleDateString('ru-RU', dateOptions),
     spec_items: '• Symbols: 15 шт.\n• Backgrounds: 5 шт.\n• UI Elements: 10 шт.',
-    payment_schedule: 'See invoices for detailed payment schedule',
+    payment_schedule: 'См. инвойсы для детального графика платежей',
     terms_version: '1.0',
-    publish_date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    publish_date: new Date().toLocaleDateString('ru-RU', dateOptions),
     prepayment_amount: '2,250.00 USD',
     production_payment: '1,125.00 USD',
     final_payment: '1,125.00 USD',
   };
 
+  const samplesEn = {
+    client_name: 'Example LLC',
+    client_contact: 'John Smith',
+    project_name: 'Mobile Game UI Redesign',
+    grand_total: '4,500.00 USD',
+    currency: 'USDT',
+    valid_until: sampleDate.toLocaleDateString('en-US', dateOptions),
+    spec_items: '• Symbols: 15 pcs.\n• Backgrounds: 5 pcs.\n• UI Elements: 10 pcs.',
+    payment_schedule: 'See invoices for detailed payment schedule',
+    terms_version: '1.0',
+    publish_date: new Date().toLocaleDateString('en-US', dateOptions),
+    prepayment_amount: '2,250.00 USD',
+    production_payment: '1,125.00 USD',
+    final_payment: '1,125.00 USD',
+  };
+
+  const samples = contentLang === 'ru' ? samplesRu : samplesEn;
+
   const result = { ...samples };
   for (const v of variables || []) {
     if (!result[v.key]) {
-      result[v.key] = `[${v.label}]`;
+      const label = contentLang === 'en' && v.label_en ? v.label_en : v.label;
+      result[v.key] = `[${label}]`;
     }
   }
   return result;

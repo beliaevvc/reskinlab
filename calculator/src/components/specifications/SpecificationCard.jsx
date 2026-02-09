@@ -1,4 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency } from '../../lib/utils';
 import useCalculatorStore from '../../stores/calculatorStore';
 
@@ -11,6 +12,7 @@ function useBasePath() {
 }
 
 export function SpecificationCard({ specification, projectId, projectName }) {
+  const { t } = useTranslation('specs');
   const navigate = useNavigate();
   const basePath = useBasePath();
   const { setProject, setSpecification } = useCalculatorStore();
@@ -41,7 +43,7 @@ export function SpecificationCard({ specification, projectId, projectName }) {
             </span>
             {specification.is_addon && (
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">
-                Add-on
+                {t('card.addon')}
               </span>
             )}
           </div>
@@ -52,7 +54,7 @@ export function SpecificationCard({ specification, projectId, projectName }) {
                 : 'bg-emerald-100 text-emerald-800'
             }`}
           >
-            {isDraft ? 'Draft' : 'Finalized'}
+            {isDraft ? t('card.draft') : t('card.finalized')}
           </span>
         </div>
 
@@ -94,7 +96,7 @@ export function SpecificationCard({ specification, projectId, projectName }) {
               d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
             />
           </svg>
-          View
+          {t('card.view')}
         </Link>
 
         {isDraft && (
@@ -115,7 +117,7 @@ export function SpecificationCard({ specification, projectId, projectName }) {
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               />
             </svg>
-            Edit
+            {t('card.edit')}
           </button>
         )}
 
@@ -134,13 +136,13 @@ export function SpecificationCard({ specification, projectId, projectName }) {
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
-            Locked
+            {t('card.locked')}
           </span>
         )}
 
         {specification.finalized_at && (
           <span className="ml-auto text-xs text-neutral-400">
-            Finalized {formatDate(specification.finalized_at)}
+            {t('card.finalizedOn', { date: formatDate(specification.finalized_at) })}
           </span>
         )}
       </div>

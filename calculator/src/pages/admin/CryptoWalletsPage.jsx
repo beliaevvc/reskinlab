@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import {
   useCryptoWallets,
   useCreateWallet,
@@ -12,7 +13,7 @@ import {
 } from '../../hooks/useCryptoWallets';
 
 
-function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
+function WalletModal({ wallet, isOpen, onClose, onSave, isSaving, t }) {
   const [formData, setFormData] = useState({
     currency: wallet?.currency || 'USDT',
     network: wallet?.network || 'TRC20',
@@ -52,14 +53,14 @@ function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
       <div className="relative bg-white rounded shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="px-6 py-4 border-b border-neutral-200">
           <h2 className="text-lg font-semibold text-neutral-900">
-            {wallet ? 'Edit Wallet' : 'Add Wallet'}
+            {wallet ? t('wallets.modal.editTitle') : t('wallets.modal.newTitle')}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Currency *</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">{t('wallets.form.currency')} *</label>
               <select
                 value={formData.currency}
                 onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
@@ -71,7 +72,7 @@ function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Network *</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">{t('wallets.form.network')} *</label>
               <select
                 value={formData.network}
                 onChange={(e) => setFormData(prev => ({ ...prev, network: e.target.value }))}
@@ -87,23 +88,23 @@ function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Wallet Address *</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('wallets.form.address')} *</label>
             <input
               type="text"
               value={formData.address}
               onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-              placeholder="Enter wallet address"
+              placeholder={t('wallets.form.addressPlaceholder')}
               className="w-full px-4 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Label (optional)</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('wallets.form.label')}</label>
             <input
               type="text"
               value={formData.label}
               onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value }))}
-              placeholder="e.g., Main USDT wallet"
+              placeholder={t('wallets.form.labelPlaceholder')}
               className="w-full px-4 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
@@ -115,7 +116,7 @@ function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
               onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
               className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-neutral-300 rounded"
             />
-            <span className="text-sm text-neutral-700">Active (show to clients in invoices)</span>
+            <span className="text-sm text-neutral-700">{t('wallets.form.activeLabel')}</span>
           </label>
 
           <div className="pt-2 flex gap-3">
@@ -143,6 +144,7 @@ function WalletModal({ wallet, isOpen, onClose, onSave, isSaving }) {
 }
 
 export function CryptoWalletsPage() {
+  const { t } = useTranslation('admin');
   const [showModal, setShowModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState(null);
 
@@ -197,8 +199,8 @@ export function CryptoWalletsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Payment Wallets</h1>
-          <p className="text-neutral-500 mt-1">Manage crypto wallets for invoice payments</p>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('wallets.title')}</h1>
+          <p className="text-neutral-500 mt-1">{t('wallets.subtitle')}</p>
         </div>
         <button
           onClick={() => { setEditingWallet(null); setShowModal(true); }}
@@ -207,18 +209,18 @@ export function CryptoWalletsPage() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Add Wallet
+          {t('wallets.create')}
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Total Wallets</p>
+          <p className="text-sm text-neutral-500">{t('wallets.stats.total')}</p>
           <p className="text-2xl font-bold text-neutral-900 mt-1">{wallets?.length || 0}</p>
         </div>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Active Wallets</p>
+          <p className="text-sm text-neutral-500">{t('wallets.stats.active')}</p>
           <p className="text-2xl font-bold text-emerald-600 mt-1">{activeCount}</p>
         </div>
       </div>
@@ -249,11 +251,11 @@ export function CryptoWalletsPage() {
             <table className="min-w-full divide-y divide-neutral-200">
               <thead className="bg-neutral-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Currency</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Network</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Address</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Label</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Active</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('wallets.table.currency')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('wallets.table.network')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('wallets.table.address')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('wallets.table.label')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('wallets.table.active')}</th>
                   <th className="px-4 py-3 w-12"></th>
                 </tr>
               </thead>
@@ -299,7 +301,7 @@ export function CryptoWalletsPage() {
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                           wallet.is_active ? 'bg-emerald-500' : 'bg-neutral-300'
                         }`}
-                        title={wallet.is_active ? 'Active' : 'Inactive'}
+                        title={wallet.is_active ? t('wallets.actions.active') : t('wallets.actions.inactive')}
                       >
                         <span
                           className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
@@ -312,7 +314,7 @@ export function CryptoWalletsPage() {
                       <button
                         onClick={() => handleDelete(wallet.id)}
                         className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete wallet"
+                        title={t('wallets.actions.delete')}
                       >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -334,11 +336,11 @@ export function CryptoWalletsPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div className="text-sm text-amber-800">
-            <p className="font-medium">How it works</p>
+            <p className="font-medium">{t('wallets.info.title')}</p>
             <ul className="mt-1 space-y-1 text-amber-700">
-              <li>• Active wallets are shown to clients when they view invoice payment details</li>
-              <li>• Clients can choose from available networks based on active wallets</li>
-              <li>• Inactive wallets are hidden from clients but remain in the system</li>
+              <li>• {t('wallets.info.point1')}</li>
+              <li>• {t('wallets.info.point2')}</li>
+              <li>• {t('wallets.info.point3')}</li>
             </ul>
           </div>
         </div>
@@ -351,6 +353,7 @@ export function CryptoWalletsPage() {
         onClose={() => { setShowModal(false); setEditingWallet(null); }}
         onSave={handleSave}
         isSaving={createWallet.isPending || updateWallet.isPending}
+        t={t}
       />
     </div>
   );

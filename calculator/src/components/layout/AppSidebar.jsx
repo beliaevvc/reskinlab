@@ -1,42 +1,43 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePendingConfirmationsCount } from '../../hooks/useInvoices';
 
-// Navigation items for each role
+// Navigation items for each role - using translation keys
 const clientNavItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: 'home' },
-  { to: '/calculator', label: 'Calculator', icon: 'calculator' },
-  { to: '/projects', label: 'Projects', icon: 'folder' },
-  { to: '/offers', label: 'Offers', icon: 'document' },
-  { to: '/invoices', label: 'Invoices', icon: 'receipt' },
+  { to: '/dashboard', labelKey: 'dashboard', icon: 'home' },
+  { to: '/calculator', labelKey: 'calculator', icon: 'calculator' },
+  { to: '/projects', labelKey: 'projects', icon: 'folder' },
+  { to: '/offers', labelKey: 'offers', icon: 'document' },
+  { to: '/invoices', labelKey: 'invoices', icon: 'receipt' },
 ];
 
 const amNavItems = [
-  { to: '/am/dashboard', label: 'Dashboard', icon: 'home' },
-  { to: '/am/clients', label: 'Clients', icon: 'users' },
-  { to: '/am/projects', label: 'Projects', icon: 'folder' },
-  { to: '/am/calculator', label: 'Calculator', icon: 'calculator' },
-  { to: '/am/specifications', label: 'Specifications', icon: 'clipboard' },
-  { to: '/am/offers', label: 'Offers', icon: 'document' },
-  { to: '/am/invoices', label: 'Invoices', icon: 'receipt' },
+  { to: '/am/dashboard', labelKey: 'dashboard', icon: 'home' },
+  { to: '/am/clients', labelKey: 'clients', icon: 'users' },
+  { to: '/am/projects', labelKey: 'projects', icon: 'folder' },
+  { to: '/am/calculator', labelKey: 'calculator', icon: 'calculator' },
+  { to: '/am/specifications', labelKey: 'specifications', icon: 'clipboard' },
+  { to: '/am/offers', labelKey: 'offers', icon: 'document' },
+  { to: '/am/invoices', labelKey: 'invoices', icon: 'receipt' },
 ];
 
 const adminNavItems = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: 'home' },
-  { to: '/admin/users', label: 'Users', icon: 'users' },
-  { to: '/admin/projects', label: 'Projects', icon: 'folder' },
-  { to: '/admin/calculator', label: 'Calculator', icon: 'calculator' },
-  { to: '/admin/specifications', label: 'Specifications', icon: 'clipboard' },
-  { to: '/admin/offers', label: 'Offers', icon: 'document' },
-  { to: '/admin/invoices', label: 'Invoices', icon: 'receipt' },
-  { type: 'section', label: 'Settings' },
-  { to: '/admin/offer-templates', label: 'Offer Templates', icon: 'document-template' },
-  { to: '/admin/pricing', label: 'Pricing', icon: 'calculator' },
-  { to: '/admin/promo-codes', label: 'Promo Codes', icon: 'ticket' },
-  { to: '/admin/task-settings', label: 'Task Settings', icon: 'settings' },
-  { to: '/admin/wallets', label: 'Wallets', icon: 'wallet' },
+  { to: '/admin/dashboard', labelKey: 'dashboard', icon: 'home' },
+  { to: '/admin/users', labelKey: 'users', icon: 'users' },
+  { to: '/admin/projects', labelKey: 'projects', icon: 'folder' },
+  { to: '/admin/calculator', labelKey: 'calculator', icon: 'calculator' },
+  { to: '/admin/specifications', labelKey: 'specifications', icon: 'clipboard' },
+  { to: '/admin/offers', labelKey: 'offers', icon: 'document' },
+  { to: '/admin/invoices', labelKey: 'invoices', icon: 'receipt' },
+  { type: 'section', labelKey: 'settings' },
+  { to: '/admin/offer-templates', labelKey: 'admin.offerTemplates', icon: 'document-template' },
+  { to: '/admin/pricing', labelKey: 'admin.pricing', icon: 'calculator' },
+  { to: '/admin/promo-codes', labelKey: 'admin.promoCodes', icon: 'ticket' },
+  { to: '/admin/task-settings', labelKey: 'admin.taskSettings', icon: 'settings' },
+  { to: '/admin/wallets', labelKey: 'admin.wallets', icon: 'wallet' },
   { type: 'divider' },
-  { to: '/admin/audit-logs', label: 'Audit Log', icon: 'shield' },
+  { to: '/admin/audit-logs', labelKey: 'admin.auditLog', icon: 'shield' },
 ];
 
 // Simple icon component
@@ -129,6 +130,7 @@ function NavIcon({ name }) {
 }
 
 export function AppSidebar({ open, onClose }) {
+  const { t } = useTranslation('navigation');
   const { profile, signOut, isAdmin, isAM, profileLoaded } = useAuth();
   const { data: pendingConfirmations } = usePendingConfirmationsCount();
 
@@ -141,7 +143,7 @@ export function AppSidebar({ open, onClose }) {
   
   // Check if this nav item should show a badge
   const getBadgeCount = (item) => {
-    if (item.label === 'Invoices' && (isAdmin || isAM) && pendingConfirmations > 0) {
+    if (item.labelKey === 'invoices' && (isAdmin || isAM) && pendingConfirmations > 0) {
       return pendingConfirmations;
     }
     return null;
@@ -181,7 +183,7 @@ export function AppSidebar({ open, onClose }) {
                 : 'bg-emerald-100 text-emerald-800'
             }`}
           >
-            {isAdmin ? 'Admin' : isAM ? 'Account Manager' : 'Client'}
+            {isAdmin ? t('roles.admin') : isAM ? t('roles.am') : t('roles.client')}
           </span>
         </div>
       )}
@@ -200,7 +202,7 @@ export function AppSidebar({ open, onClose }) {
               <div key={`section-${index}`} className="pt-4 pb-2">
                 <div className="border-t border-neutral-200 pt-3">
                   <span className="px-3 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </div>
               </div>
@@ -222,7 +224,7 @@ export function AppSidebar({ open, onClose }) {
               }
             >
               <NavIcon name={item.icon} />
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1">{t(item.labelKey)}</span>
               {badgeCount && (
                 <span className="bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {badgeCount}
@@ -247,14 +249,14 @@ export function AppSidebar({ open, onClose }) {
           }
         >
           <NavIcon name="user" />
-          Profile
+          {t('profile')}
         </NavLink>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-red-600 hover:bg-red-50 transition-colors mt-1"
         >
           <NavIcon name="logout" />
-          Sign Out
+          {t('signOut')}
         </button>
       </div>
     </aside>

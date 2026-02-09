@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { Select } from '../../components/Select';
 import UserAvatar from '../../components/UserAvatar';
 
 export function ProfilePage() {
+  const { t, i18n } = useTranslation('common');
+  const { changeLanguage } = useLanguage();
   const {
     profile,
     client,
@@ -184,11 +188,11 @@ export function ProfilePage() {
         if (clientError) throw clientError;
       }
 
-      setSuccess('Profile updated successfully!');
+      setSuccess(t('profile.profileUpdated'));
       setHasChanges(false);
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err.message || 'Failed to update profile');
+      setError(err.message || t('profile.failedUpdate'));
     } finally {
       setSaving(false);
     }
@@ -201,11 +205,11 @@ export function ProfilePage() {
     setPasswordSuccess('');
 
     if (newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+      setPasswordError(t('profile.passwordMinLength'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('profile.passwordMismatch'));
       return;
     }
 
@@ -213,7 +217,7 @@ export function ProfilePage() {
     try {
       const { error } = await changePassword(newPassword);
       if (error) throw error;
-      setPasswordSuccess('Password changed successfully!');
+      setPasswordSuccess(t('profile.passwordChanged'));
       setNewPassword('');
       setConfirmPassword('');
       setShowPasswordSection(false);
@@ -251,9 +255,9 @@ export function ProfilePage() {
 
   const getRoleBadge = () => {
     const role = profile?.role;
-    if (role === 'admin') return { label: 'Administrator', classes: 'bg-red-100 text-red-700' };
-    if (role === 'am') return { label: 'Account Manager', classes: 'bg-blue-100 text-blue-700' };
-    return { label: 'Client', classes: 'bg-amber-100 text-amber-700' };
+    if (role === 'admin') return { labelKey: 'profile.roles.admin', classes: 'bg-red-100 text-red-700' };
+    if (role === 'am') return { labelKey: 'profile.roles.am', classes: 'bg-blue-100 text-blue-700' };
+    return { labelKey: 'profile.roles.client', classes: 'bg-amber-100 text-amber-700' };
   };
 
   const roleBadge = getRoleBadge();
@@ -264,9 +268,9 @@ export function ProfilePage() {
       <div className="sticky top-0 z-10 bg-neutral-50/95 backdrop-blur-sm pb-4 pt-1 -mx-1 px-1">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Profile Settings</h1>
+            <h1 className="text-2xl font-bold text-neutral-900">{t('profile.title')}</h1>
             <p className="text-sm text-neutral-500 mt-0.5">
-              Manage your account information
+              {t('profile.subtitle')}
             </p>
           </div>
           <button
@@ -282,14 +286,14 @@ export function ProfilePage() {
             {saving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                {uploadingAvatar ? 'Uploading...' : 'Saving...'}
+                {uploadingAvatar ? t('profile.uploading') : t('profile.saving')}
               </>
             ) : (
               <>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Save Changes
+                {t('profile.saveChanges')}
               </>
             )}
           </button>
@@ -383,8 +387,8 @@ export function ProfilePage() {
                   </button>
                 )}
               </div>
-              <p className="text-xs text-neutral-400 mt-2 text-center">
-                Click to upload
+              <p className="text-xs text-neutral-400 mt-2 text-center whitespace-pre-line">
+                {t('profile.clickToUpload')}
               </p>
             </div>
 
@@ -395,7 +399,7 @@ export function ProfilePage() {
                   htmlFor="fullName"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  Full name
+                  {t('profile.fullName')}
                 </label>
                 <input
                   id="fullName"
@@ -403,7 +407,7 @@ export function ProfilePage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                  placeholder="Your full name"
+                  placeholder={t('profile.fullNamePlaceholder')}
                 />
               </div>
 
@@ -412,7 +416,7 @@ export function ProfilePage() {
                   htmlFor="email"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  Email address
+                  {t('profile.emailAddress')}
                 </label>
                 <input
                   id="email"
@@ -425,15 +429,50 @@ export function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                  Role
+                  {t('profile.role')}
                 </label>
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${roleBadge.classes}`}
                 >
-                  {roleBadge.label}
+                  {t(roleBadge.labelKey)}
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* ============================================ */}
+        {/* Language Settings */}
+        {/* ============================================ */}
+        <div className="bg-white rounded-lg border border-neutral-200 p-6">
+          <h2 className="text-lg font-semibold text-neutral-900 mb-1">{t('profile.language')}</h2>
+          <p className="text-sm text-neutral-500 mb-4">{t('profile.languageSubtitle')}</p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-neutral-100 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => changeLanguage('en')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  i18n.language === 'en'
+                    ? 'bg-white text-neutral-900 shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                {t('profile.languages.en')}
+              </button>
+              <button
+                type="button"
+                onClick={() => changeLanguage('ru')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  i18n.language === 'ru'
+                    ? 'bg-white text-neutral-900 shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                {t('profile.languages.ru')}
+              </button>
+            </div>
+            <p className="text-xs text-neutral-400">{t('profile.languageNote')}</p>
           </div>
         </div>
 
@@ -443,7 +482,7 @@ export function ProfilePage() {
         {isStaff && (
           <div className="bg-white rounded-lg border border-neutral-200 p-6">
             <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-              Contact & Bio
+              {t('profile.contactBio')}
             </h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -452,7 +491,7 @@ export function ProfilePage() {
                     htmlFor="phone"
                     className="block text-sm font-medium text-neutral-700 mb-1.5"
                   >
-                    Phone
+                    {t('profile.phone')}
                   </label>
                   <input
                     id="phone"
@@ -460,7 +499,7 @@ export function ProfilePage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                    placeholder="+1 234 567 8900"
+                    placeholder={t('profile.phonePlaceholder')}
                   />
                 </div>
                 <div>
@@ -468,7 +507,7 @@ export function ProfilePage() {
                     htmlFor="telegram"
                     className="block text-sm font-medium text-neutral-700 mb-1.5"
                   >
-                    Telegram
+                    {t('profile.telegram')}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400">@</span>
@@ -478,7 +517,7 @@ export function ProfilePage() {
                       value={telegram}
                       onChange={(e) => setTelegram(e.target.value)}
                       className="w-full pl-7 pr-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                      placeholder="username"
+                      placeholder={t('profile.telegramPlaceholder')}
                     />
                   </div>
                 </div>
@@ -489,7 +528,7 @@ export function ProfilePage() {
                   htmlFor="bio"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  Bio
+                  {t('profile.bio')}
                 </label>
                 <textarea
                   id="bio"
@@ -497,10 +536,10 @@ export function ProfilePage() {
                   onChange={(e) => setBio(e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors resize-none"
-                  placeholder="A short bio about yourself..."
+                  placeholder={t('profile.bioPlaceholder')}
                 />
                 <p className="mt-1 text-xs text-neutral-400">
-                  {bio.length}/200 characters
+                  {t('profile.characters', { count: bio.length })}
                 </p>
               </div>
             </div>
@@ -513,19 +552,19 @@ export function ProfilePage() {
         {isClient && (
           <div className="bg-white rounded-lg border border-neutral-200 p-6">
             <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-              Company Information
+              {t('profile.companyInfo')}
             </h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                  Type
+                  {t('profile.companyType')}
                 </label>
                 <Select
                   value={companyType}
                   onChange={(val) => setCompanyType(val)}
                   options={[
-                    { value: 'individual', label: 'Individual / Freelancer' },
-                    { value: 'company', label: 'Company' },
+                    { value: 'individual', label: t('profile.companyTypes.individual') },
+                    { value: 'company', label: t('profile.companyTypes.company') },
                   ]}
                 />
               </div>
@@ -536,7 +575,7 @@ export function ProfilePage() {
                     htmlFor="companyName"
                     className="block text-sm font-medium text-neutral-700 mb-1.5"
                   >
-                    Company name
+                    {t('profile.companyName')}
                   </label>
                   <input
                     id="companyName"
@@ -544,7 +583,7 @@ export function ProfilePage() {
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                    placeholder="Your company name"
+                    placeholder={t('profile.companyNamePlaceholder')}
                   />
                 </div>
               )}
@@ -554,7 +593,7 @@ export function ProfilePage() {
                   htmlFor="country"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  Country
+                  {t('profile.country')}
                 </label>
                 <input
                   id="country"
@@ -562,7 +601,7 @@ export function ProfilePage() {
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                  placeholder="e.g., United States"
+                  placeholder={t('profile.countryPlaceholder')}
                 />
               </div>
 
@@ -571,7 +610,7 @@ export function ProfilePage() {
                   htmlFor="address"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  Address
+                  {t('profile.address')}
                 </label>
                 <textarea
                   id="address"
@@ -579,7 +618,7 @@ export function ProfilePage() {
                   onChange={(e) => setAddress(e.target.value)}
                   rows={2}
                   className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors resize-none"
-                  placeholder="Your business address"
+                  placeholder={t('profile.addressPlaceholder')}
                 />
               </div>
 
@@ -589,7 +628,7 @@ export function ProfilePage() {
                     htmlFor="contactName"
                     className="block text-sm font-medium text-neutral-700 mb-1.5"
                   >
-                    Contact name
+                    {t('profile.contactName')}
                   </label>
                   <input
                     id="contactName"
@@ -597,7 +636,7 @@ export function ProfilePage() {
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                    placeholder="Contact person"
+                    placeholder={t('profile.contactNamePlaceholder')}
                   />
                 </div>
                 <div>
@@ -605,7 +644,7 @@ export function ProfilePage() {
                     htmlFor="contactPhone"
                     className="block text-sm font-medium text-neutral-700 mb-1.5"
                   >
-                    Contact phone
+                    {t('profile.contactPhone')}
                   </label>
                   <input
                     id="contactPhone"
@@ -613,7 +652,7 @@ export function ProfilePage() {
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                    placeholder="+1 234 567 8900"
+                    placeholder={t('profile.phonePlaceholder')}
                   />
                 </div>
               </div>
@@ -627,9 +666,9 @@ export function ProfilePage() {
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-neutral-900">Password</h2>
+              <h2 className="text-lg font-semibold text-neutral-900">{t('profile.password')}</h2>
               <p className="text-sm text-neutral-500 mt-0.5">
-                Update your account password
+                {t('profile.passwordSubtitle')}
               </p>
             </div>
             {!showPasswordSection && (
@@ -638,7 +677,7 @@ export function ProfilePage() {
                 onClick={() => setShowPasswordSection(true)}
                 className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
               >
-                Change Password
+                {t('profile.changePassword')}
               </button>
             )}
           </div>
@@ -650,7 +689,7 @@ export function ProfilePage() {
                   htmlFor="newPassword"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  New password
+                  {t('profile.newPassword')}
                 </label>
                 <input
                   id="newPassword"
@@ -658,7 +697,7 @@ export function ProfilePage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                  placeholder="Minimum 6 characters"
+                  placeholder={t('profile.newPasswordPlaceholder')}
                   minLength={6}
                 />
               </div>
@@ -667,7 +706,7 @@ export function ProfilePage() {
                   htmlFor="confirmPassword"
                   className="block text-sm font-medium text-neutral-700 mb-1.5"
                 >
-                  Confirm new password
+                  {t('profile.confirmPassword')}
                 </label>
                 <input
                   id="confirmPassword"
@@ -675,7 +714,7 @@ export function ProfilePage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-neutral-300 transition-colors"
-                  placeholder="Repeat new password"
+                  placeholder={t('profile.confirmPasswordPlaceholder')}
                 />
               </div>
 
@@ -692,10 +731,10 @@ export function ProfilePage() {
                   {changingPassword ? (
                     <>
                       <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
-                      Updating...
+                      {t('profile.updating')}
                     </>
                   ) : (
-                    'Update Password'
+                    t('profile.updatePassword')
                   )}
                 </button>
                 <button
@@ -708,7 +747,7 @@ export function ProfilePage() {
                   }}
                   className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
                 >
-                  Cancel
+                  {t('actions.cancel')}
                 </button>
               </div>
             </form>
@@ -719,9 +758,9 @@ export function ProfilePage() {
         {/* Danger Zone */}
         {/* ============================================ */}
         <div className="bg-white rounded-lg border border-red-200 p-6">
-          <h2 className="text-lg font-semibold text-red-700 mb-1">Danger Zone</h2>
+          <h2 className="text-lg font-semibold text-red-700 mb-1">{t('profile.dangerZone')}</h2>
           <p className="text-sm text-neutral-500 mb-4">
-            Irreversible actions that will affect your account
+            {t('profile.dangerZoneSubtitle')}
           </p>
 
           {!showDeactivateConfirm ? (
@@ -730,15 +769,15 @@ export function ProfilePage() {
               onClick={() => setShowDeactivateConfirm(true)}
               className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors"
             >
-              Deactivate Account
+              {t('profile.deactivateAccount')}
             </button>
           ) : (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg space-y-3">
               <p className="text-sm text-red-800 font-medium">
-                Are you sure you want to deactivate your account?
+                {t('profile.deactivateConfirm')}
               </p>
               <p className="text-sm text-red-700">
-                Your account will be disabled and you will be signed out. Contact support to reactivate.
+                {t('profile.deactivateWarning')}
               </p>
               <div>
                 <label className="block text-sm text-red-700 mb-1.5">
@@ -762,10 +801,10 @@ export function ProfilePage() {
                   {deactivating ? (
                     <>
                       <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
-                      Deactivating...
+                      {t('profile.deactivating')}
                     </>
                   ) : (
-                    'Deactivate Account'
+                    t('profile.deactivateAccount')
                   )}
                 </button>
                 <button
@@ -776,7 +815,7 @@ export function ProfilePage() {
                   }}
                   className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
                 >
-                  Cancel
+                  {t('actions.cancel')}
                 </button>
               </div>
             </div>

@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency, formatDateTime } from '../../lib/utils';
 import UserAvatar from '../UserAvatar';
 
-const ROLE_BADGES = {
-  admin: { label: 'Admin', color: 'bg-purple-100 text-purple-700' },
-  am: { label: 'AM', color: 'bg-blue-100 text-blue-700' },
-  client: { label: 'Client', color: 'bg-emerald-100 text-emerald-700' },
+const ROLE_BADGE_KEYS = {
+  admin: { labelKey: 'users.roles.admin', color: 'bg-purple-100 text-purple-700' },
+  am: { labelKey: 'users.roles.am', color: 'bg-blue-100 text-blue-700' },
+  client: { labelKey: 'users.roles.client', color: 'bg-emerald-100 text-emerald-700' },
 };
 
 export function UsersTable({ 
@@ -18,6 +19,7 @@ export function UsersTable({
   onSelectionChange,
   showCheckboxes = false 
 }) {
+  const { t } = useTranslation('admin');
   const [sortField, setSortField] = useState('created_at');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -92,7 +94,7 @@ export function UsersTable({
   if (!users || users.length === 0) {
     return (
       <div className="text-center py-12 text-neutral-500">
-        No users found
+        {t('users.noUsersFound')}
       </div>
     );
   }
@@ -118,19 +120,19 @@ export function UsersTable({
                 />
               </th>
             )}
-            <SortHeader field="full_name">User</SortHeader>
-            <SortHeader field="email">Email</SortHeader>
-            <SortHeader field="role">Role</SortHeader>
-            <SortHeader field="company">Company</SortHeader>
-            <SortHeader field="projects_count">Projects</SortHeader>
-            <SortHeader field="total_revenue">Revenue</SortHeader>
-            <SortHeader field="created_at">Joined</SortHeader>
-            <SortHeader field="last_login_at">Last Login</SortHeader>
+            <SortHeader field="full_name">{t('users.table.user')}</SortHeader>
+            <SortHeader field="email">{t('users.table.email')}</SortHeader>
+            <SortHeader field="role">{t('users.table.role')}</SortHeader>
+            <SortHeader field="company">{t('users.table.company')}</SortHeader>
+            <SortHeader field="projects_count">{t('users.table.projects')}</SortHeader>
+            <SortHeader field="total_revenue">{t('users.table.revenue')}</SortHeader>
+            <SortHeader field="created_at">{t('users.table.joined')}</SortHeader>
+            <SortHeader field="last_login_at">{t('users.table.lastLogin')}</SortHeader>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-neutral-200">
           {sortedUsers.map((user) => {
-            const roleBadge = ROLE_BADGES[user.role] || ROLE_BADGES.client;
+            const roleBadge = ROLE_BADGE_KEYS[user.role] || ROLE_BADGE_KEYS.client;
             const isSelected = selectedIds.includes(user.id);
             
             return (
@@ -187,7 +189,7 @@ export function UsersTable({
                   }}
                 >
                   <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${roleBadge.color}`}>
-                    {roleBadge.label}
+                    {t(roleBadge.labelKey)}
                   </span>
                 </td>
                 <td 

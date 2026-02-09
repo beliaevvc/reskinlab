@@ -1,11 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency } from '../../lib/utils';
 import { getOfferStatusInfo } from '../../lib/offerUtils';
 
 export function OffersTable({ offers, onOfferClick, showClient = true }) {
+  const { t } = useTranslation('offers');
+  
   if (!offers || offers.length === 0) {
     return (
       <div className="text-center py-8 text-neutral-500">
-        No offers
+        {t('table.noOffers')}
       </div>
     );
   }
@@ -16,27 +19,27 @@ export function OffersTable({ offers, onOfferClick, showClient = true }) {
         <thead>
           <tr className="border-b border-neutral-200">
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Offer
+              {t('table.offer')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Project
+              {t('page.filter.project')}
             </th>
             {showClient && (
               <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                Client
+                {t('table.client')}
               </th>
             )}
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Spec
+              {t('card.spec')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Status
+              {t('table.status')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Date
+              {t('table.date')}
             </th>
             <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Total
+              {t('table.amount')}
             </th>
           </tr>
         </thead>
@@ -62,7 +65,7 @@ export function OffersTable({ offers, onOfferClick, showClient = true }) {
 
                 {/* Project */}
                 <td className="px-4 py-3">
-                  <span className="text-sm text-neutral-700">{project?.name || 'Unknown'}</span>
+                  <span className="text-sm text-neutral-700">{project?.name || t('common:unknown', { defaultValue: 'Unknown' })}</span>
                 </td>
 
                 {/* Client */}
@@ -95,7 +98,7 @@ export function OffersTable({ offers, onOfferClick, showClient = true }) {
                 {/* Status */}
                 <td className="px-4 py-3">
                   <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${statusInfo.bgClass} ${statusInfo.textClass}`}>
-                    {statusInfo.label}
+                    {t(`status.${offer.status}`)}
                   </span>
                 </td>
 
@@ -104,7 +107,7 @@ export function OffersTable({ offers, onOfferClick, showClient = true }) {
                   {offer.accepted_at ? (
                     <span className="text-emerald-600">{formatDate(offer.accepted_at)}</span>
                   ) : offer.status === 'pending' && offer.valid_until ? (
-                    <span className="text-neutral-600">Until {formatDate(offer.valid_until)}</span>
+                    <span className="text-neutral-600">{t('common:until', { defaultValue: 'Until' })} {formatDate(offer.valid_until)}</span>
                   ) : (
                     <span className="text-neutral-500">{formatDate(offer.created_at)}</span>
                   )}

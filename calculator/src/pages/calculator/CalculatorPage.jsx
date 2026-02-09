@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CATEGORIES as LOCAL_CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
 import { useDynamicPricing } from '../../hooks/useDynamicPricing';
@@ -30,6 +31,7 @@ import { ImportCodeModal } from '../../components/calculator/ImportCodeModal';
  * Wrapper around existing calculator functionality with Supabase integration
  */
 export function CalculatorPage() {
+  const { t } = useTranslation('calculator');
   const [view, setView] = useState('editor');
   const [searchParams] = useSearchParams();
   const [showImportModal, setShowImportModal] = useState(false);
@@ -231,24 +233,24 @@ export function CalculatorPage() {
             <button
               onClick={() => setShowImportModal(true)}
               className="text-xs text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1 transition-colors"
-              title="Import a selection from a shared code"
+              title={t('editor.importCodeTitle')}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              Import Code
+              {t('actions.importCode')}
             </button>
             <a
               href="/shared/calculator"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-emerald-500 hover:text-emerald-600 font-medium flex items-center gap-1 transition-colors"
-              title="Open public calculator — share this link with anyone"
+              title={t('editor.publicCalculatorTitle')}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              Public Calculator
+              {t('actions.publicCalculator')}
             </a>
             <DraftStatusBadge
               isSaving={saveSpec.isPending}
@@ -283,12 +285,12 @@ export function CalculatorPage() {
 
           {/* Order Type Selector */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-500 font-medium">Order type:</span>
+            <span className="text-xs text-neutral-500 font-medium">{t('options.orderType')}:</span>
             <div className="flex rounded-md border border-neutral-200 overflow-hidden">
               {[
-                { id: 'art_only', label: 'Art Only', activeCls: 'bg-blue-500 text-white' },
-                { id: 'anim_only', label: 'Anim Only', activeCls: 'bg-violet-500 text-white' },
-                { id: 'art_and_anim', label: 'Art+Anim', activeCls: 'bg-emerald-500 text-white' },
+                { id: 'art_only', labelKey: 'orderTypes.artOnly', activeCls: 'bg-blue-500 text-white' },
+                { id: 'anim_only', labelKey: 'orderTypes.animOnly', activeCls: 'bg-violet-500 text-white' },
+                { id: 'art_and_anim', labelKey: 'orderTypes.artAndAnim', activeCls: 'bg-emerald-500 text-white' },
               ].map((type) => (
                 <button
                   key={type.id}
@@ -298,7 +300,7 @@ export function CalculatorPage() {
                     defaultOrderType === type.id ? type.activeCls : 'bg-white text-neutral-500 hover:bg-neutral-50'
                   }`}
                 >
-                  {type.label}
+                  {t(type.labelKey)}
                 </button>
               ))}
             </div>

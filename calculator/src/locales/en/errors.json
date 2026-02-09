@@ -1,0 +1,60 @@
+{
+  "generic": {
+    "title": "Error",
+    "message": "Something went wrong. Please try again.",
+    "retry": "Try Again"
+  },
+  "network": {
+    "title": "Connection Error",
+    "message": "Unable to connect to the server. Please check your internet connection.",
+    "offline": "You are currently offline"
+  },
+  "auth": {
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "invalidToken": "Invalid authentication token",
+    "notAuthenticated": "Please sign in to continue"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be no more than {{max}} characters",
+    "passwordWeak": "Password must contain at least 8 characters, including uppercase, lowercase, and numbers",
+    "passwordMismatch": "Passwords do not match",
+    "invalidFormat": "Invalid format",
+    "invalidDate": "Invalid date",
+    "invalidNumber": "Please enter a valid number",
+    "positiveNumber": "Must be a positive number"
+  },
+  "notFound": {
+    "title": "Not Found",
+    "message": "The requested resource was not found.",
+    "project": "Project not found",
+    "invoice": "Invoice not found",
+    "offer": "Offer not found",
+    "specification": "Specification not found",
+    "user": "User not found"
+  },
+  "permission": {
+    "title": "Access Denied",
+    "message": "You do not have permission to perform this action.",
+    "readOnly": "You have read-only access",
+    "ownerOnly": "Only the owner can perform this action"
+  },
+  "file": {
+    "tooLarge": "File size exceeds the maximum limit of {{size}}",
+    "invalidType": "File type not supported. Allowed types: {{types}}",
+    "uploadFailed": "Failed to upload file",
+    "downloadFailed": "Failed to download file"
+  },
+  "payment": {
+    "failed": "Payment processing failed",
+    "invalidAmount": "Invalid payment amount",
+    "insufficientFunds": "Insufficient funds"
+  },
+  "server": {
+    "internal": "Internal server error",
+    "maintenance": "Server is under maintenance. Please try again later.",
+    "overloaded": "Server is currently overloaded. Please try again later."
+  }
+}

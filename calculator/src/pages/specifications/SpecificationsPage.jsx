@@ -1,16 +1,17 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAllSpecifications, useAMSpecifications } from '../../hooks/useSpecifications';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency, formatDate } from '../../lib/utils';
-import { SpecificationModal } from '../../components/project';
+import { SpecificationModal, OfferModal } from '../../components/project';
 import { ClientFilter } from '../../components/offers';
 // Status badge component
-function StatusBadge({ status, hasOffer, offerStatus }) {
+function StatusBadge({ status, hasOffer, offerStatus, t }) {
   if (status === 'draft') {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 text-neutral-700">
-        Draft
+        {t('card.draft')}
       </span>
     );
   }
@@ -19,7 +20,7 @@ function StatusBadge({ status, hasOffer, offerStatus }) {
     if (!hasOffer) {
       return (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">
-          Awaiting Offer
+          {t('status.awaitingOffer', { defaultValue: 'Awaiting Offer' })}
         </span>
       );
     }
@@ -27,7 +28,7 @@ function StatusBadge({ status, hasOffer, offerStatus }) {
     if (offerStatus === 'pending') {
       return (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
-          Offer Pending
+          {t('status.offerPending', { defaultValue: 'Offer Pending' })}
         </span>
       );
     }
@@ -35,14 +36,14 @@ function StatusBadge({ status, hasOffer, offerStatus }) {
     if (offerStatus === 'accepted') {
       return (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700">
-          Accepted
+          {t('common:status.accepted')}
         </span>
       );
     }
     
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 text-neutral-500">
-        {offerStatus || 'Finalized'}
+        {offerStatus || t('card.finalized')}
       </span>
     );
   }
@@ -51,7 +52,7 @@ function StatusBadge({ status, hasOffer, offerStatus }) {
 }
 
 // Specification card component
-function SpecificationCard({ spec, onClick }) {
+function SpecificationCard({ spec, onClick, t }) {
   const total = spec.totals_json?.total || spec.totals_json?.grandTotal || 0;
   const hasOffer = !!spec.offer;
   const offerStatus = spec.offer?.status;
@@ -65,15 +66,15 @@ function SpecificationCard({ spec, onClick }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-neutral-900 truncate">
-              {spec.project?.name || 'Unknown Project'}
+              {spec.project?.name || t('common:unknown')}
             </h3>
             <span className="text-xs text-neutral-400">{spec.number || spec.version}</span>
           </div>
           <p className="text-sm text-neutral-500 truncate mt-0.5">
-            {spec.project?.client?.company_name || spec.project?.client?.profile?.full_name || 'No client'}
+            {spec.project?.client?.company_name || spec.project?.client?.profile?.full_name || t('noClient', { defaultValue: 'No client' })}
           </p>
         </div>
-        <StatusBadge status={spec.status} hasOffer={hasOffer} offerStatus={offerStatus} />
+        <StatusBadge status={spec.status} hasOffer={hasOffer} offerStatus={offerStatus} t={t} />
       </div>
       
       <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
@@ -87,7 +88,7 @@ function SpecificationCard({ spec, onClick }) {
       
       {hasOffer && (
         <div className="mt-2 text-xs text-neutral-500">
-          Offer #{spec.offer.number}
+          {t('offers:card.offer')} #{spec.offer.number}
         </div>
       )}
     </div>
@@ -95,20 +96,20 @@ function SpecificationCard({ spec, onClick }) {
 }
 
 // Specifications table component
-function SpecificationsTable({ specifications, onSpecClick, showClient }) {
+function SpecificationsTable({ specifications, onSpecClick, showClient, t }) {
   return (
     <table className="w-full">
       <thead>
         <tr className="border-b border-neutral-200 text-left">
-          <th className="py-3 pl-4 text-xs font-semibold text-neutral-500 uppercase">Project</th>
+          <th className="py-3 pl-4 text-xs font-semibold text-neutral-500 uppercase">{t('common:labels.project')}</th>
           {showClient && (
-            <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">Client</th>
+            <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">{t('common:labels.client')}</th>
           )}
-          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">Version</th>
-          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">Amount</th>
-          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">Status</th>
-          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">Date</th>
-          <th className="py-3 pr-4 text-xs font-semibold text-neutral-500 uppercase">Offer</th>
+          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">{t('table.version', { defaultValue: 'Version' })}</th>
+          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">{t('common:labels.amount')}</th>
+          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">{t('common:labels.status')}</th>
+          <th className="py-3 text-xs font-semibold text-neutral-500 uppercase">{t('common:labels.date')}</th>
+          <th className="py-3 pr-4 text-xs font-semibold text-neutral-500 uppercase">{t('offers:card.offer')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-neutral-100">
@@ -123,7 +124,7 @@ function SpecificationsTable({ specifications, onSpecClick, showClient }) {
               className="hover:bg-neutral-50 cursor-pointer transition-colors"
             >
               <td className="py-3 pl-4">
-                <span className="font-medium text-neutral-900">{spec.project?.name || 'Unknown'}</span>
+                <span className="font-medium text-neutral-900">{spec.project?.name || t('common:unknown')}</span>
               </td>
               {showClient && (
                 <td className="py-3 text-sm text-neutral-600">
@@ -133,7 +134,7 @@ function SpecificationsTable({ specifications, onSpecClick, showClient }) {
               <td className="py-3 text-sm text-neutral-600">{spec.number || spec.version}</td>
               <td className="py-3 font-medium text-neutral-900">{formatCurrency(total)}</td>
               <td className="py-3">
-                <StatusBadge status={spec.status} hasOffer={hasOffer} offerStatus={spec.offer?.status} />
+                <StatusBadge status={spec.status} hasOffer={hasOffer} offerStatus={spec.offer?.status} t={t} />
               </td>
               <td className="py-3 text-sm text-neutral-500">{formatDate(spec.created_at)}</td>
               <td className="py-3 pr-4 text-sm text-neutral-500">
@@ -147,20 +148,21 @@ function SpecificationsTable({ specifications, onSpecClick, showClient }) {
   );
 }
 
-// Status filter options
-const STATUS_OPTIONS = [
-  { id: '', name: 'All Statuses' },
-  { id: 'draft', name: 'Draft' },
-  { id: 'awaiting_offer', name: 'Awaiting Offer' },
-  { id: 'offer_pending', name: 'Offer Pending' },
-  { id: 'accepted', name: 'Accepted' },
+// Status filter options - will be translated in component
+const STATUS_OPTIONS_KEYS = [
+  { id: '', key: 'filter.allStatuses' },
+  { id: 'draft', key: 'filter.draft' },
+  { id: 'awaiting_offer', key: 'filter.awaitingOffer' },
+  { id: 'offer_pending', key: 'filter.offerPending' },
+  { id: 'accepted', key: 'filter.accepted' },
 ];
 
 // Status filter component (custom dropdown)
-function StatusFilter({ value, onChange }) {
+function StatusFilter({ value, onChange, t }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const STATUS_OPTIONS = STATUS_OPTIONS_KEYS.map(o => ({ ...o, name: t(o.key) }));
   const selectedOption = STATUS_OPTIONS.find(o => o.id === value) || STATUS_OPTIONS[0];
 
   // Close dropdown on outside click
@@ -188,7 +190,7 @@ function StatusFilter({ value, onChange }) {
   return (
     <div ref={dropdownRef} className="relative">
       <label className="block text-xs font-medium text-neutral-500 mb-1">
-        Status
+        {t('common:labels.status')}
       </label>
       
       {/* Trigger Button */}
@@ -205,7 +207,7 @@ function StatusFilter({ value, onChange }) {
             <button
               onClick={handleClear}
               className="p-0.5 hover:bg-neutral-100 rounded"
-              title="Clear filter"
+              title={t('common:actions.clear')}
             >
               <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -254,6 +256,7 @@ function StatusFilter({ value, onChange }) {
 }
 
 export function SpecificationsPage() {
+  const { t } = useTranslation('specs');
   const { user, isAdmin, isAM } = useAuth();
   const location = useLocation();
   const isStaff = isAdmin || isAM;
@@ -272,6 +275,8 @@ export function SpecificationsPage() {
   const error = isAdminView ? allError : isAMView ? amError : null;
 
   const [selectedSpecificationId, setSelectedSpecificationId] = useState(null);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
+  const [returnToSpecificationId, setReturnToSpecificationId] = useState(null);
   const [clientFilter, setClientFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState(() => {
@@ -345,7 +350,7 @@ export function SpecificationsPage() {
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-          <p className="text-sm text-neutral-500">Loading specifications...</p>
+          <p className="text-sm text-neutral-500">{t('page.loading')}</p>
         </div>
       </div>
     );
@@ -354,7 +359,7 @@ export function SpecificationsPage() {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-6">
-        <p className="text-red-800">Failed to load specifications: {error.message}</p>
+        <p className="text-red-800">{t('page.loadError', { error: error.message })}</p>
       </div>
     );
   }
@@ -364,9 +369,9 @@ export function SpecificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Specifications</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('page.title')}</h1>
           <p className="text-neutral-500 mt-1">
-            View and manage all project specifications
+            {t('page.subtitle')}
           </p>
         </div>
         {/* View Toggle */}
@@ -378,7 +383,7 @@ export function SpecificationsPage() {
                 ? 'bg-white text-neutral-900 shadow-sm' 
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
-            title="Grid view"
+            title={t('offers:page.gridView')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -391,7 +396,7 @@ export function SpecificationsPage() {
                 ? 'bg-white text-neutral-900 shadow-sm' 
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
-            title="List view"
+            title={t('offers:page.listView')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -415,12 +420,13 @@ export function SpecificationsPage() {
               <StatusFilter
                 value={statusFilter}
                 onChange={setStatusFilter}
+                t={t}
               />
             </div>
             {(clientFilter || statusFilter) && (
               <div className="flex items-end pt-6">
                 <span className="text-xs text-neutral-500">
-                  {filteredSpecs.length} {filteredSpecs.length === 1 ? 'specification' : 'specifications'} found
+                  {filteredSpecs.length} {t('common:found')}
                 </span>
               </div>
             )}
@@ -445,16 +451,16 @@ export function SpecificationsPage() {
             />
           </svg>
           <h2 className="mt-4 text-lg font-semibold text-neutral-900">
-            No specifications yet
+            {t('emptyState.title')}
           </h2>
           <p className="mt-2 text-neutral-500 max-w-md mx-auto">
-            Specifications will appear here after creating them in the calculator.
+            {t('emptyState.subtitle')}
           </p>
           <Link
             to={isAdminView ? '/admin/calculator' : isAMView ? '/am/calculator' : '/calculator'}
             className="inline-flex items-center gap-2 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded transition-colors"
           >
-            Go to Calculator
+            {t('offers:emptyState.goToCalculator')}
           </Link>
         </div>
       )}
@@ -464,17 +470,17 @@ export function SpecificationsPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-purple-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-purple-500" />
-            Awaiting Offer ({awaitingOfferSpecs.length})
+            {t('status.awaitingOffer', { defaultValue: 'Awaiting Offer' })} ({awaitingOfferSpecs.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {awaitingOfferSpecs.map((spec) => (
-                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} />
+                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} t={t} />
               ))}
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-neutral-200">
-              <SpecificationsTable specifications={awaitingOfferSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} />
+              <SpecificationsTable specifications={awaitingOfferSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} t={t} />
             </div>
           )}
         </div>
@@ -485,17 +491,17 @@ export function SpecificationsPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-500" />
-            Offer Pending ({offerPendingSpecs.length})
+            {t('status.offerPending', { defaultValue: 'Offer Pending' })} ({offerPendingSpecs.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {offerPendingSpecs.map((spec) => (
-                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} />
+                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} t={t} />
               ))}
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-neutral-200">
-              <SpecificationsTable specifications={offerPendingSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} />
+              <SpecificationsTable specifications={offerPendingSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} t={t} />
             </div>
           )}
         </div>
@@ -506,17 +512,17 @@ export function SpecificationsPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-emerald-600 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Accepted ({acceptedSpecs.length})
+            {t('common:status.accepted')} ({acceptedSpecs.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {acceptedSpecs.map((spec) => (
-                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} />
+                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} t={t} />
               ))}
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-neutral-200">
-              <SpecificationsTable specifications={acceptedSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} />
+              <SpecificationsTable specifications={acceptedSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} t={t} />
             </div>
           )}
         </div>
@@ -527,17 +533,17 @@ export function SpecificationsPage() {
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-neutral-400" />
-            Drafts ({draftSpecs.length})
+            {t('card.draft')} ({draftSpecs.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 opacity-70">
               {draftSpecs.map((spec) => (
-                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} />
+                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} t={t} />
               ))}
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-neutral-200 opacity-70">
-              <SpecificationsTable specifications={draftSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} />
+              <SpecificationsTable specifications={draftSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} t={t} />
             </div>
           )}
         </div>
@@ -547,17 +553,17 @@ export function SpecificationsPage() {
       {otherSpecs.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide">
-            Other ({otherSpecs.length})
+            {t('status.other', { defaultValue: 'Other' })} ({otherSpecs.length})
           </h2>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 opacity-60">
               {otherSpecs.map((spec) => (
-                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} />
+                <SpecificationCard key={spec.id} spec={spec} onClick={handleSpecClick} t={t} />
               ))}
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-neutral-200 opacity-60">
-              <SpecificationsTable specifications={otherSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} />
+              <SpecificationsTable specifications={otherSpecs} onSpecClick={handleSpecClick} showClient={isStaff && isAdminOrAMView} t={t} />
             </div>
           )}
         </div>
@@ -568,6 +574,26 @@ export function SpecificationsPage() {
         isOpen={!!selectedSpecificationId}
         onClose={() => setSelectedSpecificationId(null)}
         specificationId={selectedSpecificationId}
+        onViewOffer={(offer) => {
+          // Save current spec ID to return after closing offer
+          setReturnToSpecificationId(selectedSpecificationId);
+          setSelectedSpecificationId(null);
+          setSelectedOfferId(offer.id);
+        }}
+      />
+
+      {/* Offer Modal */}
+      <OfferModal
+        isOpen={!!selectedOfferId}
+        onClose={() => {
+          setSelectedOfferId(null);
+          // Return to specification modal if we came from there
+          if (returnToSpecificationId) {
+            setSelectedSpecificationId(returnToSpecificationId);
+            setReturnToSpecificationId(null);
+          }
+        }}
+        offerId={selectedOfferId}
       />
     </div>
   );

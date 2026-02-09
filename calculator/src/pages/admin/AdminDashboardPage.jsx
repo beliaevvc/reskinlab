@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useDashboardStats, useRecentActivity, useRevenueChart, useProjectsChart } from '../../hooks/useDashboard';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { getHumanDescription, getActionIcon } from '../../components/audit-logs/auditLogHumanize';
@@ -120,6 +121,7 @@ function ActivityItem({ log }) {
 }
 
 export function AdminDashboardPage() {
+  const { t } = useTranslation(['admin', 'common', 'navigation']);
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: activity, isLoading: activityLoading } = useRecentActivity(8);
   const { data: revenueData } = useRevenueChart();
@@ -137,17 +139,17 @@ export function AdminDashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
-        <p className="text-neutral-500 mt-1">Overview of your platform activity</p>
+        <h1 className="text-2xl font-bold text-neutral-900">{t('dashboard.title')}</h1>
+        <p className="text-neutral-500 mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total Revenue"
+          title={t('dashboard.stats.monthlyRevenue')}
           value={formatCurrency(stats?.revenue?.total || 0)}
           change={stats?.revenue?.change}
-          changeLabel="vs last month"
+          changeLabel=""
           color="emerald"
           link="/admin/invoices"
           icon={
@@ -158,7 +160,7 @@ export function AdminDashboardPage() {
         />
         
         <StatCard
-          title="Active Projects"
+          title={t('dashboard.stats.activeProjects')}
           value={stats?.projects?.in_progress || 0}
           color="blue"
           link="/admin/projects"
@@ -170,7 +172,7 @@ export function AdminDashboardPage() {
         />
         
         <StatCard
-          title="Total Users"
+          title={t('dashboard.stats.totalClients')}
           value={stats?.users?.total || 0}
           color="purple"
           link="/admin/users"
@@ -182,7 +184,7 @@ export function AdminDashboardPage() {
         />
         
         <StatCard
-          title="Awaiting Offer"
+          title={t('dashboard.stats.pendingInvoices')}
           value={stats?.finalizedSpecs?.count || 0}
           subtitle={stats?.finalizedSpecs?.amount > 0 ? formatCurrency(stats.finalizedSpecs.amount) : null}
           color={stats?.finalizedSpecs?.count > 0 ? 'purple' : 'emerald'}
@@ -198,19 +200,19 @@ export function AdminDashboardPage() {
       {/* Secondary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">This Month</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.stats.thisMonth')}</p>
           <p className="text-xl font-bold text-emerald-600 mt-1">
             {formatCurrency(stats?.revenue?.thisMonth || 0)}
           </p>
         </div>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Pending Revenue</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.stats.pendingRevenue')}</p>
           <p className="text-xl font-bold text-amber-600 mt-1">
             {formatCurrency(stats?.revenue?.pending || 0)}
           </p>
         </div>
         <Link to="/admin/offers" className="bg-white rounded-md border border-neutral-200 p-4 hover:border-emerald-300 hover:shadow-md transition-all">
-          <p className="text-sm text-neutral-500">Pending Offers</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.stats.pendingOffers')}</p>
           <p className={`text-xl font-bold mt-1 ${stats?.pendingOffers?.count > 0 ? 'text-amber-600' : 'text-neutral-400'}`}>
             {stats?.pendingOffers?.count || 0}
           </p>
@@ -219,19 +221,19 @@ export function AdminDashboardPage() {
           )}
         </Link>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Completed Projects</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.stats.completedProjects')}</p>
           <p className="text-xl font-bold text-emerald-600 mt-1">
             {stats?.projects?.completed || 0}
           </p>
         </div>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Active Clients</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.stats.activeClients')}</p>
           <p className="text-xl font-bold text-blue-600 mt-1">
             {stats?.users?.clients || 0}
           </p>
         </div>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Draft Projects</p>
+          <p className="text-sm text-neutral-500">{t('dashboard.stats.draftProjects')}</p>
           <p className="text-xl font-bold text-neutral-500 mt-1">
             {stats?.projects?.draft || 0}
           </p>
@@ -243,16 +245,16 @@ export function AdminDashboardPage() {
         {/* Revenue Chart */}
         <div className="bg-white rounded-md border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-neutral-900">Revenue (6 months)</h3>
+            <h3 className="font-semibold text-neutral-900">{t('dashboard.charts.revenue')}</h3>
             <Link to="/admin/invoices" className="text-sm text-emerald-600 hover:text-emerald-700">
-              View all
+              {t('dashboard.viewAll')}
             </Link>
           </div>
           {revenueData ? (
             <BarChart data={revenueData} dataKey="revenue" color="emerald" />
           ) : (
             <div className="h-48 flex items-center justify-center text-neutral-400">
-              Loading...
+              {t('dashboard.loading')}
             </div>
           )}
         </div>
@@ -260,16 +262,16 @@ export function AdminDashboardPage() {
         {/* Projects Chart */}
         <div className="bg-white rounded-md border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-neutral-900">Projects (6 months)</h3>
+            <h3 className="font-semibold text-neutral-900">{t('dashboard.charts.projects')}</h3>
             <Link to="/admin/projects" className="text-sm text-emerald-600 hover:text-emerald-700">
-              View all
+              {t('dashboard.viewAll')}
             </Link>
           </div>
           {projectsData ? (
             <BarChart data={projectsData} dataKey="total" color="blue" />
           ) : (
             <div className="h-48 flex items-center justify-center text-neutral-400">
-              Loading...
+              {t('dashboard.loading')}
             </div>
           )}
         </div>
@@ -277,9 +279,9 @@ export function AdminDashboardPage() {
         {/* Recent Activity */}
         <div className="bg-white rounded-md border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-neutral-900">Recent Activity</h3>
+            <h3 className="font-semibold text-neutral-900">{t('auditLog.title')}</h3>
             <Link to="/admin/audit-logs" className="text-sm text-emerald-600 hover:text-emerald-700">
-              View all
+              {t('dashboard.viewAll')}
             </Link>
           </div>
           {activityLoading ? (
@@ -294,7 +296,7 @@ export function AdminDashboardPage() {
             </div>
           ) : (
             <div className="h-48 flex items-center justify-center text-neutral-400">
-              No recent activity
+              {t('common:empty.noActivity')}
             </div>
           )}
         </div>
@@ -302,7 +304,7 @@ export function AdminDashboardPage() {
 
       {/* Quick Links */}
       <div className="bg-white rounded-md border border-neutral-200 p-6">
-        <h3 className="font-semibold text-neutral-900 mb-4">Quick Actions</h3>
+        <h3 className="font-semibold text-neutral-900 mb-4">{t('common:actions.view')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             to="/admin/users"
@@ -313,7 +315,7 @@ export function AdminDashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
             </div>
-            <span className="font-medium text-neutral-700">Manage Users</span>
+            <span className="font-medium text-neutral-700">{t('users.title')}</span>
           </Link>
           
           <Link
@@ -325,7 +327,7 @@ export function AdminDashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <span className="font-medium text-neutral-700">View Projects</span>
+            <span className="font-medium text-neutral-700">{t('navigation:projects')}</span>
           </Link>
           
           <Link
@@ -337,7 +339,7 @@ export function AdminDashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
-            <span className="font-medium text-neutral-700">Calculator</span>
+            <span className="font-medium text-neutral-700">{t('navigation:calculator')}</span>
           </Link>
           
           <Link
@@ -349,7 +351,7 @@ export function AdminDashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
               </svg>
             </div>
-            <span className="font-medium text-neutral-700">Promo Codes</span>
+            <span className="font-medium text-neutral-700">{t('promoCodes.title')}</span>
           </Link>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUploadFiles, BUCKETS, formatFileSize } from '../../hooks/useFiles';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -14,6 +15,7 @@ export function FileUploader({
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const { isStaff } = useAuth();
+  const { t } = useTranslation('files');
   
   const uploadFiles = useUploadFiles();
 
@@ -118,9 +120,9 @@ export function FileUploader({
               htmlFor="file-upload"
               className="text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium"
             >
-              Click to upload
+              {t('upload.clickToUpload')}
             </label>
-            <span className="text-neutral-500"> or drag and drop</span>
+            <span className="text-neutral-500"> {t('upload.orDragDrop')}</span>
           </div>
           
           <p className="text-sm text-neutral-400">
@@ -134,13 +136,13 @@ export function FileUploader({
         <div className="bg-neutral-50 rounded p-4 space-y-2">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-neutral-700">
-              {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
+              {t('upload.filesSelected', { count: selectedFiles.length })}
             </span>
             <button
               onClick={() => setSelectedFiles([])}
               className="text-sm text-neutral-500 hover:text-neutral-700"
             >
-              Clear all
+              {t('upload.clearAll')}
             </button>
           </div>
           
@@ -181,14 +183,14 @@ export function FileUploader({
             {uploadFiles.isPending ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                Uploading...
+                {t('upload.uploading')}
               </>
             ) : (
               <>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                Upload {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}
+                {t('upload.uploadFiles', { count: selectedFiles.length })}
               </>
             )}
           </button>

@@ -1,10 +1,21 @@
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 
 export function TaskCard({ task, onClick, isDragging, canToggleComplete = false, onToggleComplete }) {
+  const { t, i18n } = useTranslation('tasks');
+  const currentLang = i18n.language;
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done';
   const isDone = task.status === 'done';
   
   const hasPendingApproval = task.pending_approval || task.needs_approval;
+
+  // Get localized title
+  const getLocalizedTitle = () => {
+    if (currentLang === 'ru') {
+      return task.title_ru || task.title || '';
+    }
+    return task.title_en || task.title || '';
+  };
 
   const handleToggleComplete = (e) => {
     e.stopPropagation();
@@ -69,7 +80,7 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
           <h4 className={`font-medium text-[13px] leading-snug line-clamp-2 ${
             isDone ? 'text-neutral-400 line-through' : 'text-neutral-800'
           }`}>
-            {task.title}
+            {getLocalizedTitle()}
           </h4>
         </div>
       </div>
@@ -136,8 +147,8 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
                   : 'text-neutral-400'
               }`}
               title={task.unread_comments_count > 0 
-                ? `${task.unread_comments_count} unread`
-                : `${task.comments_count} comments`
+                ? t('card.commentsCount', { count: task.unread_comments_count })
+                : t('card.commentsCount', { count: task.comments_count })
               }
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

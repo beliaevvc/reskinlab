@@ -1,14 +1,25 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 import { useTaskChecklist, useUpdateChecklistItem } from '../../hooks/useTaskChecklist';
 import UserAvatar from '../UserAvatar';
 
 export function TaskListRow({ task, onClick, isDragging, canToggleComplete = false, onToggleComplete, canEdit = false }) {
+  const { t, i18n } = useTranslation('tasks');
+  const currentLang = i18n.language;
   const [isExpanded, setIsExpanded] = useState(false);
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done';
   const isDone = task.status === 'done';
   const hasPendingApproval = task.pending_approval || task.needs_approval;
   const hasChecklist = task.checklist_total > 0;
+
+  // Get localized title
+  const getLocalizedTitle = () => {
+    if (currentLang === 'ru') {
+      return task.title_ru || task.title || '';
+    }
+    return task.title_en || task.title || '';
+  };
 
   // Lazy-load checklist items only when expanded
   const { data: checklistItems = [], isLoading: checklistLoading } = useTaskChecklist(isExpanded ? task.id : null);
@@ -85,7 +96,7 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
           <span className={`text-[13px] font-medium leading-snug truncate ${
             isDone ? 'text-neutral-400 line-through' : 'text-neutral-800'
           }`}>
-            {task.title}
+            {getLocalizedTitle()}
           </span>
 
           {/* Checklist count badge near title */}
@@ -99,7 +110,7 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
                   : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
                 }
               `}
-              title={isExpanded ? 'Скрыть чеклист' : 'Показать чеклист'}
+              title={isExpanded ? t('checklist.hide', { defaultValue: 'Hide checklist' }) : t('checklist.show', { defaultValue: 'Show checklist' })}
             >
               {/* Chevron */}
               <svg
@@ -124,8 +135,8 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
                   : 'text-neutral-400'
               }`}
               title={task.unread_comments_count > 0
-                ? `${task.unread_comments_count} unread`
-                : `${task.comments_count} comments`
+                ? t('card.commentsCount', { count: task.unread_comments_count })
+                : t('card.commentsCount', { count: task.comments_count })
               }
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -188,7 +199,7 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
           {checklistLoading ? (
             <div className="flex items-center gap-2 py-2 text-neutral-400 text-xs">
               <div className="animate-spin rounded-full h-3 w-3 border border-neutral-300 border-t-emerald-500" />
-              Loading...
+              {t('common:loading', { defaultValue: 'Loading...' })}
             </div>
           ) : (
             <div className="space-y-0.5">

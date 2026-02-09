@@ -3,6 +3,7 @@ export const PRESETS = [
     id: 'starter',
     name: 'MVP Start',
     desc: 'Быстрый запуск. Простой стиль.',
+    descEn: 'Quick launch. Simple style.',
     styleId: 'S1',
     animId: 'none',
     items: {
@@ -17,6 +18,7 @@ export const PRESETS = [
     id: 'standard',
     name: 'Standard Slot',
     desc: 'Золотой стандарт. Детальная графика.',
+    descEn: 'Gold standard. Detailed graphics.',
     styleId: 'S3',
     animId: 'AN-L',
     items: {
@@ -32,6 +34,7 @@ export const PRESETS = [
     id: 'premium',
     name: 'Premium Flagship',
     desc: 'Топ уровень. Сложная 3D графика.',
+    descEn: 'Top level. Complex 3D graphics.',
     styleId: 'S6',
     animId: 'AN-F',
     items: {

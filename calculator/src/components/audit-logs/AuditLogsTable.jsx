@@ -1,4 +1,5 @@
 import { useState, Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '../../lib/utils';
 import { AuditLogRowExpanded, AuditLogCardExpanded } from './AuditLogRowExpanded';
 import { AuditLogEntityLink } from './AuditLogEntityLink';
@@ -29,13 +30,6 @@ const ROLE_COLORS = {
   anonymous: 'bg-red-100 text-red-600',
 };
 
-const SORTABLE_COLUMNS = [
-  { key: 'created_at', label: 'Time' },
-  { key: 'action', label: 'Action' },
-  { key: 'user_role', label: 'Role' },
-  { key: 'entity_type', label: 'Entity' },
-];
-
 function getActionColor(action) {
   const key = Object.keys(ACTION_COLORS).find(k => action?.toLowerCase().includes(k));
   return ACTION_COLORS[key] || 'bg-neutral-100 text-neutral-700';
@@ -45,7 +39,15 @@ function getActionColor(action) {
  * AuditLogsTable — main table view with sortable columns and expandable rows
  */
 export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFiltersChange, humanMode = false }) {
+  const { t } = useTranslation('admin');
   const [expandedRow, setExpandedRow] = useState(null);
+
+  const SORTABLE_COLUMNS = [
+    { key: 'created_at', label: t('auditLog.table.time') },
+    { key: 'action', label: t('auditLog.table.action') },
+    { key: 'user_role', label: t('auditLog.table.role') },
+    { key: 'entity_type', label: t('auditLog.table.entity') },
+  ];
 
   const currentPage = Math.floor((filters.offset || 0) / (filters.limit || 100)) + 1;
   const totalPages = Math.ceil((totalCount || 0) / (filters.limit || 100));
@@ -94,8 +96,8 @@ export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFilters
           <svg className="mx-auto h-12 w-12 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p className="mt-2 text-neutral-500">No audit logs found</p>
-          <p className="text-sm text-neutral-400">Try adjusting your filters</p>
+          <p className="mt-2 text-neutral-500">{t('auditLog.empty.title')}</p>
+          <p className="text-sm text-neutral-400">{t('auditLog.empty.subtitle')}</p>
         </div>
       ) : (
         <>
@@ -121,10 +123,10 @@ export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFilters
                   ))}
 
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                    User
+                    {t('auditLog.table.user')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                    Details
+                    {t('auditLog.table.details')}
                   </th>
                 </tr>
               </thead>
@@ -200,7 +202,7 @@ export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFilters
                             size="xs"
                           />
                           <span className="text-sm text-neutral-900 truncate max-w-[150px]">
-                            {log.user?.full_name || log.user?.email || 'Unknown'}
+                            {log.user?.full_name || log.user?.email || t('auditLog.unknown')}
                           </span>
                         </div>
                       </td>
@@ -257,9 +259,9 @@ export function AuditLogsTable({ logs, isLoading, totalCount, filters, onFilters
                         role={log.user?.role}
                         size="xs"
                       />
-                      <span className="text-sm text-neutral-700 truncate max-w-[150px]">
-                        {log.user?.full_name || log.user?.email || 'Unknown'}
-                      </span>
+                        <span className="text-sm text-neutral-700 truncate max-w-[150px]">
+                          {log.user?.full_name || log.user?.email || t('auditLog.unknown')}
+                        </span>
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${ROLE_COLORS[log.user_role || log.user?.role] || ROLE_COLORS.unknown}`}>
                         {log.user_role || log.user?.role || 'unknown'}
                       </span>

@@ -41,43 +41,81 @@ export async function generateOfferNumber() {
 
 /**
  * Get legal text from admin-managed template system.
+ * Selects the appropriate language version based on client preferences.
  * Falls back to hardcoded text if no template is found.
  * 
  * @param {Object} spec - Specification with totals_json, state_json
  * @param {Object} project - Project record
  * @param {Object} client - Client record with profile
- * @returns {Promise<{text: string, templateId: string|null, termsVersion: string}>}
+ * @param {string} forceLang - Force specific language (optional, overrides client preference)
+ * @returns {Promise<{text: string, templateId: string|null, termsVersion: string, language: string}>}
  */
-export async function getLegalTextFromTemplate(spec, project, client) {
+export async function getLegalTextFromTemplate(spec, project, client, forceLang = null) {
   try {
     // 1. Get the appropriate template for this client/project
     const clientId = project?.client_id || client?.profile?.id || client?.id;
     const template = await getTemplateForClient(clientId, project?.id);
 
-    const templateText = template?.content?.text;
-    if (!template || !templateText) {
+    if (!template) {
       // Fallback to legacy hardcoded text
       return {
         text: getLegalTextFallback(spec),
         templateId: null,
         termsVersion: '1.0',
+        language: 'ru',
       };
     }
 
-    // 2. Resolve variables
+    // 2. Determine language: forceLang > client preference > default to 'en'
+    let lang = forceLang || client?.preferred_language || 'en';
+    if (lang === 'auto') lang = 'en'; // Default to English for auto
+
+    // 3. Select content based on language with fallback
+    let templateText = null;
+    let usedLang = lang;
+
+    if (lang === 'ru') {
+      templateText = template.content_ru?.text || template.content?.text;
+      if (!templateText) {
+        // Fallback to English
+        templateText = template.content_en?.text;
+        usedLang = 'en';
+      }
+    } else {
+      // English or any other
+      templateText = template.content_en?.text;
+      if (!templateText) {
+        // Fallback to Russian
+        templateText = template.content_ru?.text || template.content?.text;
+        usedLang = 'ru';
+      }
+    }
+
+    if (!templateText) {
+      // No content in either language, use hardcoded fallback
+      return {
+        text: getLegalTextFallback(spec),
+        templateId: null,
+        termsVersion: '1.0',
+        language: 'ru',
+      };
+    }
+
+    // 4. Resolve variables
     const variables = await getAvailableVariables();
     const resolvedVars = resolveVariables(spec, project, client, variables);
 
     // Override terms_version from template
     resolvedVars.terms_version = template.terms_version || '1.0';
 
-    // 3. Render template with variables
+    // 5. Render template with variables
     const text = renderTemplateContent(templateText, resolvedVars);
 
     return {
       text,
       templateId: template.id,
       termsVersion: template.terms_version || '1.0',
+      language: usedLang,
     };
   } catch (err) {
     console.error('Error rendering template, falling back to hardcoded:', err);
@@ -85,6 +123,7 @@ export async function getLegalTextFromTemplate(spec, project, client) {
       text: getLegalTextFallback(spec),
       templateId: null,
       termsVersion: '1.0',
+      language: 'ru',
     };
   }
 }

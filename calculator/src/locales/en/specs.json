@@ -1,0 +1,102 @@
+{
+  "title": "Specifications",
+  "subtitle": "View and manage your project specifications",
+  "noClient": "No client",
+  "status": {
+    "awaitingOffer": "Awaiting Offer",
+    "offerPending": "Offer Pending",
+    "other": "Other"
+  },
+  "filter": {
+    "allStatuses": "All Statuses",
+    "draft": "Draft",
+    "awaitingOffer": "Awaiting Offer",
+    "offerPending": "Offer Pending",
+    "accepted": "Accepted"
+  },
+  "table": {
+    "version": "Version"
+  },
+  "view": {
+    "header": "Specification",
+    "back": "Back",
+    "print": "Print / Export",
+    "tagline": "Boutique iGaming Production",
+    "visualStyle": "Visual Style",
+    "usageRights": "Usage Rights",
+    "multiplier": "Multiplier",
+    "workflow": "Production Workflow",
+    "stages": "{{count}} stages",
+    "afterStageApproval": "After stage approval",
+    "assetsServices": "Assets & Services",
+    "scrollTable": "Scroll table",
+    "tableItem": "Item",
+    "tableType": "Type",
+    "tableAnim": "Anim",
+    "tableQty": "Qty",
+    "tableTotal": "Total",
+    "base": "Base",
+    "ex": "Ex",
+    "artOnly": "Art Only",
+    "animOnly": "Anim Only",
+    "artAndAnim": "Art+Anim",
+    "extraRevisions": "Extra Revisions (+2.5%/round)",
+    "production": "Production",
+    "rights": "Rights",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "promo": "PROMO",
+    "paymentTerms": "Payment Terms",
+    "discountApplied": "{{percent}}% discount applied",
+    "flexibilityFee": "+{{percent}}% flexibility fee",
+    "paymentMethods": "Payment methods: Bank transfer, PayPal, Crypto (USDT/USDC)",
+    "validFor30Days": "This specification is valid for 30 days. Prices may vary based on final requirements.",
+    "fullPrepayment": "Full Prepayment",
+    "upfrontPayment": "Upfront Payment",
+    "beforeProjectStart": "Before project start",
+    "projectStart": "Project Start",
+    "noUpfrontRequired": "No upfront payment required"
+  },
+  "card": {
+    "draft": "Draft",
+    "finalized": "Finalized",
+    "addon": "Add-on",
+    "view": "View",
+    "edit": "Edit",
+    "locked": "Locked",
+    "finalizedOn": "Finalized {{date}}"
+  },
+  "page": {
+    "title": "Specifications",
+    "subtitle": "View all project specifications",
+    "loading": "Loading specifications...",
+    "loadError": "Failed to load specifications: {{error}}",
+    "backToProject": "Back to project",
+    "breadcrumbSpecs": "Specifications"
+  },
+  "detail": {
+    "loading": "Loading specification...",
+    "loadError": "Failed to load specification: {{error}}",
+    "notFound": "Specification not found",
+    "backToSpecs": "Back to specifications",
+    "viewOffer": "View Offer",
+    "finalize": "Finalize"
+  },
+  "emptyState": {
+    "title": "No specifications yet",
+    "subtitle": "Create your first specification in the calculator."
+  },
+  "modal": {
+    "deleteTitle": "Delete Specification?",
+    "deleteAbout": "You are about to delete",
+    "deleteOfferWarning": "This will also delete the associated offer!",
+    "deleteWarning": "This action cannot be undone. The specification and all related data will be permanently deleted.",
+    "finalizeTitle": "Finalize Specification?",
+    "finalizeAbout": "You are about to finalize",
+    "cannotUndo": "This action cannot be undone",
+    "finalizeWarning": "Once finalized, this specification cannot be edited. An offer will be automatically created for client approval.",
+    "finalizing": "Finalizing...",
+    "creatingOffer": "Creating Offer...",
+    "finalizeAndCreate": "Finalize & Create Offer"
+  }
+}

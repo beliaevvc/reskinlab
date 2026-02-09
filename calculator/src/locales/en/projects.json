@@ -1,0 +1,159 @@
+{
+  "title": "Projects",
+  "titleAll": "All Projects",
+  "titleMy": "My Projects",
+  "subtitle": "Manage your active projects",
+  "subtitleAll": "Manage all client projects and specifications",
+  "subtitleMy": "Manage your game art projects and specifications",
+  "create": {
+    "title": "Create New Project",
+    "name": "Project Name",
+    "namePlaceholder": "e.g., Aztec Gold Slot",
+    "description": "Description",
+    "descriptionPlaceholder": "Brief description of the project...",
+    "client": "Client",
+    "selectClient": "Select a client",
+    "loadingClients": "Loading clients...",
+    "submit": "Create Project",
+    "creating": "Creating...",
+    "optional": "optional"
+  },
+  "card": {
+    "stage": "Stage",
+    "tasks": "Tasks",
+    "progress": "Progress",
+    "lastUpdate": "Last updated",
+    "viewDetails": "View Details",
+    "open": "Open",
+    "rename": "Rename project",
+    "specs": "Specs",
+    "offers": "Offers",
+    "invoices": "Invoices"
+  },
+  "detail": {
+    "overview": "Overview",
+    "tasks": "Tasks",
+    "files": "Files",
+    "invoices": "Invoices",
+    "offers": "Offers",
+    "specifications": "Specifications",
+    "comments": "Comments",
+    "activity": "Activity",
+    "loading": "Loading project...",
+    "notFound": "Project not found",
+    "loadError": "Failed to load project"
+  },
+  "stages": {
+    "title": "Project Stage",
+    "change": "Change Stage",
+    "current": "Current Stage",
+    "next": "Next Stage",
+    "confirm": "Confirm Stage Change",
+    "warning": "This will notify the client about the stage change."
+  },
+  "tasks": {
+    "title": "Tasks",
+    "create": "Create Task",
+    "noTasks": "No tasks yet",
+    "addTask": "Add Task",
+    "taskCount": "{{count}} tasks",
+    "noTasksInColumn": "No tasks in this column"
+  },
+  "files": {
+    "title": "Project Files",
+    "upload": "Upload Files",
+    "noFiles": "No files uploaded yet"
+  },
+  "sidebar": {
+    "client": "Client",
+    "accountManager": "Account Manager",
+    "created": "Created",
+    "lastActivity": "Last Activity"
+  },
+  "kanban": {
+    "title": "Kanban Board",
+    "listView": "List View",
+    "boardView": "Board View"
+  },
+  "empty": {
+    "title": "No projects yet",
+    "titleStaff": "No projects found",
+    "subtitle": "Create your first project to get started",
+    "subtitleStaff": "No projects match the current filters.",
+    "clientSubtitle": "Create your first project to start building game art specifications.",
+    "createFirst": "Create First Project"
+  },
+  "filters": {
+    "all": "All Projects",
+    "active": "Active",
+    "completed": "Completed",
+    "myProjects": "My Projects",
+    "client": "Client",
+    "allClients": "All clients",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "clear": "Clear",
+    "cardView": "Card view",
+    "listView": "List view",
+    "tableView": "Table view",
+    "ofCount": "{{filtered}} of {{total}}"
+  },
+  "actions": {
+    "newProject": "New Project",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "deleteProject": "Delete Project",
+    "cancel": "Cancel",
+    "complete": "Complete",
+    "archive": "Archive",
+    "completeProject": "Complete Project",
+    "archiveProject": "Archive Project"
+  },
+  "delete": {
+    "title": "Delete Project",
+    "confirm": "Are you sure you want to delete",
+    "warning": "This will permanently remove all specifications, offers, invoices, and files."
+  },
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "in_production": "In Progress",
+    "completed": "Completed",
+    "archived": "Archived",
+    "pending_payment": "Pending Payment",
+    "on_hold": "On Hold",
+    "cancelled": "Cancelled"
+  },
+  "table": {
+    "project": "Project",
+    "client": "Client",
+    "status": "Status",
+    "specs": "Specs",
+    "offers": "Offers",
+    "invoices": "Invoices",
+    "tasks": "Tasks"
+  },
+  "resources": {
+    "add": "Add Resource",
+    "edit": "Edit Resource",
+    "remove": "Remove Resource",
+    "removeConfirm": "Are you sure you want to remove \"{{name}}\"?",
+    "url": "URL",
+    "service": "Service",
+    "title": "Title",
+    "titlePlaceholder": "Resource name",
+    "descPlaceholder": "Brief description"
+  },
+  "empty": {
+    "title": "No projects yet",
+    "titleStaff": "No projects found",
+    "subtitle": "Create your first project to get started",
+    "subtitleStaff": "No projects match the current filters.",
+    "clientSubtitle": "Create your first project to start building game art specifications.",
+    "createFirst": "Create First Project",
+    "noSpecs": "No specifications yet",
+    "noOffers": "No offers yet",
+    "noInvoices": "No invoices yet",
+    "noResources": "No resources yet"
+  }
+}

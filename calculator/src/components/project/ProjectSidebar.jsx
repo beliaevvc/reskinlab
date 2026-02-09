@@ -1,16 +1,10 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProjectLinks, useCreateProjectLink, useUpdateProjectLink, useDeleteProjectLink, useReorderProjectLinks, detectServiceType, SERVICE_CONFIG } from '../../hooks/useProjectLinks';
 import { Select } from '../Select';
-
-const TABS = [
-  { id: 'specs', label: 'Specs' },
-  { id: 'offers', label: 'Offers' },
-  { id: 'invoices', label: 'Invoices' },
-  { id: 'resources', label: 'Resources' },
-];
 
 // Service type options for the Select dropdown
 const SERVICE_TYPE_OPTIONS = [
@@ -34,9 +28,17 @@ export function ProjectSidebar({
   onInvoiceClick,
   onNewSpecification,
 }) {
+  const { t } = useTranslation('projects');
   const [activeTab, setActiveTab] = useState('specs');
   const { isAdmin, isAM } = useAuth();
   const isStaff = isAdmin || isAM;
+  
+  const TABS = [
+    { id: 'specs', label: t('card.specs') },
+    { id: 'offers', label: t('card.offers') },
+    { id: 'invoices', label: t('card.invoices') },
+    { id: 'resources', label: t('detail.files', { defaultValue: 'Resources' }) },
+  ];
 
   // Resources data
   const { data: resources = [] } = useProjectLinks(project?.id);
@@ -82,7 +84,7 @@ export function ProjectSidebar({
           text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 transition-all
           ${isCollapsed ? 'right-0' : 'right-[280px]'}
         `}
-        title={isCollapsed ? 'Open panel' : 'Close panel'}
+        title={isCollapsed ? t('common:openPanel', { defaultValue: 'Open panel' }) : t('common:closePanel', { defaultValue: 'Close panel' })}
       >
         <svg className={`w-3 h-3 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -131,13 +133,13 @@ export function ProjectSidebar({
                   onClick={onNewSpecification}
                   className="w-full py-2 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors font-medium"
                 >
-                  + New Specification
+                  + {t('detail.specifications', { defaultValue: 'New Specification' })}
                 </button>
               )}
               {specifications.length === 0 ? (
                 <EmptyState
                   icon="document"
-                  text="No specifications yet"
+                  text={t('empty.noSpecs', { defaultValue: 'No specifications yet' })}
                 />
               ) : (
                 specifications.map((spec) => (
@@ -156,7 +158,7 @@ export function ProjectSidebar({
           {activeTab === 'offers' && (
             <div className="p-3 space-y-2">
               {offers.length === 0 ? (
-                <EmptyState icon="offer" text="No offers yet" />
+                <EmptyState icon="offer" text={t('empty.noOffers', { defaultValue: 'No offers yet' })} />
               ) : (
                 offers.map((offer) => (
                   <OfferCard key={offer.id} offer={offer} onOfferClick={onOfferClick} />
@@ -169,7 +171,7 @@ export function ProjectSidebar({
           {activeTab === 'invoices' && (
             <div className="p-3 space-y-2">
               {invoices.length === 0 ? (
-                <EmptyState icon="invoice" text="No invoices yet" />
+                <EmptyState icon="invoice" text={t('empty.noInvoices', { defaultValue: 'No invoices yet' })} />
               ) : (
                 invoices.map((invoice) => (
                   <InvoiceRow key={invoice.id} invoice={invoice} onInvoiceClick={onInvoiceClick} />
@@ -212,6 +214,7 @@ export function ProjectSidebar({
 // --- Resources Tab ---
 
 function ResourcesTab({ projectId, resources, isStaff }) {
+  const { t } = useTranslation('projects');
   const [showModal, setShowModal] = useState(false);
   const [editingLink, setEditingLink] = useState(null);
   const [deletingLink, setDeletingLink] = useState(null);
@@ -273,7 +276,7 @@ function ResourcesTab({ projectId, resources, isStaff }) {
           onClick={handleAdd}
           className="w-full py-2 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors font-medium"
         >
-          + Add Resource
+          + {t('resources.add', { defaultValue: 'Add Resource' })}
         </button>
       )}
 
@@ -318,8 +321,8 @@ function ResourcesTab({ projectId, resources, isStaff }) {
       {/* Delete confirmation */}
       {deletingLink && (
         <DeleteConfirmModal
-          title="Remove Resource"
-          message={`Are you sure you want to remove "${deletingLink.title}"?`}
+          title={t('resources.remove', { defaultValue: 'Remove Resource' })}
+          message={t('resources.removeConfirm', { name: deletingLink.title, defaultValue: `Are you sure you want to remove "${deletingLink.title}"?` })}
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingLink(null)}
           isLoading={deleteLink.isPending}
@@ -430,6 +433,7 @@ function ServiceIcon({ type, url, size = 20 }) {
 }
 
 function ResourceCard({ link, isStaff, onEdit, onDelete, isDragging, onDragStart, onDragOver, onDragEnd, draggable }) {
+  const { t } = useTranslation('projects');
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -495,13 +499,13 @@ function ResourceCard({ link, isStaff, onEdit, onDelete, isDragging, onDragStart
                       onClick={(e) => { e.stopPropagation(); e.preventDefault(); onEdit(); setMenuOpen(false); }}
                       className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors"
                     >
-                      Edit
+                      {t('common:edit', { defaultValue: 'Edit' })}
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); e.preventDefault(); onDelete(); setMenuOpen(false); }}
                       className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors"
                     >
-                      Remove
+                      {t('common:remove', { defaultValue: 'Remove' })}
                     </button>
                   </div>
                 </>
@@ -530,6 +534,7 @@ function ResourceCard({ link, isStaff, onEdit, onDelete, isDragging, onDragStart
 // --- ResourceModal ---
 
 function ResourceModal({ projectId, link, onClose }) {
+  const { t } = useTranslation('projects');
   const isEditing = !!link;
   const createLink = useCreateProjectLink();
   const updateLink = useUpdateProjectLink();
@@ -594,13 +599,13 @@ function ResourceModal({ projectId, link, onClose }) {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full p-5">
         <h3 className="text-sm font-semibold text-neutral-900 mb-4">
-          {isEditing ? 'Edit Resource' : 'Add Resource'}
+          {isEditing ? t('resources.edit', { defaultValue: 'Edit Resource' }) : t('resources.add', { defaultValue: 'Add Resource' })}
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {/* URL */}
           <div>
-            <label className="block text-xs font-medium text-neutral-600 mb-1">URL</label>
+            <label className="block text-xs font-medium text-neutral-600 mb-1">{t('resources.url', { defaultValue: 'URL' })}</label>
             <input
               type="url"
               value={url}
@@ -617,7 +622,7 @@ function ResourceModal({ projectId, link, onClose }) {
 
           {/* Service type */}
           <div>
-            <label className="block text-xs font-medium text-neutral-600 mb-1">Service</label>
+            <label className="block text-xs font-medium text-neutral-600 mb-1">{t('resources.service', { defaultValue: 'Service' })}</label>
             <Select
               value={type}
               onChange={handleTypeChange}
@@ -627,12 +632,12 @@ function ResourceModal({ projectId, link, onClose }) {
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-medium text-neutral-600 mb-1">Title</label>
+            <label className="block text-xs font-medium text-neutral-600 mb-1">{t('resources.title', { defaultValue: 'Title' })}</label>
             <input
               type="text"
               value={title}
               onChange={(e) => { setTitle(e.target.value); setAutoDetected(false); }}
-              placeholder="Resource name"
+              placeholder={t('resources.titlePlaceholder', { defaultValue: 'Resource name' })}
               className="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
               required
             />
@@ -641,13 +646,13 @@ function ResourceModal({ projectId, link, onClose }) {
           {/* Description */}
           <div>
             <label className="block text-xs font-medium text-neutral-600 mb-1">
-              Description <span className="text-neutral-400 font-normal">(optional)</span>
+              {t('create.description')} <span className="text-neutral-400 font-normal">({t('create.optional')})</span>
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description"
+              placeholder={t('resources.descPlaceholder', { defaultValue: 'Brief description' })}
               className="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
             />
           </div>
@@ -659,14 +664,14 @@ function ResourceModal({ projectId, link, onClose }) {
               onClick={onClose}
               className="px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"
             >
-              Cancel
+              {t('actions.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSaving || !url.trim() || !title.trim()}
               className="px-4 py-2 text-xs font-medium bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSaving ? 'Saving...' : isEditing ? 'Save' : 'Add'}
+              {isSaving ? t('common:saving', { defaultValue: 'Saving...' }) : isEditing ? t('common:save', { defaultValue: 'Save' }) : t('common:add', { defaultValue: 'Add' })}
             </button>
           </div>
         </form>
@@ -679,6 +684,7 @@ function ResourceModal({ projectId, link, onClose }) {
 // --- Delete Confirm Modal ---
 
 function DeleteConfirmModal({ title, message, onConfirm, onCancel, isLoading }) {
+  const { t } = useTranslation('projects');
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
@@ -699,14 +705,14 @@ function DeleteConfirmModal({ title, message, onConfirm, onCancel, isLoading }) 
             onClick={onCancel}
             className="px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"
           >
-            Cancel
+            {t('actions.cancel')}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
             className="px-4 py-2 text-xs font-medium bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors disabled:opacity-50"
           >
-            {isLoading ? 'Removing...' : 'Remove'}
+            {isLoading ? t('common:removing', { defaultValue: 'Removing...' }) : t('common:remove', { defaultValue: 'Remove' })}
           </button>
         </div>
       </div>
@@ -718,6 +724,7 @@ function DeleteConfirmModal({ title, message, onConfirm, onCancel, isLoading }) 
 // --- Resources Empty State ---
 
 function ResourcesEmptyState({ isStaff, onAdd }) {
+  const { t } = useTranslation('projects');
   return (
     <div className="flex flex-col items-center py-8 text-neutral-300">
       <div className="flex items-center gap-2 mb-3">
@@ -730,13 +737,13 @@ function ResourcesEmptyState({ isStaff, onAdd }) {
       <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
       </svg>
-      <span className="text-xs">No resources yet</span>
+      <span className="text-xs">{t('empty.noResources', { defaultValue: 'No resources yet' })}</span>
       {isStaff && (
         <button
           onClick={onAdd}
           className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
         >
-          + Add Resource
+          + {t('resources.add', { defaultValue: 'Add Resource' })}
         </button>
       )}
     </div>

@@ -10,7 +10,7 @@ function useMinimumOrderSettings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('price_configs')
-        .select('name, value, description')
+        .select('name, value, description, config_data')
         .eq('category', 'Minimum Order');
 
       if (error) throw error;
@@ -20,10 +20,19 @@ function useMinimumOrderSettings() {
         settings[row.name] = row;
       });
 
+      // Get bilingual messages from config_data or fallback to description
+      const messageConfig = settings.min_order_message;
+      const configData = messageConfig?.config_data || {};
+      const messageRu = configData.message_ru || messageConfig?.description || '';
+      const messageEn = configData.message_en || messageConfig?.description || '';
+
       return {
         isEnabled: (settings.min_order_enabled?.value ?? 0) === 1,
         amount: settings.min_order_amount?.value ?? 0,
-        message: settings.min_order_message?.description || '',
+        messageRu,
+        messageEn,
+        // Legacy: keep message for backward compatibility
+        message: messageEn,
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes cache
@@ -56,7 +65,7 @@ export function useProjectHasPaidInvoices(projectId) {
  * Main hook: combines settings + project check
  *
  * @param {string|null} projectId - Current project ID
- * @returns {{ isEnabled, amount, message, isFirstOrder, isLoading, isBelowMinimum: function }}
+ * @returns {{ isEnabled, amount, message, messageRu, messageEn, getMessage, isFirstOrder, isLoading, isBelowMinimum: function }}
  */
 export function useMinimumOrder(projectId) {
   const {
@@ -71,12 +80,24 @@ export function useMinimumOrder(projectId) {
 
   const isEnabled = settings?.isEnabled ?? false;
   const amount = settings?.amount ?? 0;
-  const message = settings?.message || '';
+  const messageRu = settings?.messageRu || '';
+  const messageEn = settings?.messageEn || '';
+  // Legacy: default to English
+  const message = messageEn;
 
   // No project selected → treat as first order (conservative)
   const isFirstOrder = !projectId ? true : !hasPaidInvoices;
 
   const isLoading = settingsLoading || (!!projectId && invoicesLoading);
+
+  /**
+   * Get message by language code
+   * @param {string} lang - 'ru' or 'en'
+   */
+  const getMessage = (lang) => {
+    if (lang === 'ru') return messageRu || messageEn;
+    return messageEn || messageRu;
+  };
 
   /**
    * Check if a given grandTotal is below the minimum
@@ -91,6 +112,9 @@ export function useMinimumOrder(projectId) {
     isEnabled,
     amount,
     message,
+    messageRu,
+    messageEn,
+    getMessage,
     isFirstOrder,
     isLoading,
     isBelowMinimum,

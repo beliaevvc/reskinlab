@@ -1,0 +1,62 @@
+{
+  "upload": {
+    "clickToUpload": "Click to upload",
+    "orDragDrop": "or drag and drop",
+    "maxFiles": "Max {{count}} files, up to {{size}} each",
+    "filesSelected": "{{count}} file(s) selected",
+    "clearAll": "Clear all",
+    "uploading": "Uploading...",
+    "uploadFiles": "Upload {{count}} file(s)",
+    "fileTooLarge": "File \"{{name}}\" is too large. Max size is {{size}}"
+  },
+  "browser": {
+    "allFiles": "All Files",
+    "noFilesYet": "No files yet",
+    "uploadToStart": "Upload files to get started",
+    "failedToLoad": "Failed to load files",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "preview": "Preview",
+    "download": "Download"
+  },
+  "buckets": {
+    "references": "References",
+    "deliverables": "Deliverables",
+    "sources": "Sources",
+    "proofs": "Payment Proofs"
+  },
+  "preview": {
+    "close": "Close",
+    "download": "Download",
+    "delete": "Delete",
+    "previewNotAvailable": "Preview not available",
+    "deleteConfirm": "Are you sure you want to delete this file?",
+    "deleting": "Deleting..."
+  },
+  "card": {
+    "uploaded": "Uploaded",
+    "by": "by"
+  },
+  "gallery": {
+    "title": "Project Files",
+    "projectFiles": "Project Files",
+    "filesCount": "{{total}} files total • {{shown}} shown",
+    "searchPlaceholder": "Search files...",
+    "noFilesFound": "No files found",
+    "adjustFilters": "Try adjusting your filters",
+    "filesWillAppear": "Files uploaded to tasks will appear here",
+    "filter": {
+      "allTypes": "All Types",
+      "images": "Images",
+      "documents": "Documents",
+      "design": "Design Files",
+      "archives": "Archives",
+      "videos": "Videos"
+    },
+    "sort": {
+      "newest": "Newest First",
+      "name": "Name A-Z",
+      "largest": "Largest First"
+    }
+  }
+}

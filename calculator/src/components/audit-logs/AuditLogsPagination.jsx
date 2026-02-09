@@ -1,7 +1,11 @@
+import { useTranslation } from 'react-i18next';
+
 /**
  * AuditLogsPagination — classic pagination with page numbers
  */
 export function AuditLogsPagination({ currentPage, totalPages, totalCount, offset, limit, onPageChange }) {
+  const { t } = useTranslation('admin');
+
   if (totalPages <= 1) return null;
 
   // Generate page numbers to show
@@ -38,9 +42,9 @@ export function AuditLogsPagination({ currentPage, totalPages, totalCount, offse
   return (
     <div className="px-4 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p className="text-sm text-neutral-500">
-        Showing <span className="font-medium text-neutral-700">{offset + 1}</span> to{' '}
-        <span className="font-medium text-neutral-700">{Math.min(offset + limit, totalCount)}</span> of{' '}
-        <span className="font-medium text-neutral-700">{totalCount.toLocaleString()}</span> logs
+        {t('auditLog.pagination.showing')} <span className="font-medium text-neutral-700">{offset + 1}</span> {t('auditLog.pagination.to')}{' '}
+        <span className="font-medium text-neutral-700">{Math.min(offset + limit, totalCount)}</span> {t('auditLog.pagination.of')}{' '}
+        <span className="font-medium text-neutral-700">{totalCount.toLocaleString()}</span> {t('auditLog.pagination.logs')}
       </p>
 
       <div className="flex items-center gap-1">

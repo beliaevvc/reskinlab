@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 
 /**
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
  * Optionally restricts access to specific roles
  */
 export function ProtectedRoute({ allowedRoles }) {
+  const { t } = useTranslation('auth');
   const { isAuthenticated, profile, loading, profileLoaded, isConfigured } = useAuth();
   const location = useLocation();
 
@@ -16,7 +18,7 @@ export function ProtectedRoute({ allowedRoles }) {
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-          <p className="text-sm text-neutral-500">Loading...</p>
+          <p className="text-sm text-neutral-500">{t('protected.loading')}</p>
         </div>
       </div>
     );
@@ -60,7 +62,7 @@ export function ProtectedRoute({ allowedRoles }) {
         <div className="min-h-screen flex items-center justify-center bg-neutral-50">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-            <p className="text-sm text-neutral-500">Loading profile...</p>
+            <p className="text-sm text-neutral-500">{t('protected.loading')}</p>
           </div>
         </div>
       );

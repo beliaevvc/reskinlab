@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useInvoice, useSubmitPayment, useConfirmPayment, useRejectPayment } from '../../hooks/useInvoices';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatDate } from '../../lib/utils';
@@ -11,6 +12,7 @@ import { SpecificationModal } from './SpecificationModal';
 import { UserDetailModal } from '../admin/UserDetailModal';
 
 export function InvoiceModal({ isOpen, onClose, invoiceId }) {
+  const { t } = useTranslation('invoices');
   const { isAdmin, isStaff } = useAuth();
   const { data: invoice, isLoading, error, refetch } = useInvoice(isOpen ? invoiceId : null);
   const { mutate: submitPayment, isPending: isSubmitting, error: submitError } = useSubmitPayment();
@@ -30,11 +32,13 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   // Loading state
   if (isLoading) {
     return createPortal(
-      <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50">
+      <div 
+        className="flex items-center justify-center bg-black/50"
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 999999 }}>
         <div className="bg-white rounded-lg p-8">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-            <p className="text-sm text-neutral-500">Loading invoice...</p>
+            <p className="text-sm text-neutral-500">{t('detail.loading')}</p>
           </div>
         </div>
       </div>,
@@ -45,16 +49,18 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   // Error state
   if (error || !invoice) {
     return createPortal(
-      <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50">
+      <div 
+        className="flex items-center justify-center bg-black/50"
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 999999 }}>
         <div className="bg-white rounded-lg p-6 max-w-md">
           <div className="text-red-600 mb-4">
-            {error ? `Failed to load invoice: ${error.message}` : 'Invoice not found'}
+            {error ? t('detail.loadError', { error: error.message }) : t('detail.notFound')}
           </div>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-sm"
           >
-            Close
+            {t('modal.close')}
           </button>
         </div>
       </div>,
@@ -72,16 +78,18 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
   const isOfferAccepted = offer?.status === 'accepted';
 
   return createPortal(
-    <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+    <div 
+      className="flex items-center justify-center bg-black/50 p-4"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 999999 }}>
       <div className="bg-white rounded-lg w-full max-w-[720px] max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold text-neutral-900">
-              Invoice {invoice.number}
+              {t('table.invoice')} {invoice.number}
             </h2>
             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.bgClass} ${statusInfo.textClass}`}>
-              {statusInfo.label}
+              {t(`status.${isOverdue ? 'overdue' : invoice.status}`)}
             </span>
           </div>
           <button
@@ -102,7 +110,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
               <p className="text-neutral-600 font-medium">{invoice.milestone_name}</p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm">
                 <span className="text-neutral-500">
-                  Project: <Link to={`/projects/${project?.id}`} onClick={onClose} className="text-emerald-600 hover:text-emerald-700 hover:underline">{project?.name || 'Unknown'}</Link>
+                  {t('detail.project')}: <Link to={`/projects/${project?.id}`} onClick={onClose} className="text-emerald-600 hover:text-emerald-700 hover:underline">{project?.name || t('card.unknown')}</Link>
                 </span>
                 {offer && (
                   <span className="text-neutral-500">
@@ -117,19 +125,19 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
               </div>
               {canManagePayments && clientName && client?.profile?.id && (
                 <p className="text-sm text-neutral-500 mt-0.5">
-                  Client: <button onClick={() => setShowClientModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{clientName}</button>
+                  {t('detail.client')}: <button onClick={() => setShowClientModal(true)} className="text-emerald-600 hover:text-emerald-700 hover:underline">{clientName}</button>
                 </p>
               )}
               <div className="flex items-center gap-4 mt-3 text-sm text-neutral-500">
-                <span>Created {formatDate(invoice.created_at)}</span>
+                <span>{t('detail.created', { date: formatDate(invoice.created_at) })}</span>
                 {invoice.due_date && isPending && (
                   <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                    {isOverdue ? 'Overdue since' : 'Due'} {formatDate(invoice.due_date)}
+                    {isOverdue ? t('detail.overdueSince', { date: formatDate(invoice.due_date) }) : t('detail.due', { date: formatDate(invoice.due_date) })}
                   </span>
                 )}
                 {invoice.paid_at && (
                   <span className="text-emerald-600">
-                    Paid {formatDate(invoice.paid_at)}
+                    {t('detail.paid', { date: formatDate(invoice.paid_at) })}
                   </span>
                 )}
               </div>
@@ -151,9 +159,9 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-amber-800">Offer Not Accepted</h3>
+                  <h3 className="font-semibold text-amber-800">{t('modal.offerNotAccepted')}</h3>
                   <p className="text-amber-700 text-sm">
-                    Payment will be available after you accept the offer
+                    {t('modal.offerNotAcceptedDesc')}
                   </p>
                 </div>
               </div>
@@ -170,12 +178,12 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-amber-800">Payment Needs Correction</h3>
+                  <h3 className="font-semibold text-amber-800">{t('modal.paymentNeedsCorrection')}</h3>
                   <p className="text-amber-700 text-sm mt-1">
                     {invoice.rejection_reason}
                   </p>
                   <p className="text-amber-600 text-xs mt-2">
-                    Please review the comment above and submit payment again with the correct transaction hash.
+                    {t('modal.paymentNeedsCorrectionHint')}
                   </p>
                 </div>
               </div>
@@ -192,12 +200,12 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-neutral-800">Previous Rejection Comment</h3>
+                  <h3 className="font-semibold text-neutral-800">{t('modal.prevRejectionComment')}</h3>
                   <p className="text-neutral-700 text-sm mt-1">
                     {invoice.rejection_reason}
                   </p>
                   <p className="text-neutral-500 text-xs mt-2">
-                    This invoice was previously rejected and returned to pending. Client can see this comment and retry payment.
+                    {t('modal.prevRejectionHint')}
                   </p>
                 </div>
               </div>
@@ -219,9 +227,9 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-blue-800">Awaiting Confirmation</h3>
+                  <h3 className="font-semibold text-blue-800">{t('modal.awaitingConfirmation')}</h3>
                   <p className="text-blue-700 text-sm">
-                    Your payment is being verified
+                    {t('modal.paymentBeingVerified')}
                   </p>
                   {invoice.tx_hash && (
                     <p className="text-blue-600 text-xs mt-1 font-mono">
@@ -243,13 +251,13 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-blue-800">Payment Needs Confirmation</h3>
+                  <h3 className="font-semibold text-blue-800">{t('modal.paymentNeedsConfirmation')}</h3>
                   <p className="text-blue-700 text-sm mt-1">
-                    Client submitted payment proof. Please verify and confirm.
+                    {t('modal.clientSubmittedProof')}
                   </p>
                   {invoice.tx_hash && (
                     <div className="mt-2 p-2 bg-white rounded border border-blue-200">
-                      <p className="text-xs text-neutral-500 mb-1">Transaction Hash:</p>
+                      <p className="text-xs text-neutral-500 mb-1">{t('detail.transactionHash')}</p>
                       <p className="text-sm font-mono text-neutral-900 break-all">{invoice.tx_hash}</p>
                     </div>
                   )}
@@ -271,14 +279,14 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                     {isConfirming ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        Confirming...
+                        {t('modal.confirming')}
                       </>
                     ) : (
                       <>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        Confirm Payment
+                        {t('modal.confirmPayment')}
                       </>
                     )}
                   </button>
@@ -290,16 +298,16 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Reject
+                    {t('modal.reject')}
                   </button>
                 </div>
               ) : (
                 <div className="space-y-3 p-3 bg-white rounded-lg border border-blue-200">
-                  <p className="text-sm font-medium text-neutral-700">Return to Pending with comment:</p>
+                  <p className="text-sm font-medium text-neutral-700">{t('modal.returnToPendingWith')}</p>
                   <textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Enter reason for rejection (required). This comment will be visible to the client."
+                    placeholder={t('modal.rejectReasonPlaceholder')}
                     rows={3}
                     className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   />
@@ -316,7 +324,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                                 refetch();
                               },
                               onError: (error) => {
-                                alert(`Error: ${error.message}`);
+                                alert(t('modal.error', { error: error.message }));
                               }
                             }
                           );
@@ -325,7 +333,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                       disabled={isRejecting || !rejectReason.trim()}
                       className="flex-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-neutral-300 disabled:text-neutral-500 text-white text-sm font-medium rounded transition-colors"
                     >
-                      {isRejecting ? 'Returning...' : 'Return to Pending'}
+                      {isRejecting ? t('modal.returning') : t('modal.returnToPending')}
                     </button>
                     <button
                       onClick={() => {
@@ -335,7 +343,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                       disabled={isRejecting}
                       className="px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-sm font-medium rounded transition-colors"
                     >
-                      Cancel
+                      {t('modal.cancel')}
                     </button>
                   </div>
                 </div>
@@ -354,9 +362,9 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-emerald-800">Payment Confirmed</h3>
+                  <h3 className="font-semibold text-emerald-800">{t('detail.paymentConfirmed')}</h3>
                   <p className="text-emerald-700 text-sm">
-                    Paid on {formatDate(invoice.paid_at)}
+                    {t('modal.paidOn', { date: formatDate(invoice.paid_at) })}
                   </p>
                 </div>
               </div>
@@ -373,7 +381,7 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                   type="text"
                   value={txHash}
                   onChange={(e) => setTxHash(e.target.value)}
-                  placeholder="Enter transaction hash (0x... or TRX)"
+                  placeholder={t('modal.txHashPlaceholder')}
                   className="w-full px-3 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono text-sm"
                 />
               </div>
@@ -397,21 +405,21 @@ export function InvoiceModal({ isOpen, onClose, invoiceId }) {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                    Submitting...
+                    {t('modal.submitting')}
                   </>
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Confirm Payment
+                    {t('modal.confirmPayment')}
                   </>
                 )}
               </button>
             </div>
             {submitError && (
               <div className="mt-2 text-sm text-red-600">
-                Error: {submitError.message}
+                {t('modal.error', { error: submitError.message })}
               </div>
             )}
           </div>

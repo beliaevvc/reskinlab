@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import useCalculatorStore from '../../stores/calculatorStore';
 
 export function DraftStatusBadge({ isSaving, lastSaved }) {
+  const { t } = useTranslation('calculator');
   const {
     currentProjectId,
     currentSpecificationId,
@@ -13,7 +15,7 @@ export function DraftStatusBadge({ isSaving, lastSaved }) {
     return (
       <div className="flex items-center gap-1.5 text-xs text-neutral-500">
         <span className="w-2 h-2 rounded-full bg-neutral-300" />
-        <span>Not saved</span>
+        <span>{t('draftStatus.notSaved')}</span>
       </div>
     );
   }
@@ -23,7 +25,7 @@ export function DraftStatusBadge({ isSaving, lastSaved }) {
     return (
       <div className="flex items-center gap-1.5 text-xs text-amber-600">
         <div className="animate-spin rounded-full h-2 w-2 border-b border-amber-600" />
-        <span>Saving...</span>
+        <span>{t('draftStatus.saving')}</span>
       </div>
     );
   }
@@ -45,7 +47,7 @@ export function DraftStatusBadge({ isSaving, lastSaved }) {
             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
           />
         </svg>
-        <span>Finalized {currentSpecificationVersion}</span>
+        <span>{t('draftStatus.finalized')} {currentSpecificationVersion}</span>
       </div>
     );
   }
@@ -63,8 +65,8 @@ export function DraftStatusBadge({ isSaving, lastSaved }) {
       <div className="flex items-center gap-1.5 text-xs text-amber-600">
         <span className="w-2 h-2 rounded-full bg-amber-400" />
         <span>
-          Draft {currentSpecificationVersion}
-          {savedTime && ` • Saved ${savedTime}`}
+          {t('draftStatus.draft')} {currentSpecificationVersion}
+          {savedTime && ` • ${t('draftStatus.saved')} ${savedTime}`}
         </span>
       </div>
     );
@@ -74,7 +76,7 @@ export function DraftStatusBadge({ isSaving, lastSaved }) {
   return (
     <div className="flex items-center gap-1.5 text-xs text-neutral-500">
       <span className="w-2 h-2 rounded-full bg-blue-400" />
-      <span>New specification</span>
+      <span>{t('draftStatus.newSpecification')}</span>
     </div>
   );
 }

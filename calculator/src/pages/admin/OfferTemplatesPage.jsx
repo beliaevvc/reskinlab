@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import {
   useOfferTemplates,
   useCreateOfferTemplate,
@@ -14,7 +15,7 @@ import UserAvatar from '../../components/UserAvatar';
 // ============================================
 // Create Template Modal
 // ============================================
-function TemplateModal({ template, isOpen, onClose, onSave, isSaving }) {
+function TemplateModal({ template, isOpen, onClose, onSave, isSaving, t }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -34,7 +35,7 @@ function TemplateModal({ template, isOpen, onClose, onSave, isSaving }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
-      alert('Название обязательно');
+      alert(t('offerTemplates.modal.nameRequired'));
       return;
     }
     onSave(formData);
@@ -47,28 +48,28 @@ function TemplateModal({ template, isOpen, onClose, onSave, isSaving }) {
       <div className="relative bg-white rounded shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="px-6 py-4 border-b border-neutral-200">
           <h2 className="text-lg font-semibold text-neutral-900">
-            {template ? 'Редактировать шаблон' : 'Новый шаблон'}
+            {template ? t('offerTemplates.modal.editTitle') : t('offerTemplates.modal.newTitle')}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Название *</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('offerTemplates.form.nameRequired')}</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-              placeholder="Стандартная оферта"
+              placeholder={t('offerTemplates.form.namePlaceholder')}
               className="w-full px-4 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Описание</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('offerTemplates.form.description')}</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-              placeholder="Описание шаблона..."
+              placeholder={t('offerTemplates.form.descriptionPlaceholder')}
               rows={3}
               className="w-full px-4 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
             />
@@ -81,14 +82,14 @@ function TemplateModal({ template, isOpen, onClose, onSave, isSaving }) {
               disabled={isSaving}
               className="flex-1 px-4 py-2 border border-neutral-300 rounded text-neutral-700 font-medium hover:bg-neutral-50 disabled:opacity-50"
             >
-              Отмена
+              {t('offerTemplates.actions.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSaving}
               className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded disabled:opacity-50"
             >
-              {isSaving ? 'Сохранение...' : 'Сохранить'}
+              {isSaving ? t('offerTemplates.actions.saving') : t('offerTemplates.actions.save')}
             </button>
           </div>
         </form>
@@ -101,7 +102,7 @@ function TemplateModal({ template, isOpen, onClose, onSave, isSaving }) {
 // ============================================
 // Audience badge for table
 // ============================================
-function AudienceBadge({ template, assignments }) {
+function AudienceBadge({ template, assignments, t }) {
   const audienceType = template.audience_type || 'all';
 
   if (audienceType === 'all') {
@@ -110,7 +111,7 @@ function AudienceBadge({ template, assignments }) {
         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        Все
+        {t('offerTemplates.audience.all')}
       </span>
     );
   }
@@ -156,6 +157,7 @@ function AudienceBadge({ template, assignments }) {
 // Main Page
 // ============================================
 export function OfferTemplatesPage() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
@@ -178,7 +180,7 @@ export function OfferTemplatesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Удалить этот шаблон?'))
+    if (!confirm(t('offerTemplates.confirmDelete')))
       return;
     try {
       await deleteTemplate.mutateAsync(id);
@@ -230,9 +232,9 @@ export function OfferTemplatesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Шаблоны оферт</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('offerTemplates.title')}</h1>
           <p className="text-neutral-500 mt-1">
-            Управление шаблонами оферт с переменными и настройкой аудитории
+            {t('offerTemplates.subtitle')}
           </p>
         </div>
         <button
@@ -242,20 +244,20 @@ export function OfferTemplatesPage() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Новый шаблон
+          {t('offerTemplates.create')}
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Всего шаблонов</p>
+          <p className="text-sm text-neutral-500">{t('offerTemplates.stats.total')}</p>
           <p className="text-2xl font-bold text-neutral-900 mt-1">{templates?.length || 0}</p>
         </div>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Активный шаблон</p>
+          <p className="text-sm text-neutral-500">{t('offerTemplates.stats.active')}</p>
           <p className="text-2xl font-bold text-emerald-600 mt-1">
-            {activeTemplate ? activeTemplate.name : 'Не выбран'}
+            {activeTemplate ? activeTemplate.name : t('offerTemplates.stats.notSelected')}
           </p>
         </div>
         <div
@@ -265,7 +267,7 @@ export function OfferTemplatesPage() {
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
         >
-          <p className="text-sm text-neutral-500">Персональные назначения</p>
+          <p className="text-sm text-neutral-500">{t('offerTemplates.stats.personalAssignments')}</p>
           <p className="text-2xl font-bold text-amber-600 mt-1">{specificCount}</p>
         </div>
       </div>
@@ -278,7 +280,7 @@ export function OfferTemplatesPage() {
           </div>
         ) : templates?.length === 0 ? (
           <div className="text-center py-12 text-neutral-500">
-            Нет шаблонов оферт. Создайте первый шаблон.
+            {t('offerTemplates.noTemplatesYet')}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -286,22 +288,22 @@ export function OfferTemplatesPage() {
               <thead className="bg-neutral-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">
-                    Шаблон
+                    {t('offerTemplates.table.template')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">
-                    Аудитория
+                    {t('offerTemplates.table.audience')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">
-                    Версия
+                    {t('offerTemplates.table.version')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">
-                    Статус
+                    {t('offerTemplates.table.status')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">
-                    Создано
+                    {t('offerTemplates.table.created')}
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase">
-                    Действия
+                    {t('offerTemplates.table.actions')}
                   </th>
                 </tr>
               </thead>
@@ -323,7 +325,7 @@ export function OfferTemplatesPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <AudienceBadge template={tpl} assignments={assignments} />
+                      <AudienceBadge template={tpl} assignments={assignments} t={t} />
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs text-neutral-500">{tpl.terms_version}</span>
@@ -338,7 +340,7 @@ export function OfferTemplatesPage() {
                             : 'bg-neutral-100 text-neutral-500 hover:bg-emerald-50 hover:text-emerald-600 cursor-pointer'
                         }`}
                       >
-                        {tpl.is_active ? 'Активна' : 'Черновик'}
+                        {tpl.is_active ? t('offerTemplates.status.active') : t('offerTemplates.status.draft')}
                       </button>
                     </td>
                     <td className="px-4 py-3">
@@ -349,7 +351,7 @@ export function OfferTemplatesPage() {
                         {/* Duplicate */}
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDuplicate(tpl.id); }}
-                          title="Дублировать"
+                          title={t('offerTemplates.actions.duplicate')}
                           className="p-1.5 rounded hover:bg-neutral-100 text-neutral-400 hover:text-blue-600 transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -359,7 +361,7 @@ export function OfferTemplatesPage() {
                         {/* Delete */}
                         <button
                           onClick={(e) => { e.stopPropagation(); !tpl.is_active && handleDelete(tpl.id); }}
-                          title={tpl.is_active ? 'Нельзя удалить активный шаблон' : 'Удалить'}
+                          title={tpl.is_active ? t('offerTemplates.actions.cannotDeleteActive') : t('offerTemplates.actions.delete')}
                           disabled={tpl.is_active}
                           className={`p-1.5 rounded transition-colors ${
                             tpl.is_active
@@ -389,7 +391,7 @@ export function OfferTemplatesPage() {
                 <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <h2 className="text-sm font-semibold text-neutral-900">Персональные назначения</h2>
+                <h2 className="text-sm font-semibold text-neutral-900">{t('offerTemplates.assignments.title')}</h2>
                 <span className="text-xs text-neutral-400">({specificCount})</span>
               </div>
 
@@ -403,7 +405,7 @@ export function OfferTemplatesPage() {
                     type="text"
                     value={assignmentSearch}
                     onChange={(e) => setAssignmentSearch(e.target.value)}
-                    placeholder="Поиск..."
+                    placeholder={t('offerTemplates.assignments.search')}
                     className="pl-8 pr-3 py-1.5 text-xs border border-neutral-200 rounded-md focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 w-48"
                   />
                 </div>
@@ -414,7 +416,7 @@ export function OfferTemplatesPage() {
                   onChange={(e) => setAssignmentFilter(e.target.value)}
                   className="text-xs border border-neutral-200 rounded-md px-2 py-1.5 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
                 >
-                  <option value="all">Все шаблоны</option>
+                  <option value="all">{t('offerTemplates.assignments.allTemplates')}</option>
                   {templates?.filter((t) => t.audience_type === 'specific').map((t) => (
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
@@ -434,8 +436,8 @@ export function OfferTemplatesPage() {
               </svg>
               <p className="text-sm text-neutral-400">
                 {assignmentSearch
-                  ? 'Ничего не найдено'
-                  : 'Нет персональных назначений. Откройте шаблон → Настройки → «Для конкретных» чтобы назначить пользователей.'}
+                  ? t('offerTemplates.assignments.noResults')
+                  : t('offerTemplates.assignments.noAssignmentsHint')}
               </p>
             </div>
           ) : (
@@ -454,7 +456,7 @@ export function OfferTemplatesPage() {
                   {/* User info */}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-neutral-900 truncate">
-                      {a.client?.full_name || 'Без имени'}
+                      {a.client?.full_name || t('offerTemplates.assignments.noName')}
                     </p>
                     <p className="text-xs text-neutral-500 truncate">{a.client?.email}</p>
                   </div>
@@ -478,13 +480,13 @@ export function OfferTemplatesPage() {
                     onClick={() => a.template?.id && navigate(`/admin/offer-templates/${a.template.id}`)}
                     className="text-sm font-medium text-emerald-600 hover:text-emerald-700 truncate max-w-[200px] shrink-0"
                   >
-                    {a.template?.name || 'Неизвестный шаблон'}
+                    {a.template?.name || t('offerTemplates.assignments.unknownTemplate')}
                   </button>
 
                   {/* Active badge */}
                   {a.template?.is_active && (
                     <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-semibold rounded-full shrink-0">
-                      Активна
+                      {t('offerTemplates.status.active')}
                     </span>
                   )}
 
@@ -504,6 +506,7 @@ export function OfferTemplatesPage() {
         onClose={() => setShowModal(false)}
         onSave={handleCreate}
         isSaving={createTemplate.isPending}
+        t={t}
       />
     </div>
   );

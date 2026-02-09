@@ -1,0 +1,754 @@
+{
+  "dashboard": {
+    "title": "Панель администратора",
+    "subtitle": "Обзор системы и статистика",
+    "stats": {
+      "totalClients": "Всего клиентов",
+      "activeProjects": "Активных проектов",
+      "pendingInvoices": "Неоплаченных счетов",
+      "monthlyRevenue": "Доход за месяц",
+      "thisMonth": "За этот месяц",
+      "pendingRevenue": "Ожидаемый доход",
+      "pendingOffers": "Ожидающие оферты",
+      "completedProjects": "Завершённые проекты",
+      "activeClients": "Активные клиенты",
+      "draftProjects": "Черновики проектов"
+    },
+    "charts": {
+      "revenue": "Доход (6 месяцев)",
+      "projects": "Проекты (6 месяцев)"
+    },
+    "viewAll": "Смотреть все",
+    "loading": "Загрузка..."
+  },
+  "users": {
+    "title": "Пользователи",
+    "subtitle": "Управление аккаунтами, ролями и компаниями",
+    "create": "Создать пользователя",
+    "table": {
+      "name": "Имя",
+      "user": "Пользователь",
+      "email": "Email",
+      "role": "Роль",
+      "status": "Статус",
+      "lastLogin": "Последний вход",
+      "actions": "Действия",
+      "company": "Компания",
+      "projects": "Проекты",
+      "revenue": "Доход",
+      "joined": "Регистрация",
+      "contact": "Контакт",
+      "noName": "Без имени"
+    },
+    "roles": {
+      "client": "Клиент",
+      "am": "АМ",
+      "admin": "Админ",
+      "all": "Все"
+    },
+    "changeRole": "Изменить роль",
+    "deactivate": "Деактивировать",
+    "activate": "Активировать",
+    "stats": {
+      "total": "Всего пользователей",
+      "admins": "Администраторы",
+      "ams": "Аккаунт-менеджеры",
+      "clients": "Клиенты"
+    },
+    "search": "Поиск по имени, email или компании...",
+    "bulkActions": "Массовые действия:",
+    "selected": "Выбрано: {{count}}",
+    "changeRoleTo": "Изменить роль на...",
+    "clearSelection": "Снять выделение",
+    "confirmBulkRole": "Изменить роль на {{role}} для {{count}} пользователей?",
+    "viewDetails": "Подробнее",
+    "viewFinance": "Финансы",
+    "noUsersFound": "Пользователи не найдены"
+  },
+  "clients": {
+    "title": "Клиенты",
+    "subtitle": "Управление компаниями и аккаунтами клиентов",
+    "table": {
+      "name": "Имя",
+      "company": "Компания",
+      "contact": "Контакт",
+      "email": "Email",
+      "projects": "Проекты",
+      "joined": "Дата регистрации",
+      "accountManager": "Аккаунт-менеджер",
+      "actions": "Действия",
+      "noCompany": "Без компании",
+      "active": "{{count}} актив."
+    },
+    "assignAM": "Назначить менеджера",
+    "viewProfile": "Профиль",
+    "viewDetails": "Подробнее",
+    "stats": {
+      "total": "Всего клиентов",
+      "withActiveProjects": "С активными проектами",
+      "inactive": "Неактивные"
+    },
+    "search": "Поиск по названию компании или email...",
+    "noClientsFound": "Клиенты не найдены"
+  },
+  "pricing": {
+    "title": "Настройки цен",
+    "subtitle": "Управление ценами калькулятора",
+    "categories": "Категории",
+    "items": "Позиции",
+    "basePrice": "Базовая цена",
+    "complexity": "Сложность",
+    "dynamicPricing": "Динамическое ценообразование",
+    "save": "Сохранить изменения"
+  },
+  "promoCodes": {
+    "title": "Промокоды",
+    "subtitle": "Управление скидочными кодами для калькулятора",
+    "create": "Создать код",
+    "table": {
+      "code": "Код",
+      "discount": "Скидка",
+      "type": "Тип",
+      "uses": "Использований",
+      "usage": "Использование",
+      "maxUses": "Макс.",
+      "validUntil": "Действует до",
+      "expires": "Истекает",
+      "status": "Статус"
+    },
+    "types": {
+      "percent": "Процент",
+      "fixed": "Фиксированная сумма"
+    },
+    "form": {
+      "code": "Код",
+      "discountType": "Тип скидки",
+      "discountValue": "Размер скидки",
+      "maxUses": "Макс. использований",
+      "minOrder": "Мин. заказ",
+      "validFrom": "Действует с",
+      "validUntil": "Действует до",
+      "expiresAt": "Истекает",
+      "prefix": "Префикс:",
+      "generate": "Сгенерировать",
+      "value": "Значение",
+      "type": "Тип",
+      "noMinimum": "Без минимума",
+      "unlimited": "Без ограничений"
+    },
+    "status": {
+      "active": "Активен",
+      "inactive": "Неактивен"
+    },
+    "stats": {
+      "total": "Всего кодов",
+      "active": "Активных кодов"
+    },
+    "modal": {
+      "editTitle": "Редактировать промокод",
+      "newTitle": "Новый промокод",
+      "deleteTitle": "Удалить промокод?",
+      "deleteMessage": "Вы собираетесь удалить",
+      "cannotUndo": "Это действие нельзя отменить."
+    },
+    "actions": {
+      "save": "Сохранить изменения",
+      "createCode": "Создать код",
+      "saving": "Сохранение...",
+      "deleting": "Удаление...",
+      "cancel": "Отмена",
+      "delete": "Удалить",
+      "copied": "Скопировано!",
+      "clickToCopy": "Нажмите для копирования",
+      "deactivate": "Деактивировать",
+      "activate": "Активировать"
+    },
+    "never": "Никогда",
+    "noCodesYet": "Промокодов пока нет",
+    "min": "Мин.:"
+  },
+  "offerTemplates": {
+    "title": "Шаблоны оферт",
+    "subtitle": "Управление шаблонами оферт с переменными и настройкой аудитории",
+    "create": "Новый шаблон",
+    "table": {
+      "template": "Шаблон",
+      "audience": "Аудитория",
+      "version": "Версия",
+      "status": "Статус",
+      "created": "Создано",
+      "actions": "Действия",
+      "name": "Название",
+      "language": "Язык",
+      "lastUpdated": "Обновлён"
+    },
+    "editor": {
+      "title": "Редактирование шаблона",
+      "variables": "Переменные",
+      "preview": "Предпросмотр",
+      "blocks": "Блоки",
+      "edit": "Редактировать",
+      "save": "Сохранить",
+      "saving": "Сохранение...",
+      "saveChanges": "Сохранить *",
+      "saved": "Сохранено",
+      "setActive": "Сделать активным",
+      "settingsTitle": "Настройки шаблона",
+      "placeholder": "Начните писать оферту... Нажмите / чтобы вставить переменную",
+      "formatHints": {
+        "format": "Формат:",
+        "section": "секция",
+        "bullet": "буллет",
+        "subitem": "подпункт",
+        "label": "метка",
+        "variable": "переменная"
+      },
+      "previewModes": {
+        "variables": "Переменные",
+        "sampleData": "Пример данных",
+        "clientView": "Так увидит клиент",
+        "print": "Печать"
+      }
+    },
+    "form": {
+      "name": "Название",
+      "nameRequired": "Название *",
+      "description": "Описание",
+      "namePlaceholder": "Стандартная оферта",
+      "descriptionPlaceholder": "Описание шаблона..."
+    },
+    "stats": {
+      "total": "Всего шаблонов",
+      "active": "Активный шаблон",
+      "notSelected": "Не выбран",
+      "personalAssignments": "Персональные назначения"
+    },
+    "status": {
+      "active": "Активна",
+      "draft": "Черновик"
+    },
+    "audience": {
+      "all": "Все",
+      "personal": "Персональная"
+    },
+    "settingsModal": {
+      "title": "Настройки шаблона",
+      "descriptionSection": "Описание",
+      "descriptionLabel": "Описание",
+      "descriptionPlaceholder": "Краткое описание шаблона для внутреннего использования...",
+      "audienceSection": "Аудитория",
+      "forAll": "Для всех",
+      "forSpecific": "Для конкретных",
+      "forAllDesc": "Эта оферта будет использоваться для всех клиентов по умолчанию.",
+      "forSpecificDesc": "Выберите конкретных клиентов для этого шаблона",
+      "search": "Поиск по имени или email...",
+      "loadingUsers": "Загрузка пользователей...",
+      "allAssigned": "Все пользователи уже назначены",
+      "noResults": "Никого не найдено",
+      "assignedCount": "Назначено: {{count}}",
+      "remove": "Удалить",
+      "done": "Готово"
+    },
+    "modal": {
+      "editTitle": "Редактировать шаблон",
+      "newTitle": "Новый шаблон",
+      "nameRequired": "Название обязательно"
+    },
+    "actions": {
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "saving": "Сохранение...",
+      "duplicate": "Дублировать",
+      "delete": "Удалить",
+      "cannotDeleteActive": "Нельзя удалить активный шаблон"
+    },
+    "confirmDelete": "Удалить этот шаблон?",
+    "noTemplatesYet": "Нет шаблонов оферт. Создайте первый шаблон.",
+    "assignments": {
+      "title": "Персональные назначения",
+      "search": "Поиск...",
+      "allTemplates": "Все шаблоны",
+      "noName": "Без имени",
+      "unknownTemplate": "Неизвестный шаблон",
+      "noResults": "Ничего не найдено",
+      "noAssignmentsHint": "Нет персональных назначений. Откройте шаблон → Настройки → «Для конкретных» чтобы назначить пользователей."
+    }
+  },
+  "taskSettings": {
+    "title": "Настройки автоматического создания задач",
+    "subtitle": "Настройте параметры автоматического создания задач при подтверждении первой оплаты проекта",
+    "loading": "Загрузка настроек...",
+    "sections": {
+      "additionalTasks": {
+        "title": "Дополнительные автоматические задачи",
+        "subtitle": "Задачи, которые создаются автоматически при первой оплате (не из спецификации)"
+      },
+      "specTemplates": {
+        "title": "Шаблоны задач из спецификации",
+        "subtitle": "Настройте названия задач для каждого пункта спецификации калькулятора"
+      },
+      "specTasks": {
+        "title": "Задачи из спецификации"
+      }
+    },
+    "stages": {
+      "briefing": "Брифинг",
+      "moodboard": "Мудборд и концепция",
+      "symbols": "Дизайн символов",
+      "ui": "UI и раскладка",
+      "animation": "Производство анимации",
+      "revisions": "Правки",
+      "delivery": "Финальная сдача"
+    },
+    "form": {
+      "taskName": "Название задачи",
+      "taskNameRequired": "Название задачи *",
+      "projectStage": "Этап проекта",
+      "projectStageRequired": "Этап проекта *",
+      "taskDescription": "Описание задачи",
+      "taskDescriptionPlaceholder": "Описание задачи...",
+      "taskNamePlaceholder": "Например: Брифинг клиента",
+      "order": "Порядок создания",
+      "dueDays": "Дней до дедлайна",
+      "enabled": "Включено (задача будет создаваться автоматически)",
+      "separateAnimations": "Разделять анимации на отдельные задачи",
+      "titleRu": "Название (RU)",
+      "titleEn": "Название (EN)",
+      "titleRuPlaceholder": "Название задачи на русском...",
+      "titleEnPlaceholder": "Task name in English...",
+      "descriptionRu": "Описание (RU)",
+      "descriptionEn": "Описание (EN)",
+      "descriptionRuPlaceholder": "Описание задачи на русском...",
+      "descriptionEnPlaceholder": "Task description in English..."
+    },
+    "specForm": {
+      "specItem": "Пункт спецификации",
+      "titleRuHint": "Название (RU)",
+      "titleEnHint": "Title (EN)",
+      "titleRuPlaceholder": "Название задачи на русском...",
+      "titleEnPlaceholder": "Task name in English...",
+      "descriptionHint": "Описание задачи (используйте {qty} для количества)",
+      "descriptionPlaceholder": "Задача по созданию {item_name} в количестве {qty} шт.",
+      "descriptionRuHint": "Описание (RU) — используйте {qty}",
+      "descriptionEnHint": "Description (EN) — use {qty}",
+      "descriptionRuPlaceholder": "Задача по созданию {item_name} в количестве {qty} шт.",
+      "descriptionEnPlaceholder": "Task for creating {item_name} in quantity of {qty} pcs.",
+      "animationTitleHint": "Шаблон названия задачи с анимацией (используйте {item_name} и {anim_name})",
+      "animationTitlePlaceholder": "Анимация: {item_name} ({anim_name})",
+      "animationTitleRuHint": "Название анимации (RU)",
+      "animationTitleEnHint": "Animation title (EN)",
+      "animationTitleRuPlaceholder": "Анимация: {item_name} ({anim_name})",
+      "animationTitleEnPlaceholder": "Animation: {item_name} ({anim_name})",
+      "animationDescriptionHint": "Шаблон описания задачи с анимацией",
+      "animationDescriptionPlaceholder": "Задача по созданию анимации для {item_name}: {anim_name}",
+      "animationDescriptionRuHint": "Описание анимации (RU)",
+      "animationDescriptionEnHint": "Animation description (EN)",
+      "animationDescriptionRuPlaceholder": "Задача по созданию анимации для {item_name}: {anim_name}",
+      "animationDescriptionEnPlaceholder": "Animation task for {item_name}: {anim_name}",
+      "sortOrder": "Порядок создания (вес)",
+      "sortHint": "Меньше = выше приоритет. Briefing (шаблон) идёт первым."
+    },
+    "hints": {
+      "appliesToAll": "Применяется ко всем задачам из спецификации",
+      "separateAnimations": "Если включено, для каждого элемента с анимацией будет создана отдельная задача по анимации"
+    },
+    "labels": {
+      "order": "Порядок:",
+      "deadline": "Дедлайн:",
+      "animation": "Анимация:",
+      "days": "дней",
+      "default": "По умолчанию"
+    },
+    "status": {
+      "enabled": "Включено",
+      "disabled": "Отключено",
+      "noTemplate": "Нет шаблона"
+    },
+    "actions": {
+      "addTemplate": "+ Добавить шаблон",
+      "edit": "Изменить",
+      "delete": "Удалить",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "saving": "Сохранение...",
+      "create": "Создать",
+      "createTemplate": "Создать шаблон",
+      "done": "Готово",
+      "saveSettings": "Сохранить настройки"
+    },
+    "newTemplate": {
+      "title": "Новый шаблон задачи"
+    },
+    "noTemplates": "Нет шаблонов задач. Добавьте первый шаблон, нажав кнопку выше.",
+    "noTemplateLabel": "(без шаблона)",
+    "alerts": {
+      "saved": "Настройки успешно сохранены!",
+      "saveError": "Ошибка при сохранении настроек:",
+      "templateSaveError": "Ошибка при сохранении шаблона:",
+      "templateDeleteError": "Ошибка при удалении шаблона:"
+    },
+    "confirms": {
+      "deleteTemplate": "Вы уверены, что хотите удалить этот шаблон?"
+    },
+    "checklist": {
+      "title": "Чеклист для задачи",
+      "addItem": "+ Добавить пункт",
+      "emptyList": "Чеклист пуст. Добавьте первый пункт.",
+      "itemPlaceholder": "Название пункта чеклиста...",
+      "moveUp": "Переместить вверх",
+      "moveDown": "Переместить вниз",
+      "deleteItem": "Удалить пункт"
+    }
+  },
+  "wallets": {
+    "title": "Платёжные кошельки",
+    "subtitle": "Управление крипто-кошельками для оплаты счетов",
+    "create": "Добавить кошелёк",
+    "table": {
+      "currency": "Валюта",
+      "address": "Адрес",
+      "network": "Сеть",
+      "label": "Метка",
+      "active": "Активен",
+      "status": "Статус"
+    },
+    "stats": {
+      "total": "Всего кошельков",
+      "active": "Активных кошельков"
+    },
+    "modal": {
+      "editTitle": "Редактировать кошелёк",
+      "newTitle": "Добавить кошелёк",
+      "addressRequired": "Адрес кошелька обязателен"
+    },
+    "form": {
+      "currency": "Валюта",
+      "network": "Сеть",
+      "address": "Адрес кошелька",
+      "addressPlaceholder": "Введите адрес кошелька",
+      "label": "Метка (опционально)",
+      "labelPlaceholder": "напр., Основной USDT кошелёк",
+      "activeLabel": "Активен (показывать клиентам в счетах)"
+    },
+    "empty": {
+      "title": "Кошельки ещё не настроены",
+      "action": "Добавьте свой первый кошелёк"
+    },
+    "info": {
+      "title": "Как это работает",
+      "point1": "Активные кошельки показываются клиентам при просмотре реквизитов счёта",
+      "point2": "Клиенты могут выбирать из доступных сетей на основе активных кошельков",
+      "point3": "Неактивные кошельки скрыты от клиентов, но остаются в системе"
+    },
+    "actions": {
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "saving": "Сохранение...",
+      "delete": "Удалить кошелёк",
+      "confirmDelete": "Вы уверены, что хотите удалить этот кошелёк?",
+      "active": "Активен",
+      "inactive": "Неактивен"
+    }
+  },
+  "auditLog": {
+    "title": "Журнал действий",
+    "subtitle": "Отслеживайте все важные действия в системе",
+    "totalLogs": "{{count}} запись",
+    "totalLogs_plural": "{{count}} записей",
+    "viewMode": {
+      "table": "Таблица",
+      "timeline": "Хронология"
+    },
+    "filters": {
+      "action": "Действие",
+      "user": "Пользователь",
+      "entity": "Объект",
+      "dateRange": "Период",
+      "role": "Роль",
+      "entityType": "Тип объекта",
+      "from": "От",
+      "to": "До"
+    },
+    "table": {
+      "timestamp": "Время",
+      "user": "Пользователь",
+      "action": "Действие",
+      "entity": "Объект",
+      "details": "Детали",
+      "ip": "IP-адрес",
+      "role": "Роль",
+      "time": "Время"
+    },
+    "export": "Экспорт журнала",
+    "header": {
+      "humanMode": "Человечный",
+      "rawMode": "Технический",
+      "humanModeTitle": "Человечный режим",
+      "rawModeTitle": "Технический режим",
+      "live": "Авто",
+      "liveOn": "Авто (30с)",
+      "liveOff": "Авто ВЫКЛ",
+      "print": "Печать"
+    },
+    "stats": {
+      "last24h": "Последние 24 часа",
+      "last7d": "Последние 7 дней",
+      "last30d": "Последние 30 дней",
+      "todayVsAverage": "Сегодня vs Среднее",
+      "today": "сегодня",
+      "avg": "средн.",
+      "unusualActivity": "Обнаружена необычная активность"
+    },
+    "quickFilters": {
+      "title": "Быстрые фильтры",
+      "resetAll": "Сбросить всё",
+      "collapse": "Свернуть",
+      "expand": "Развернуть"
+    },
+    "presets": {
+      "today": "Сегодня",
+      "7days": "7 дней",
+      "30days": "30 дней",
+      "logins": "Входы",
+      "errors": "Ошибки",
+      "creates": "Создание",
+      "deletes": "Удаление",
+      "finance": "Финансы"
+    },
+    "roles": {
+      "all": "Все роли",
+      "admin": "Админ",
+      "am": "AM",
+      "client": "Клиент"
+    },
+    "options": {
+      "allUsers": "Все пользователи",
+      "allActions": "Все действия",
+      "allEntities": "Все объекты"
+    },
+    "charts": {
+      "showCharts": "Показать графики",
+      "hide": "Скрыть",
+      "analyticsTitle": "Аналитика (последние 7 дней)",
+      "activity30d": "Активность (30 дней)",
+      "topUsers": "Топ пользователей",
+      "actionDistribution": "Распределение действий",
+      "noData": "Нет данных"
+    },
+    "empty": {
+      "title": "Записи не найдены",
+      "subtitle": "Попробуйте изменить фильтры"
+    },
+    "unknown": "Неизвестно",
+    "pagination": {
+      "showing": "Показано",
+      "to": "–",
+      "of": "из",
+      "logs": "записей"
+    },
+    "timeline": {
+      "today": "Сегодня",
+      "yesterday": "Вчера",
+      "events": "событий",
+      "noEvents": "События не найдены",
+      "metadata": "Метаданные:"
+    },
+    "details": {
+      "noAdditional": "Нет дополнительных данных",
+      "changes": "Изменения",
+      "metadata": "Метаданные",
+      "ip": "IP:",
+      "browser": "Браузер:",
+      "copied": "Скопировано!",
+      "copyJson": "Копировать JSON"
+    }
+  },
+  "clientDetail": {
+    "title": "Данные клиента",
+    "noCompanyName": "Нет названия компании",
+    "contact": "Контакт:",
+    "phone": "Телефон:",
+    "totalProjects": "Всего проектов",
+    "totalRevenue": "Общий доход",
+    "memberSince": "Клиент с",
+    "linkedAccount": "Привязанный аккаунт",
+    "noName": "Без имени",
+    "projects": "Проекты",
+    "noProjects": "Проектов пока нет",
+    "clientNotFound": "Клиент не найден",
+    "view": "Открыть →",
+    "close": "Закрыть"
+  },
+  "roleModal": {
+    "title": "Изменить роль пользователя",
+    "note": "Изменение роли немедленно повлияет на права доступа пользователя.",
+    "cancel": "Отмена",
+    "saving": "Сохранение...",
+    "save": "Сохранить изменения",
+    "roles": {
+      "client": "Клиент",
+      "clientDesc": "Может создавать проекты, просматривать оферты, управлять аккаунтом",
+      "am": "Аккаунт-менеджер",
+      "amDesc": "Может управлять назначенными проектами, создавать поставки, обрабатывать согласования",
+      "admin": "Администратор",
+      "adminDesc": "Полный доступ ко всем функциям и настройкам"
+    }
+  },
+  "userDetail": {
+    "title": "Данные пользователя",
+    "noName": "Без имени",
+    "projects": "проектов",
+    "joined": "Регистрация",
+    "userNotFound": "Пользователь не найден",
+    "tabs": {
+      "profile": "Профиль",
+      "company": "Компания",
+      "projects": "Проекты",
+      "specs": "Спеки / Оферты",
+      "finance": "Финансы",
+      "activity": "Активность"
+    },
+    "profile": {
+      "fullName": "Полное имя",
+      "addName": "Добавить имя",
+      "email": "Email",
+      "phone": "Телефон",
+      "addPhone": "Добавить телефон",
+      "role": "Роль",
+      "status": "Статус",
+      "active": "Активен",
+      "blocked": "Заблокирован",
+      "joined": "Регистрация",
+      "lastLogin": "Последний вход",
+      "userId": "ID пользователя",
+      "copied": "Скопировано!",
+      "company": "Компания"
+    },
+    "company": {
+      "companyName": "Название компании",
+      "addCompanyName": "Добавить название компании",
+      "contactEmail": "Контактный email",
+      "phone": "Телефон",
+      "addPhone": "Добавить телефон",
+      "country": "Страна",
+      "addCountry": "Добавить страну",
+      "address": "Адрес",
+      "addAddress": "Добавить адрес",
+      "notes": "Заметки",
+      "noCompany": "Компания не привязана к этому пользователю"
+    },
+    "projectsTab": {
+      "noProjects": "Проекты не найдены",
+      "created": "Создан",
+      "specs": "спеков",
+      "paid": "оплачено",
+      "pending": "ожидает",
+      "invoices": "счетов",
+      "deleteProject": "Удалить проект?"
+    },
+    "specsTab": {
+      "title": "Спецификации и оферты",
+      "specs": "спек",
+      "offers": "оферта",
+      "noSpecs": "Спецификаций пока нет"
+    },
+    "finance": {
+      "revenue": "Доход",
+      "paidInvoices": "оплаченных счетов",
+      "pending": "Ожидает",
+      "pendingInvoices": "ожидающих счетов",
+      "lifetimeValue": "Общая ценность клиента",
+      "invoices": "Счета",
+      "total": "всего",
+      "noInvoices": "Счетов пока нет",
+      "paid": "оплачено"
+    },
+    "activity": {
+      "noActivity": "Активность не зафиксирована"
+    },
+    "delete": "Удалить",
+    "deleting": "Удаление...",
+    "cancel": "Отмена"
+  },
+  "pricing": {
+    "title": "Настройки калькулятора",
+    "subtitle": "Управление ценами, коэффициентами и конфигурацией",
+    "stats": {
+      "settings": "настроек",
+      "prices": "цен",
+      "coefficients": "коэффициентов"
+    },
+    "search": "Поиск настроек...",
+    "loading": "Загрузка настроек...",
+    "noConfigs": "Конфигурации цен не найдены",
+    "noConfigsHint": "Запустите миграцию для заполнения настроек калькулятора",
+    "tryDifferentSearch": "Попробуйте другой поисковый запрос",
+    "selectCategory": "Выберите категорию из боковой панели",
+    "categories": {
+      "minimumOrder": "Минимальный заказ",
+      "conceptDocument": "Концепт-документ",
+      "symbols": "Символы",
+      "backgrounds": "Фоны",
+      "popups": "Поп-апы",
+      "uiMenus": "UI меню",
+      "marketing": "Маркетинг",
+      "styles": "Стили",
+      "animations": "Анимации",
+      "usageRights": "Права использования",
+      "payment": "Оплата",
+      "revisions": "Ревизии",
+      "urgency": "Срочность",
+      "volumeDiscounts": "Скидки за объём",
+      "global": "Глобальные"
+    },
+    "types": {
+      "basePrice": "Базовая цена",
+      "coefficient": "Коэффициент",
+      "percent": "Процент",
+      "setting": "Настройка",
+      "complexity": "Сложность",
+      "surcharge": "Надбавка"
+    },
+    "table": {
+      "name": "Название",
+      "value": "Значение"
+    },
+    "modal": {
+      "current": "Текущее:",
+      "displayName": "Отображаемое имя",
+      "displayNameHint": "(показывается в калькуляторе)",
+      "value": "Значение",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "saving": "Сохранение..."
+    },
+    "minimumOrder": {
+      "title": "Минимальный заказ",
+      "subtitle": "Минимальная сумма первого заказа",
+      "active": "Активно",
+      "disabled": "Отключено",
+      "enable": "Включить минимальный заказ",
+      "enableHint": "Первый заказ в каждом проекте должен соответствовать минимуму",
+      "amount": "Минимальная сумма",
+      "amountHint": "Применяется только к первому заказу (до оплаченных счетов)",
+      "messages": "Сообщения клиенту",
+      "messageEn": "Английское сообщение",
+      "messageRu": "Русское сообщение",
+      "messagePlaceholderEn": "напр. Minimum order amount is $1,000 for your first order",
+      "messagePlaceholderRu": "напр. Минимальная сумма заказа — $1,000 для первого заказа",
+      "preview": "Предпросмотр",
+      "previewEn": "Английский",
+      "previewRu": "Русский"
+    },
+    "statsLabel": {
+      "price": "цена",
+      "prices": "цен",
+      "coefficient": "коэффициент",
+      "coefficients": "коэффициентов",
+      "percent": "процент",
+      "percents": "процентов",
+      "setting": "настройка",
+      "settings": "настроек"
+    }
+  }
+}

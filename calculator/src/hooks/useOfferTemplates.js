@@ -126,6 +126,8 @@ export function useCreateOfferTemplate() {
           description: description || null,
           is_active: false,
           content: { text: '' },
+          content_ru: { text: '' },
+          content_en: { text: '' },
         })
         .select()
         .single();
@@ -261,6 +263,8 @@ export function useDuplicateTemplate() {
           terms_version: source.terms_version,
           validity_days: source.validity_days,
           content: source.content || { text: '' },
+          content_ru: source.content_ru || { text: '' },
+          content_en: source.content_en || { text: '' },
         })
         .select()
         .single();

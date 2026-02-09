@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useCreateProject } from '../../hooks/useProjects';
 import { useClients } from '../../hooks/useClients';
 import { Select } from '../Select';
 
 export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false }) {
+  const { t } = useTranslation('projects');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedClientId, setSelectedClientId] = useState('');
@@ -55,7 +57,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-neutral-900">
-            Create New Project
+            {t('create.title')}
           </h2>
           <button
             onClick={onClose}
@@ -83,7 +85,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
           {createProject.error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded">
               <p className="text-sm text-red-800">
-                {createProject.error.message || 'Failed to create project'}
+                {createProject.error.message || t('create.failed', { defaultValue: 'Failed to create project' })}
               </p>
             </div>
           )}
@@ -92,14 +94,14 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
           {isStaff && (
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                Client <span className="text-red-500">*</span>
+                {t('create.client')} <span className="text-red-500">*</span>
               </label>
               <Select
                 value={selectedClientId}
                 onChange={setSelectedClientId}
                 disabled={clientsLoading}
                 options={[
-                  { value: '', label: clientsLoading ? 'Loading clients...' : 'Select a client' },
+                  { value: '', label: clientsLoading ? t('create.loadingClients') : t('create.selectClient') },
                   ...(clients || []).map((c) => ({
                     value: c.id,
                     label: c.user?.full_name || c.user?.email || c.company_name || c.id,
@@ -115,14 +117,14 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
               htmlFor="projectName"
               className="block text-sm font-medium text-neutral-700 mb-1.5"
             >
-              Project Name <span className="text-red-500">*</span>
+              {t('create.name')} <span className="text-red-500">*</span>
             </label>
             <input
               id="projectName"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Aztec Gold Slot"
+              placeholder={t('create.namePlaceholder')}
               required
               autoFocus
               className="w-full px-4 py-2.5 rounded border border-neutral-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
@@ -135,13 +137,13 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
               htmlFor="projectDescription"
               className="block text-sm font-medium text-neutral-700 mb-1.5"
             >
-              Description <span className="text-neutral-400">(optional)</span>
+              {t('create.description')} <span className="text-neutral-400">({t('create.optional')})</span>
             </label>
             <textarea
               id="projectDescription"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the project..."
+              placeholder={t('create.descriptionPlaceholder')}
               rows={3}
               className="w-full px-4 py-2.5 rounded border border-neutral-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors resize-none"
             />
@@ -154,7 +156,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
               onClick={onClose}
               className="flex-1 px-4 py-2.5 rounded border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors"
             >
-              Cancel
+              {t('actions.cancel')}
             </button>
             <button
               type="submit"
@@ -164,10 +166,10 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess, isStaff = false
               {createProject.isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Creating...
+                  {t('create.creating')}
                 </>
               ) : (
-                'Create Project'
+                t('create.submit')
               )}
             </button>
           </div>

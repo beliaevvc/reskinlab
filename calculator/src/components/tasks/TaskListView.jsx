@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TASK_STATUSES, useUpdateTaskStatus, useReorderTask } from '../../hooks/useTasks';
 import { TaskListSection } from './TaskListSection';
 
@@ -7,6 +8,7 @@ const SCROLL_SPEED = 10;
 const COLLAPSED_SECTIONS_KEY = 'task-list-collapsed-sections';
 
 export function TaskListView({ tasks, projectId, onTaskClick, canDrag = true, canToggleComplete = false, canEdit = false }) {
+  const { t } = useTranslation('tasks');
   const [draggedTask, setDraggedTask] = useState(null);
   const [dragOverSection, setDragOverSection] = useState(null);
   const [dropIndicator, setDropIndicator] = useState({ statusId: null, index: null });
@@ -193,7 +195,7 @@ export function TaskListView({ tasks, projectId, onTaskClick, canDrag = true, ca
         <TaskListSection
           key={status.id}
           statusId={status.id}
-          label={status.label}
+          label={t(`status.${status.id}`)}
           tasks={tasksByStatus[status.id]}
           isCollapsed={!!collapsedSections[status.id]}
           onToggleCollapse={() => handleToggleCollapse(status.id)}

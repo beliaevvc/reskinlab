@@ -1,0 +1,113 @@
+{
+  "title": "Tasks",
+  "create": {
+    "title": "Create New Task",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Task title",
+    "description": "Description",
+    "descriptionPlaceholder": "Task description (optional)",
+    "stage": "Stage",
+    "noStage": "No stage",
+    "dueDate": "Due Date",
+    "creating": "Creating...",
+    "submit": "Create Task"
+  },
+  "detail": {
+    "loading": "Loading task...",
+    "notFound": "Task not found",
+    "description": "Description",
+    "addDescription": "Add a description...",
+    "noDescription": "No description",
+    "comments": "Comments",
+    "noComments": "No comments yet",
+    "addComment": "Add a comment...",
+    "reply": "Reply",
+    "replyingTo": "Replying to",
+    "cancelReply": "Cancel reply",
+    "checklist": "Checklist",
+    "files": "Files",
+    "activity": "Activity",
+    "linkedSpec": "Linked Specification",
+    "linkedOffer": "Linked Offer",
+    "viewSpec": "View Spec",
+    "viewOffer": "View Offer",
+    "deadline": "Deadline",
+    "setDeadline": "Set deadline",
+    "editDeadline": "Edit deadline",
+    "clearDeadline": "Clear",
+    "overdue": "Overdue",
+    "assignee": "Assignee",
+    "noAssignee": "Unassigned",
+    "stage": "Stage",
+    "deleteConfirm": "Are you sure you want to delete this task?",
+    "deleteTask": "Delete Task"
+  },
+  "status": {
+    "backlog": "Backlog",
+    "todo": "To Do",
+    "in_progress": "In Progress",
+    "review": "Review",
+    "done": "Done"
+  },
+  "card": {
+    "noTitle": "Untitled task",
+    "commentsCount": "{{count}} comment",
+    "commentsCount_other": "{{count}} comments",
+    "checklistProgress": "{{done}}/{{total}}",
+    "filesCount": "{{count}} file",
+    "filesCount_other": "{{count}} files"
+  },
+  "kanban": {
+    "addTask": "Add task",
+    "noTasks": "No tasks"
+  },
+  "list": {
+    "title": "Task",
+    "status": "Status",
+    "deadline": "Deadline",
+    "assignee": "Assignee",
+    "noDeadline": "No deadline"
+  },
+  "checklist": {
+    "title": "Checklist",
+    "addItem": "Add item",
+    "itemPlaceholder": "Enter item name...",
+    "progress": "{{done}} of {{total}} completed",
+    "deleteConfirm": "Delete this checklist item?",
+    "deleteItem": "Delete item",
+    "empty": "Checklist is empty. Add first item.",
+    "hide": "Hide checklist",
+    "show": "Show checklist"
+  },
+  "deadline": {
+    "date": "Date",
+    "datetime": "Date & time",
+    "range": "Range",
+    "quickSelect": "Quick select:",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "nextWeek": "In a week",
+    "nextMonth": "In a month",
+    "start": "Start",
+    "end": "End",
+    "time": "Time",
+    "inDays": "In {{count}} days",
+    "inWeeks": "In {{count}} weeks",
+    "clickToSet": "Click to set deadline",
+    "notSet": "Deadline not set"
+  },
+  "files": {
+    "title": "Files",
+    "upload": "Upload files",
+    "noFiles": "No files attached",
+    "dropHere": "Drop files here"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "markComplete": "Mark complete",
+    "markIncomplete": "Mark incomplete"
+  }
+}

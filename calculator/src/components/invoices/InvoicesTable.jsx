@@ -1,11 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 import { getInvoiceStatusInfo, formatInvoiceAmount, isInvoiceOverdue } from '../../lib/invoiceUtils';
 
 export function InvoicesTable({ invoices, onInvoiceClick, showClient = false }) {
+  const { t } = useTranslation('invoices');
+  
   if (!invoices || invoices.length === 0) {
     return (
       <div className="text-center py-8 text-neutral-500">
-        No invoices
+        {t('table.noInvoices')}
       </div>
     );
   }
@@ -16,27 +19,27 @@ export function InvoicesTable({ invoices, onInvoiceClick, showClient = false }) 
         <thead>
           <tr className="border-b border-neutral-200">
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Invoice
+              {t('table.invoice')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Project / Milestone
+              {t('table.projectMilestone')}
             </th>
             {showClient && (
               <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                Client
+                {t('table.client')}
               </th>
             )}
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Offer / Spec
+              {t('table.offerSpec')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Status
+              {t('table.status')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Date
+              {t('table.date')}
             </th>
             <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
-              Amount
+              {t('table.amount')}
             </th>
           </tr>
         </thead>
@@ -63,7 +66,7 @@ export function InvoicesTable({ invoices, onInvoiceClick, showClient = false }) 
 
                 {/* Project / Milestone */}
                 <td className="px-4 py-3">
-                  <div className="text-sm text-neutral-900">{project?.name || 'Unknown'}</div>
+                  <div className="text-sm text-neutral-900">{project?.name || t('card.unknown')}</div>
                   <div className="text-xs text-neutral-500">{invoice.milestone_name}</div>
                 </td>
 
@@ -109,7 +112,7 @@ export function InvoicesTable({ invoices, onInvoiceClick, showClient = false }) 
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01" />
                       </svg>
                     )}
-                    {statusInfo.label}
+                    {t(`status.${isOverdue ? 'overdue' : invoice.status}`)}
                   </span>
                 </td>
 

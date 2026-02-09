@@ -1,6 +1,26 @@
 # Tasks
 
 ## Recent Task
+**Bilingual Localization (EN/RU)** — ARCHIVED ✅
+
+### Complexity: Level 3
+### Date: 2026-02-10
+
+### Summary
+Комплексная двуязычная локализация приложения ReSkin Lab:
+- Локализация UI компонентов (react-i18next)
+- Билингвальные данные в БД (title_en/title_ru, description_en/description_ru)
+- Переключатель языка в публичном калькуляторе
+- Документация по локализации для будущих задач
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-bilingual-localization.md`
+- **Reflection:** `memory-bank/reflection/reflection-bilingual-localization.md`
+- **Guide:** `memory-bank/localization-guide.md`
+
+---
+
+## Recent Task
 **Calculator Settings (PricingPage) Redesign v2** — ARCHIVED ✅
 
 ### Complexity: Level 2

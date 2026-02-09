@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from '../../lib/utils';
 
 // ─── Icon map by notification type ──────────────────────────────────
@@ -135,6 +136,7 @@ function StatusBadge({ status }) {
 // ─── Structured content renderer ────────────────────────────────────
 // Uses metadata to render rich styled notifications instead of flat text.
 function RichContent({ notification }) {
+  const { t } = useTranslation('notifications');
   const { type, metadata, body } = notification;
   const m = metadata || {};
 
@@ -143,9 +145,9 @@ function RichContent({ notification }) {
       return (
         <>
           <p className="text-sm leading-snug text-neutral-700">
-            <span className="font-semibold text-neutral-900">{m.author_name || 'Someone'}</span>
-            {' commented on '}
-            <span className="font-medium text-neutral-800">{m.task_title || 'a task'}</span>
+            <span className="font-semibold text-neutral-900">{m.author_name || t('types.comment.someone')}</span>
+            {' '}{t('types.comment.commentedOn')}{' '}
+            <span className="font-medium text-neutral-800">{m.task_title || t('types.comment.aTask')}</span>
           </p>
           {body && (
             <p className="text-xs text-neutral-500 mt-0.5 truncate italic">
@@ -159,8 +161,8 @@ function RichContent({ notification }) {
       return (
         <>
           <p className="text-sm leading-snug text-neutral-700">
-            <span className="font-medium text-neutral-800">{m.task_title || 'Task'}</span>
-            {' moved to '}
+            <span className="font-medium text-neutral-800">{m.task_title || t('common:task')}</span>
+            {' '}{t('types.task_status_change.movedTo')}{' '}
             <StatusBadge status={m.new_status} />
           </p>
           {m.project_name && (
@@ -172,17 +174,17 @@ function RichContent({ notification }) {
     case 'offer_created':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'New offer '}
+          {t('types.offer_created.newOffer')}{' '}
           {m.offer_number && <span className="font-mono text-xs text-neutral-500">#{m.offer_number}</span>}
-          {' for '}
-          <span className="font-medium text-neutral-800">{m.project_name || 'project'}</span>
+          {' '}{t('types.offer_created.for')}{' '}
+          <span className="font-medium text-neutral-800">{m.project_name || t('types.offer_created.project')}</span>
         </p>
       );
 
     case 'offer_accepted':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'Offer '}
+          {t('types.offer_accepted.offer')}{' '}
           {m.offer_number && <span className="font-mono text-xs text-neutral-500">#{m.offer_number}</span>}
           {' '}
           <StatusBadge status="accepted" />
@@ -195,7 +197,7 @@ function RichContent({ notification }) {
     case 'offer_cancelled':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'Offer '}
+          {t('types.offer_cancelled.offer')}{' '}
           {m.offer_number && <span className="font-mono text-xs text-neutral-500">#{m.offer_number}</span>}
           {' '}
           <StatusBadge status="cancelled" />
@@ -208,7 +210,7 @@ function RichContent({ notification }) {
     case 'invoice_created':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'New invoice '}
+          {t('types.invoice_created.newInvoice')}{' '}
           {m.invoice_number && <span className="font-mono text-xs text-neutral-500">#{m.invoice_number}</span>}
           {m.amount && <span className="font-semibold text-neutral-900"> ${m.amount}</span>}
           {m.project_name && (
@@ -220,7 +222,7 @@ function RichContent({ notification }) {
     case 'payment_received':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'Payment submitted for '}
+          {t('types.payment_received.paymentSubmitted')}{' '}
           {m.invoice_number && <span className="font-mono text-xs text-neutral-500">#{m.invoice_number}</span>}
           {m.amount && <span className="font-semibold text-neutral-900"> ${m.amount}</span>}
           {m.project_name && (
@@ -232,9 +234,9 @@ function RichContent({ notification }) {
     case 'payment_confirmed':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'Payment '}
+          {t('types.payment_confirmed.payment')}{' '}
           <StatusBadge status="paid" />
-          {' for '}
+          {' '}{t('types.payment_confirmed.for')}{' '}
           {m.invoice_number && <span className="font-mono text-xs text-neutral-500">#{m.invoice_number}</span>}
           {m.amount && <span className="font-semibold text-neutral-900"> ${m.amount}</span>}
         </p>
@@ -243,10 +245,10 @@ function RichContent({ notification }) {
     case 'project_created':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'New project '}
+          {t('types.project_created.newProject')}{' '}
           <span className="font-medium text-neutral-800">{m.project_name || notification.title}</span>
           {m.client_name && (
-            <span className="text-neutral-500"> by {m.client_name}</span>
+            <span className="text-neutral-500"> {t('types.project_created.by')} {m.client_name}</span>
           )}
         </p>
       );
@@ -255,9 +257,8 @@ function RichContent({ notification }) {
       return (
         <>
           <p className="text-sm leading-snug text-neutral-700">
-            <span className="font-medium text-neutral-800">{m.project_name || 'Project'}</span>
-            {' status → '}
-            <StatusBadge status={m.new_status} />
+            <span className="font-medium text-neutral-800">{m.project_name || t('common:labels.project')}</span>
+            {' '}{t('types.project_status_change.status')} → <StatusBadge status={m.new_status} />
           </p>
         </>
       );
@@ -275,18 +276,18 @@ function RichContent({ notification }) {
             <p className="text-sm leading-snug text-neutral-700">
               {stagesCount > 1 ? (
                 <>
-                  {isActivated ? 'Activated stages up to ' : 'Deactivated stages from '}
+                  {isActivated ? t('types.stage_change.activatedStagesUpTo') : t('types.stage_change.deactivatedStagesFrom')}{' '}
                   <span className="font-semibold text-neutral-900">{m.target_stage_name}</span>
                 </>
               ) : (
                 <>
-                  {'Stage '}
+                  {t('types.stage_change.stage')}{' '}
                   <span className="font-semibold text-neutral-900">{m.target_stage_name}</span>
-                  {isActivated ? ' ' : ' '}
+                  {' '}
                   <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-semibold rounded ${
                     isActivated ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'
                   }`}>
-                    {isActivated ? 'activated' : 'deactivated'}
+                    {isActivated ? t('types.stage_change.activated') : t('types.stage_change.deactivated')}
                   </span>
                 </>
               )}
@@ -307,7 +308,7 @@ function RichContent({ notification }) {
       return (
         <>
           <p className="text-sm leading-snug text-neutral-700">
-            {'Stage '}
+            {t('types.stage_change.stage')}{' '}
             <span className="font-medium text-neutral-800">{m.stage_name || 'stage'}</span>
             {' → '}
             <StatusBadge status={m.new_status} />
@@ -322,7 +323,7 @@ function RichContent({ notification }) {
     case 'spec_finalized':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'Specification finalized '}
+          {t('types.spec_finalized.specFinalized')}{' '}
           {m.spec_number && <span className="font-mono text-xs text-neutral-500">#{m.spec_number}</span>}
           {m.project_name && (
             <span className="text-neutral-500"> — {m.project_name}</span>
@@ -333,8 +334,8 @@ function RichContent({ notification }) {
     case 'new_client':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          {'New client: '}
-          <span className="font-semibold text-neutral-900">{m.client_name || m.client_email || 'Unknown'}</span>
+          {t('types.new_client.newClient')}{' '}
+          <span className="font-semibold text-neutral-900">{m.client_name || m.client_email || t('types.new_client.unknown')}</span>
           {m.client_email && m.client_name && (
             <span className="text-neutral-400 text-xs ml-1">{m.client_email}</span>
           )}
@@ -344,7 +345,7 @@ function RichContent({ notification }) {
     case 'am_action':
       return (
         <p className="text-sm leading-snug text-neutral-700">
-          <span className="font-semibold text-neutral-900">{m.actor_name || 'AM'}</span>
+          <span className="font-semibold text-neutral-900">{m.actor_name || t('types.am_action.am')}</span>
           {' '}
           <span className="text-neutral-500">{notification.title?.replace(m.actor_name + ' ', '') || m.action?.replace(/_/g, ' ')}</span>
         </p>
@@ -354,9 +355,9 @@ function RichContent({ notification }) {
       return (
         <>
           <p className="text-sm leading-snug text-neutral-700">
-            <span className="font-semibold text-neutral-900">{m.uploader_name || 'Someone'}</span>
-            {' uploaded '}
-            <span className="font-medium text-neutral-800">{m.file_name || 'a file'}</span>
+            <span className="font-semibold text-neutral-900">{m.uploader_name || t('types.file_uploaded.someone')}</span>
+            {' '}{t('types.file_uploaded.uploaded')}{' '}
+            <span className="font-medium text-neutral-800">{m.file_name || t('types.file_uploaded.aFile')}</span>
           </p>
           {m.project_name && (
             <p className="text-xs text-neutral-400 mt-0.5">{m.project_name}</p>

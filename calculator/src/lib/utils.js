@@ -8,16 +8,37 @@ export function cn(...inputs) {
 }
 
 /**
+ * Get the current locale from i18n or fallback to browser locale
+ */
+export function getCurrentLocale() {
+  // Try to get from i18n if available
+  if (typeof window !== 'undefined' && window.__i18n__) {
+    return window.__i18n__.language === 'ru' ? 'ru-RU' : 'en-US';
+  }
+  // Fallback to navigator language or en-US
+  if (typeof navigator !== 'undefined') {
+    const lang = navigator.language || navigator.userLanguage;
+    return lang.startsWith('ru') ? 'ru-RU' : 'en-US';
+  }
+  return 'en-US';
+}
+
+/**
  * Format currency
  * Handles both fiat currencies (USD, EUR, etc.) and cryptocurrencies (USDT, BTC, etc.)
+ * @param {number} amount - The amount to format
+ * @param {string} currency - Currency code (default: 'USD')
+ * @param {string} locale - Locale for formatting (default: current locale)
  */
-export function formatCurrency(amount, currency = 'USD') {
+export function formatCurrency(amount, currency = 'USD', locale = null) {
+  const effectiveLocale = locale || getCurrentLocale();
+  
   // List of cryptocurrencies that need special handling
   const cryptoCurrencies = ['USDT', 'BTC', 'ETH', 'USDC', 'DAI'];
   
   // If it's a cryptocurrency, format as number with currency symbol appended
   if (cryptoCurrencies.includes(currency?.toUpperCase())) {
-    const formatted = new Intl.NumberFormat('en-US', {
+    const formatted = new Intl.NumberFormat(effectiveLocale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(amount);
@@ -27,7 +48,7 @@ export function formatCurrency(amount, currency = 'USD') {
   // For fiat currencies, use standard Intl.NumberFormat
   // Fallback to USD if currency is not supported
   try {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(effectiveLocale, {
       style: 'currency',
       currency: currency || 'USD',
       minimumFractionDigits: 0,
@@ -36,7 +57,7 @@ export function formatCurrency(amount, currency = 'USD') {
   } catch (error) {
     // If currency code is invalid, fallback to USD
     console.warn(`Invalid currency code: ${currency}, falling back to USD`);
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(effectiveLocale, {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
@@ -114,9 +135,14 @@ export function debounce(func, wait) {
 
 /**
  * Format distance to now (e.g., "5 minutes ago", "2 days ago")
+ * @param {Date|string} date - Date to format
+ * @param {string} locale - Locale for formatting (default: current locale)
  */
-export function formatDistanceToNow(date) {
+export function formatDistanceToNow(date, locale = null) {
   if (!date) return '';
+  
+  const effectiveLocale = locale || getCurrentLocale();
+  const isRussian = effectiveLocale.startsWith('ru');
   
   const now = new Date();
   const then = new Date(date);
@@ -128,12 +154,34 @@ export function formatDistanceToNow(date) {
   const diffWeek = Math.floor(diffDay / 7);
   const diffMonth = Math.floor(diffDay / 30);
   
-  if (diffSec < 60) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHour < 24) return `${diffHour}h ago`;
-  if (diffDay < 7) return `${diffDay}d ago`;
-  if (diffWeek < 4) return `${diffWeek}w ago`;
-  if (diffMonth < 12) return `${diffMonth}mo ago`;
+  if (isRussian) {
+    if (diffSec < 60) return 'только что';
+    if (diffMin < 60) return `${diffMin} мин назад`;
+    if (diffHour < 24) return `${diffHour} ч назад`;
+    if (diffDay < 7) return `${diffDay} дн назад`;
+    if (diffWeek < 4) return `${diffWeek} нед назад`;
+    if (diffMonth < 12) return `${diffMonth} мес назад`;
+  } else {
+    if (diffSec < 60) return 'just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffHour < 24) return `${diffHour}h ago`;
+    if (diffDay < 7) return `${diffDay}d ago`;
+    if (diffWeek < 4) return `${diffWeek}w ago`;
+    if (diffMonth < 12) return `${diffMonth}mo ago`;
+  }
   
-  return formatDate(date);
+  return formatDate(date, {}, locale);
+}
+
+/**
+ * Format number with locale
+ * @param {number} num - Number to format
+ * @param {object} options - Intl.NumberFormat options
+ * @param {string} locale - Locale for formatting (default: current locale)
+ */
+export function formatNumber(num, options = {}, locale = null) {
+  if (num === null || num === undefined) return '';
+  
+  const effectiveLocale = locale || getCurrentLocale();
+  return new Intl.NumberFormat(effectiveLocale, options).format(num);
 }

@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useComments } from '../../hooks/useComments';
 import { CommentItem } from './CommentItem';
 
 export function CommentThread({ entityType, entityId, onReply, onUserClick, highlightCommentId }) {
+  const { t } = useTranslation('comments');
   const { data: comments, isLoading } = useComments(entityType, entityId);
   const highlightRef = useRef(null);
 
@@ -28,8 +30,8 @@ export function CommentThread({ entityType, entityId, onReply, onUserClick, high
   if (!comments || comments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-center">
-        <p className="text-sm text-neutral-500">No messages yet</p>
-        <p className="text-xs text-neutral-400 mt-1">Be the first to comment</p>
+        <p className="text-sm text-neutral-500">{t('thread.noMessages')}</p>
+        <p className="text-xs text-neutral-400 mt-1">{t('thread.beFirst')}</p>
       </div>
     );
   }

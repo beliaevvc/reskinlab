@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getDeliveryStatusInfo } from '../../hooks/useDelivery';
 import { formatDate } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
@@ -29,7 +30,7 @@ export function DeliveryCard({
 
   const handleRequestRevision = () => {
     if (!feedback.trim()) {
-      alert('Please provide feedback for the revision request');
+      alert(t('delivery.feedbackRequired'));
       return;
     }
     onRequestRevision?.(delivery.id, feedback);
@@ -75,13 +76,13 @@ export function DeliveryCard({
         <div className="p-4 border-b border-neutral-100 bg-neutral-50">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-neutral-700">
-              Attached Files ({delivery.files.length})
+              {t('delivery.attachedFiles', { count: delivery.files.length })}
             </span>
             <button
               onClick={() => onViewFiles?.(delivery.files)}
               className="text-sm text-emerald-600 hover:text-emerald-700"
             >
-              View all
+              {t('delivery.viewAll')}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -96,7 +97,7 @@ export function DeliveryCard({
             ))}
             {delivery.files.length > 4 && (
               <span className="text-xs text-neutral-500 self-center">
-                +{delivery.files.length - 4} more
+                {t('delivery.more', { count: delivery.files.length - 4 })}
               </span>
             )}
           </div>
@@ -107,7 +108,7 @@ export function DeliveryCard({
       {delivery.revision_count > 0 && (
         <div className="p-4 border-b border-neutral-100 bg-amber-50">
           <p className="text-sm text-amber-700">
-            🔄 {delivery.revision_count} revision{delivery.revision_count !== 1 ? 's' : ''} requested
+            🔄 {t('delivery.revisionsRequested', { count: delivery.revision_count })}
           </p>
         </div>
       )}
@@ -115,7 +116,7 @@ export function DeliveryCard({
       {/* Client feedback (if exists) */}
       {delivery.client_feedback && (
         <div className="p-4 border-b border-neutral-100">
-          <p className="text-sm font-medium text-neutral-700 mb-1">Client Feedback:</p>
+          <p className="text-sm font-medium text-neutral-700 mb-1">{t('delivery.clientFeedback')}</p>
           <p className="text-neutral-600 text-sm whitespace-pre-wrap bg-neutral-50 p-3 rounded">
             {delivery.client_feedback}
           </p>
@@ -125,15 +126,15 @@ export function DeliveryCard({
       {/* Meta info */}
       <div className="p-4 bg-neutral-50 text-sm text-neutral-500 flex items-center justify-between">
         <div>
-          <span>Submitted by </span>
+          <span>{t('delivery.submittedBy')} </span>
           <span className="font-medium text-neutral-700">
             {delivery.submitter?.full_name || delivery.submitter?.email}
           </span>
-          <span> on {formatDate(delivery.submitted_at)}</span>
+          <span> {formatDate(delivery.submitted_at)}</span>
         </div>
         {delivery.reviewed_at && (
           <span>
-            Reviewed {formatDate(delivery.reviewed_at)}
+            {t('delivery.reviewed')} {formatDate(delivery.reviewed_at)}
           </span>
         )}
       </div>
@@ -147,13 +148,13 @@ export function DeliveryCard({
                 onClick={() => setShowFeedback(true)}
                 className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 rounded transition-colors"
               >
-                ✓ Approve Delivery
+                ✓ {t('delivery.approveDelivery')}
               </button>
               <button
                 onClick={() => setShowFeedback(true)}
                 className="flex-1 border border-red-300 text-red-600 hover:bg-red-50 font-medium py-2.5 rounded transition-colors"
               >
-                Request Revision
+                {t('delivery.requestRevision')}
               </button>
             </div>
           ) : (
@@ -161,7 +162,7 @@ export function DeliveryCard({
               <textarea
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Add feedback (required for revision, optional for approval)..."
+                placeholder={t('delivery.feedbackPlaceholder')}
                 className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
                 rows={3}
               />
@@ -170,19 +171,19 @@ export function DeliveryCard({
                   onClick={handleApprove}
                   className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 rounded text-sm"
                 >
-                  Approve
+                  {t('delivery.approve')}
                 </button>
                 <button
                   onClick={handleRequestRevision}
                   className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded text-sm"
                 >
-                  Request Revision
+                  {t('delivery.requestRevision')}
                 </button>
                 <button
                   onClick={() => { setShowFeedback(false); setFeedback(''); }}
                   className="px-4 py-2 text-neutral-600 hover:text-neutral-800 text-sm"
                 >
-                  Cancel
+                  {t('actions.cancel')}
                 </button>
               </div>
             </div>
@@ -194,7 +195,7 @@ export function DeliveryCard({
       {isStaff && delivery.status === 'revision_requested' && (
         <div className="p-4 border-t border-neutral-200 bg-white">
           <p className="text-sm text-neutral-600 mb-3">
-            Please address the feedback and resubmit the delivery.
+            {t('delivery.addressFeedback')}
           </p>
         </div>
       )}

@@ -1,18 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import UserAvatar from '../UserAvatar';
 
 const STORAGE_KEY = 'reskin_saved_accounts';
 
-const ROLE_BADGES = {
-  admin: { label: 'Admin', color: 'bg-purple-100 text-purple-700', ring: 'ring-purple-200' },
-  am: { label: 'AM', color: 'bg-blue-100 text-blue-700', ring: 'ring-blue-200' },
-  client: { label: 'Client', color: 'bg-emerald-100 text-emerald-700', ring: 'ring-emerald-200' },
+const ROLE_BADGE_STYLES = {
+  admin: { color: 'bg-purple-100 text-purple-700', ring: 'ring-purple-200' },
+  am: { color: 'bg-blue-100 text-blue-700', ring: 'ring-blue-200' },
+  client: { color: 'bg-emerald-100 text-emerald-700', ring: 'ring-emerald-200' },
 };
 
 // Add Account Modal with Login/Register tabs
-function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
+function AddAccountModal({ isOpen, onClose, onAdd, onRegister, t }) {
   const [mode, setMode] = useState('login'); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,17 +46,17 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
     setSuccess('');
 
     if (!email || !password) {
-      setError('Email and password are required');
+      setError(t('accountSwitcher.errors.emailPasswordRequired'));
       return;
     }
 
     if (mode === 'register') {
       if (password !== confirmPassword) {
-        setError('Passwords do not match');
+        setError(t('accountSwitcher.errors.passwordsDoNotMatch'));
         return;
       }
       if (password.length < 6) {
-        setError('Password must be at least 6 characters');
+        setError(t('accountSwitcher.errors.passwordMinLength'));
         return;
       }
 
@@ -66,7 +67,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
       if (result?.error) {
         setError(result.error);
       } else {
-        setSuccess('Account created! You can now switch to it.');
+        setSuccess(t('accountSwitcher.modal.accountCreated'));
         setTimeout(() => {
           resetForm();
           onClose();
@@ -99,7 +100,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
         {/* Header with tabs */}
         <div className="border-b border-neutral-200">
           <div className="flex items-center justify-between px-6 pt-4 pb-0">
-            <h2 className="text-lg font-semibold text-neutral-900">Add Account</h2>
+            <h2 className="text-lg font-semibold text-neutral-900">{t('accountSwitcher.modal.title')}</h2>
             <button
               onClick={onClose}
               className="p-1 rounded text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
@@ -120,7 +121,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
                   : 'border-transparent text-neutral-500 hover:text-neutral-700'
               }`}
             >
-              Existing Account
+              {t('accountSwitcher.modal.existingAccount')}
             </button>
             <button
               onClick={() => handleModeChange('register')}
@@ -130,7 +131,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
                   : 'border-transparent text-neutral-500 hover:text-neutral-700'
               }`}
             >
-              Create New
+              {t('accountSwitcher.modal.createNew')}
             </button>
           </div>
         </div>
@@ -151,7 +152,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-              Email
+              {t('accountSwitcher.modal.email')}
             </label>
             <input
               type="email"
@@ -167,7 +168,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
           {mode === 'register' && (
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                Full Name <span className="text-neutral-400 font-normal">(optional)</span>
+                {t('accountSwitcher.modal.fullName')} <span className="text-neutral-400 font-normal">{t('accountSwitcher.modal.fullNameOptional')}</span>
               </label>
               <input
                 type="text"
@@ -182,7 +183,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-              Password
+              {t('accountSwitcher.modal.password')}
             </label>
             <div className="relative">
               <input
@@ -215,7 +216,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
           {mode === 'register' && (
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                Confirm Password
+                {t('accountSwitcher.modal.confirmPassword')}
               </label>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -230,7 +231,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-              Display Name <span className="text-neutral-400 font-normal">(for switcher)</span>
+              {t('accountSwitcher.modal.displayName')} <span className="text-neutral-400 font-normal">{t('accountSwitcher.modal.displayNameHint')}</span>
             </label>
             <input
               type="text"
@@ -249,7 +250,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
               disabled={isLoading}
               className="flex-1 px-4 py-2.5 border border-neutral-300 rounded-md text-neutral-700 font-medium hover:bg-neutral-50 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t('accountSwitcher.modal.cancel')}
             </button>
             <button
               type="submit"
@@ -259,19 +260,19 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
               {isLoading && (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
               )}
-              {mode === 'register' ? 'Create & Save' : 'Save Account'}
+              {mode === 'register' ? t('accountSwitcher.modal.createAndSave') : t('accountSwitcher.modal.saveAccount')}
             </button>
           </div>
 
           {mode === 'login' && (
             <p className="text-xs text-center text-neutral-500">
-              Save existing account credentials for quick switching
+              {t('accountSwitcher.modal.existingHint')}
             </p>
           )}
 
           {mode === 'register' && (
             <p className="text-xs text-center text-neutral-500">
-              Creates a new account in Supabase and saves it for switching
+              {t('accountSwitcher.modal.createHint')}
             </p>
           )}
         </form>
@@ -282,6 +283,7 @@ function AddAccountModal({ isOpen, onClose, onAdd, onRegister }) {
 }
 
 export function AccountSwitcher() {
+  const { t } = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
   const [savedAccounts, setSavedAccounts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -343,7 +345,7 @@ export function AccountSwitcher() {
   const handleAddAccount = ({ email, password, label }) => {
     const exists = savedAccounts.some(a => a.email === email);
     if (exists) {
-      return { error: 'Account already saved' };
+      return { error: t('accountSwitcher.errors.accountAlreadySaved') };
     }
 
     const newAccount = { email, password, label };
@@ -357,7 +359,7 @@ export function AccountSwitcher() {
   const handleRegisterAccount = async ({ email, password, fullName, label }) => {
     const exists = savedAccounts.some(a => a.email === email);
     if (exists) {
-      return { error: 'Account already saved' };
+      return { error: t('accountSwitcher.errors.accountAlreadySaved') };
     }
 
     try {
@@ -414,7 +416,7 @@ export function AccountSwitcher() {
       });
 
       if (error) {
-        setSwitchError('Login failed: ' + error.message);
+        setSwitchError(t('accountSwitcher.errors.loginFailed') + ': ' + error.message);
         setIsSwitching(false);
         return;
       }
@@ -423,12 +425,18 @@ export function AccountSwitcher() {
       setIsSwitching(false);
       // Auth state change will trigger re-render with new user
     } catch (err) {
-      setSwitchError('Switch failed: ' + err.message);
+      setSwitchError(t('accountSwitcher.errors.switchFailed') + ': ' + err.message);
       setIsSwitching(false);
     }
   };
 
-  const roleBadge = ROLE_BADGES[profile?.role] || ROLE_BADGES.client;
+  const getRoleBadge = (role) => {
+    const style = ROLE_BADGE_STYLES[role] || ROLE_BADGE_STYLES.client;
+    const label = t(`accountSwitcher.roles.${role}`) || t('accountSwitcher.roles.client');
+    return { ...style, label };
+  };
+
+  const roleBadge = getRoleBadge(profile?.role);
 
   return (
     <>
@@ -511,14 +519,13 @@ export function AccountSwitcher() {
             {savedAccounts.length > 0 && (
               <div className="py-2 border-b border-neutral-100">
                 <p className="px-4 py-1.5 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                  Switch Account
+                  {t('accountSwitcher.switchAccount')}
                 </p>
                 {savedAccounts.map((account) => {
                   const isCurrent = account.email === user?.email;
                   const displayName = account.cached_full_name || account.label;
                   const avatarUrl = account.cached_avatar_url;
                   const accountRole = account.cached_role;
-                  const accountBadge = accountRole ? ROLE_BADGES[accountRole] : null;
                   return (
                     <div
                       key={account.email}
@@ -553,7 +560,7 @@ export function AccountSwitcher() {
                         <button
                           onClick={(e) => handleRemoveAccount(account.email, e)}
                           className="p-1.5 rounded text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                          title="Remove account"
+                          title={t('accountSwitcher.removeAccount')}
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -577,7 +584,7 @@ export function AccountSwitcher() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </span>
-                Add Account
+                {t('accountSwitcher.addAccount')}
               </button>
               
               <button
@@ -589,7 +596,7 @@ export function AccountSwitcher() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                 </span>
-                Sign Out
+                {t('accountSwitcher.signOut')}
               </button>
             </div>
           </div>
@@ -602,6 +609,7 @@ export function AccountSwitcher() {
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddAccount}
         onRegister={handleRegisterAccount}
+        t={t}
       />
     </>
   );

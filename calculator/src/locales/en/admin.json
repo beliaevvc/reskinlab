@@ -1,0 +1,754 @@
+{
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "subtitle": "System overview and statistics",
+    "stats": {
+      "totalClients": "Total Clients",
+      "activeProjects": "Active Projects",
+      "pendingInvoices": "Pending Invoices",
+      "monthlyRevenue": "Monthly Revenue",
+      "thisMonth": "This Month",
+      "pendingRevenue": "Pending Revenue",
+      "pendingOffers": "Pending Offers",
+      "completedProjects": "Completed Projects",
+      "activeClients": "Active Clients",
+      "draftProjects": "Draft Projects"
+    },
+    "charts": {
+      "revenue": "Revenue (6 months)",
+      "projects": "Projects (6 months)"
+    },
+    "viewAll": "View all",
+    "loading": "Loading..."
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage user accounts, roles, and companies",
+    "create": "Create User",
+    "table": {
+      "name": "Name",
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastLogin": "Last Login",
+      "actions": "Actions",
+      "company": "Company",
+      "projects": "Projects",
+      "revenue": "Revenue",
+      "joined": "Joined",
+      "contact": "Contact",
+      "noName": "No name"
+    },
+    "roles": {
+      "client": "Client",
+      "am": "AM",
+      "admin": "Admin",
+      "all": "All"
+    },
+    "changeRole": "Change Role",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "stats": {
+      "total": "Total Users",
+      "admins": "Admins",
+      "ams": "Account Managers",
+      "clients": "Clients"
+    },
+    "search": "Search by name, email, or company...",
+    "bulkActions": "Bulk actions:",
+    "selected": "{{count}} selected",
+    "changeRoleTo": "Change Role to...",
+    "clearSelection": "Clear selection",
+    "confirmBulkRole": "Change role to {{role}} for {{count}} users?",
+    "viewDetails": "View Details",
+    "viewFinance": "View Finance",
+    "noUsersFound": "No users found"
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "Manage client companies and their accounts",
+    "table": {
+      "name": "Name",
+      "company": "Company",
+      "contact": "Contact",
+      "email": "Email",
+      "projects": "Projects",
+      "joined": "Joined",
+      "accountManager": "Account Manager",
+      "actions": "Actions",
+      "noCompany": "No company",
+      "active": "{{count}} active"
+    },
+    "assignAM": "Assign Account Manager",
+    "viewProfile": "View Profile",
+    "viewDetails": "View Details",
+    "stats": {
+      "total": "Total Clients",
+      "withActiveProjects": "With Active Projects",
+      "inactive": "Inactive"
+    },
+    "search": "Search by company name or email...",
+    "noClientsFound": "No clients found"
+  },
+  "pricing": {
+    "title": "Pricing Settings",
+    "subtitle": "Manage calculator pricing",
+    "categories": "Categories",
+    "items": "Items",
+    "basePrice": "Base Price",
+    "complexity": "Complexity",
+    "dynamicPricing": "Dynamic Pricing",
+    "save": "Save Changes"
+  },
+  "promoCodes": {
+    "title": "Promo Codes",
+    "subtitle": "Manage discount codes for the calculator",
+    "create": "Create Code",
+    "table": {
+      "code": "Code",
+      "discount": "Discount",
+      "type": "Type",
+      "uses": "Uses",
+      "usage": "Usage",
+      "maxUses": "Max Uses",
+      "validUntil": "Valid Until",
+      "expires": "Expires",
+      "status": "Status"
+    },
+    "types": {
+      "percent": "Percentage",
+      "fixed": "Fixed Amount"
+    },
+    "form": {
+      "code": "Code",
+      "discountType": "Discount Type",
+      "discountValue": "Discount Value",
+      "maxUses": "Max Uses",
+      "minOrder": "Min Order",
+      "validFrom": "Valid From",
+      "validUntil": "Valid Until",
+      "expiresAt": "Expires At",
+      "prefix": "Prefix:",
+      "generate": "Generate",
+      "value": "Value",
+      "type": "Type",
+      "noMinimum": "No minimum",
+      "unlimited": "Unlimited"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "stats": {
+      "total": "Total Codes",
+      "active": "Active Codes"
+    },
+    "modal": {
+      "editTitle": "Edit Promo Code",
+      "newTitle": "New Promo Code",
+      "deleteTitle": "Delete Promo Code?",
+      "deleteMessage": "You are about to delete",
+      "cannotUndo": "This action cannot be undone."
+    },
+    "actions": {
+      "save": "Save Changes",
+      "createCode": "Create Code",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "copied": "Copied!",
+      "clickToCopy": "Click to copy",
+      "deactivate": "Deactivate",
+      "activate": "Activate"
+    },
+    "never": "Never",
+    "noCodesYet": "No promo codes yet",
+    "min": "Min:"
+  },
+  "offerTemplates": {
+    "title": "Offer Templates",
+    "subtitle": "Manage offer templates with variables and audience settings",
+    "create": "New Template",
+    "table": {
+      "template": "Template",
+      "audience": "Audience",
+      "version": "Version",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions",
+      "name": "Name",
+      "language": "Language",
+      "lastUpdated": "Last Updated"
+    },
+    "editor": {
+      "title": "Edit Template",
+      "variables": "Variables",
+      "preview": "Preview",
+      "blocks": "Blocks",
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveChanges": "Save *",
+      "saved": "Saved",
+      "setActive": "Set Active",
+      "settingsTitle": "Template Settings",
+      "placeholder": "Start writing the offer... Press / to insert a variable",
+      "formatHints": {
+        "format": "Format:",
+        "section": "section",
+        "bullet": "bullet",
+        "subitem": "subitem",
+        "label": "label",
+        "variable": "variable"
+      },
+      "previewModes": {
+        "variables": "Variables",
+        "sampleData": "Sample Data",
+        "clientView": "Client view",
+        "print": "Print"
+      }
+    },
+    "form": {
+      "name": "Name",
+      "nameRequired": "Name *",
+      "description": "Description",
+      "namePlaceholder": "Standard Offer",
+      "descriptionPlaceholder": "Template description..."
+    },
+    "stats": {
+      "total": "Total Templates",
+      "active": "Active Template",
+      "notSelected": "Not Selected",
+      "personalAssignments": "Personal Assignments"
+    },
+    "status": {
+      "active": "Active",
+      "draft": "Draft"
+    },
+    "audience": {
+      "all": "All",
+      "personal": "Personal"
+    },
+    "settingsModal": {
+      "title": "Template Settings",
+      "descriptionSection": "Description",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Brief description of the template for internal use...",
+      "audienceSection": "Audience",
+      "forAll": "For all",
+      "forSpecific": "For specific",
+      "forAllDesc": "This offer will be used for all clients by default.",
+      "forSpecificDesc": "Select specific clients for this template",
+      "search": "Search by name or email...",
+      "loadingUsers": "Loading users...",
+      "allAssigned": "All users are already assigned",
+      "noResults": "No one found",
+      "assignedCount": "Assigned: {{count}}",
+      "remove": "Remove",
+      "done": "Done"
+    },
+    "modal": {
+      "editTitle": "Edit Template",
+      "newTitle": "New Template",
+      "nameRequired": "Name is required"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "cannotDeleteActive": "Cannot delete active template"
+    },
+    "confirmDelete": "Delete this template?",
+    "noTemplatesYet": "No offer templates. Create the first template.",
+    "assignments": {
+      "title": "Personal Assignments",
+      "search": "Search...",
+      "allTemplates": "All Templates",
+      "noName": "No Name",
+      "unknownTemplate": "Unknown Template",
+      "noResults": "Nothing found",
+      "noAssignmentsHint": "No personal assignments. Open template → Settings → For specific to assign users."
+    }
+  },
+  "taskSettings": {
+    "title": "Task Auto-Creation Settings",
+    "subtitle": "Configure automatic task creation parameters when first project payment is confirmed",
+    "loading": "Loading settings...",
+    "sections": {
+      "additionalTasks": {
+        "title": "Additional Automatic Tasks",
+        "subtitle": "Tasks that are created automatically on first payment (not from specification)"
+      },
+      "specTemplates": {
+        "title": "Specification Task Templates",
+        "subtitle": "Configure task names for each calculator specification item"
+      },
+      "specTasks": {
+        "title": "Specification Tasks"
+      }
+    },
+    "stages": {
+      "briefing": "Briefing",
+      "moodboard": "Moodboard & Concept",
+      "symbols": "Symbol Design",
+      "ui": "UI & Layout",
+      "animation": "Animation Production",
+      "revisions": "Revisions",
+      "delivery": "Final Delivery"
+    },
+    "form": {
+      "taskName": "Task Name",
+      "taskNameRequired": "Task Name *",
+      "projectStage": "Project Stage",
+      "projectStageRequired": "Project Stage *",
+      "taskDescription": "Task Description",
+      "taskDescriptionPlaceholder": "Task description...",
+      "taskNamePlaceholder": "e.g., Client Briefing",
+      "order": "Creation Order",
+      "dueDays": "Days Until Deadline",
+      "enabled": "Enabled (task will be created automatically)",
+      "separateAnimations": "Separate animations into individual tasks",
+      "titleRu": "Title (RU)",
+      "titleEn": "Title (EN)",
+      "titleRuPlaceholder": "Название задачи на русском...",
+      "titleEnPlaceholder": "Task name in English...",
+      "descriptionRu": "Description (RU)",
+      "descriptionEn": "Description (EN)",
+      "descriptionRuPlaceholder": "Описание задачи на русском...",
+      "descriptionEnPlaceholder": "Task description in English..."
+    },
+    "specForm": {
+      "specItem": "Specification Item",
+      "titleRuHint": "Title (RU)",
+      "titleEnHint": "Title (EN)",
+      "titleRuPlaceholder": "Название задачи на русском...",
+      "titleEnPlaceholder": "Task name in English...",
+      "descriptionHint": "Task description (use {qty} for quantity)",
+      "descriptionPlaceholder": "Task for creating {item_name} in quantity of {qty} pcs.",
+      "descriptionRuHint": "Description (RU) — use {qty}",
+      "descriptionEnHint": "Description (EN) — use {qty}",
+      "descriptionRuPlaceholder": "Задача по созданию {item_name} в количестве {qty} шт.",
+      "descriptionEnPlaceholder": "Task for creating {item_name} in quantity of {qty} pcs.",
+      "animationTitleHint": "Animation task title template (use {item_name} and {anim_name})",
+      "animationTitlePlaceholder": "Animation: {item_name} ({anim_name})",
+      "animationTitleRuHint": "Animation title (RU)",
+      "animationTitleEnHint": "Animation title (EN)",
+      "animationTitleRuPlaceholder": "Анимация: {item_name} ({anim_name})",
+      "animationTitleEnPlaceholder": "Animation: {item_name} ({anim_name})",
+      "animationDescriptionHint": "Animation task description template",
+      "animationDescriptionPlaceholder": "Animation task for {item_name}: {anim_name}",
+      "animationDescriptionRuHint": "Animation description (RU)",
+      "animationDescriptionEnHint": "Animation description (EN)",
+      "animationDescriptionRuPlaceholder": "Задача по созданию анимации для {item_name}: {anim_name}",
+      "animationDescriptionEnPlaceholder": "Animation task for {item_name}: {anim_name}",
+      "sortOrder": "Creation Order (weight)",
+      "sortHint": "Lower = higher priority. Briefing (template) goes first."
+    },
+    "hints": {
+      "appliesToAll": "Applies to all specification tasks",
+      "separateAnimations": "If enabled, a separate animation task will be created for each item with animation"
+    },
+    "labels": {
+      "order": "Order:",
+      "deadline": "Deadline:",
+      "animation": "Animation:",
+      "days": "days",
+      "default": "Default"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "noTemplate": "No Template"
+    },
+    "actions": {
+      "addTemplate": "+ Add Template",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "create": "Create",
+      "createTemplate": "Create Template",
+      "done": "Done",
+      "saveSettings": "Save Settings"
+    },
+    "newTemplate": {
+      "title": "New Task Template"
+    },
+    "noTemplates": "No task templates. Add the first template by clicking the button above.",
+    "noTemplateLabel": "(no template)",
+    "alerts": {
+      "saved": "Settings saved successfully!",
+      "saveError": "Error saving settings:",
+      "templateSaveError": "Error saving template:",
+      "templateDeleteError": "Error deleting template:"
+    },
+    "confirms": {
+      "deleteTemplate": "Are you sure you want to delete this template?"
+    },
+    "checklist": {
+      "title": "Task Checklist",
+      "addItem": "+ Add Item",
+      "emptyList": "Checklist is empty. Add the first item.",
+      "itemPlaceholder": "Checklist item name...",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "deleteItem": "Delete item"
+    }
+  },
+  "wallets": {
+    "title": "Payment Wallets",
+    "subtitle": "Manage crypto wallets for invoice payments",
+    "create": "Add Wallet",
+    "table": {
+      "currency": "Currency",
+      "address": "Address",
+      "network": "Network",
+      "label": "Label",
+      "active": "Active",
+      "status": "Status"
+    },
+    "stats": {
+      "total": "Total Wallets",
+      "active": "Active Wallets"
+    },
+    "modal": {
+      "editTitle": "Edit Wallet",
+      "newTitle": "Add Wallet",
+      "addressRequired": "Wallet address is required"
+    },
+    "form": {
+      "currency": "Currency",
+      "network": "Network",
+      "address": "Wallet Address",
+      "addressPlaceholder": "Enter wallet address",
+      "label": "Label (optional)",
+      "labelPlaceholder": "e.g., Main USDT wallet",
+      "activeLabel": "Active (show to clients in invoices)"
+    },
+    "empty": {
+      "title": "No wallets configured yet",
+      "action": "Add your first wallet"
+    },
+    "info": {
+      "title": "How it works",
+      "point1": "Active wallets are shown to clients when they view invoice payment details",
+      "point2": "Clients can choose from available networks based on active wallets",
+      "point3": "Inactive wallets are hidden from clients but remain in the system"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "delete": "Delete wallet",
+      "confirmDelete": "Are you sure you want to delete this wallet?",
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "auditLog": {
+    "title": "Audit Logs",
+    "subtitle": "Track all important actions in the system",
+    "totalLogs": "{{count}} total log",
+    "totalLogs_plural": "{{count}} total logs",
+    "viewMode": {
+      "table": "Table",
+      "timeline": "Timeline"
+    },
+    "filters": {
+      "action": "Action",
+      "user": "User",
+      "entity": "Entity",
+      "dateRange": "Date Range",
+      "role": "Role",
+      "entityType": "Entity Type",
+      "from": "From",
+      "to": "To"
+    },
+    "table": {
+      "timestamp": "Timestamp",
+      "user": "User",
+      "action": "Action",
+      "entity": "Entity",
+      "details": "Details",
+      "ip": "IP Address",
+      "role": "Role",
+      "time": "Time"
+    },
+    "export": "Export Log",
+    "header": {
+      "humanMode": "Human",
+      "rawMode": "Raw",
+      "humanModeTitle": "Human-readable mode",
+      "rawModeTitle": "Raw technical mode",
+      "live": "Live",
+      "liveOn": "Auto-refresh ON (30s)",
+      "liveOff": "Auto-refresh OFF",
+      "print": "Print"
+    },
+    "stats": {
+      "last24h": "Last 24 Hours",
+      "last7d": "Last 7 Days",
+      "last30d": "Last 30 Days",
+      "todayVsAverage": "Today vs Average",
+      "today": "today",
+      "avg": "avg",
+      "unusualActivity": "Unusual activity detected"
+    },
+    "quickFilters": {
+      "title": "Quick Filters",
+      "resetAll": "Reset All",
+      "collapse": "Collapse",
+      "expand": "Expand"
+    },
+    "presets": {
+      "today": "Today",
+      "7days": "7 Days",
+      "30days": "30 Days",
+      "logins": "Logins",
+      "errors": "Errors",
+      "creates": "Creates",
+      "deletes": "Deletes",
+      "finance": "Finance"
+    },
+    "roles": {
+      "all": "All Roles",
+      "admin": "Admin",
+      "am": "AM",
+      "client": "Client"
+    },
+    "options": {
+      "allUsers": "All Users",
+      "allActions": "All Actions",
+      "allEntities": "All Entities"
+    },
+    "charts": {
+      "showCharts": "Show Charts",
+      "hide": "Hide",
+      "analyticsTitle": "Analytics (Last 7 Days)",
+      "activity30d": "Activity (30 Days)",
+      "topUsers": "Top Users",
+      "actionDistribution": "Action Distribution",
+      "noData": "No data"
+    },
+    "empty": {
+      "title": "No audit logs found",
+      "subtitle": "Try adjusting your filters"
+    },
+    "unknown": "Unknown",
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "logs": "logs"
+    },
+    "timeline": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "events": "events",
+      "noEvents": "No events found",
+      "metadata": "Metadata:"
+    },
+    "details": {
+      "noAdditional": "No additional details",
+      "changes": "Changes",
+      "metadata": "Metadata",
+      "ip": "IP:",
+      "browser": "Browser:",
+      "copied": "Copied!",
+      "copyJson": "Copy JSON"
+    }
+  },
+  "clientDetail": {
+    "title": "Client Details",
+    "noCompanyName": "No company name",
+    "contact": "Contact:",
+    "phone": "Phone:",
+    "totalProjects": "Total Projects",
+    "totalRevenue": "Total Revenue",
+    "memberSince": "Member Since",
+    "linkedAccount": "Linked Account",
+    "noName": "No name",
+    "projects": "Projects",
+    "noProjects": "No projects yet",
+    "clientNotFound": "Client not found",
+    "view": "View →",
+    "close": "Close"
+  },
+  "roleModal": {
+    "title": "Change User Role",
+    "note": "Changing role will immediately affect user's access permissions.",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save Changes",
+    "roles": {
+      "client": "Client",
+      "clientDesc": "Can create projects, view offers, manage their account",
+      "am": "Account Manager",
+      "amDesc": "Can manage assigned projects, create deliveries, handle approvals",
+      "admin": "Admin",
+      "adminDesc": "Full access to all features and settings"
+    }
+  },
+  "userDetail": {
+    "title": "User Details",
+    "noName": "No name",
+    "projects": "projects",
+    "joined": "Joined",
+    "userNotFound": "User not found",
+    "tabs": {
+      "profile": "Profile",
+      "company": "Company",
+      "projects": "Projects",
+      "specs": "Specs / Offers",
+      "finance": "Finance",
+      "activity": "Activity"
+    },
+    "profile": {
+      "fullName": "Full Name",
+      "addName": "Add name",
+      "email": "Email",
+      "phone": "Phone",
+      "addPhone": "Add phone",
+      "role": "Role",
+      "status": "Status",
+      "active": "Active",
+      "blocked": "Blocked",
+      "joined": "Joined",
+      "lastLogin": "Last Login",
+      "userId": "User ID",
+      "copied": "Copied!",
+      "company": "Company"
+    },
+    "company": {
+      "companyName": "Company Name",
+      "addCompanyName": "Add company name",
+      "contactEmail": "Contact Email",
+      "phone": "Phone",
+      "addPhone": "Add phone",
+      "country": "Country",
+      "addCountry": "Add country",
+      "address": "Address",
+      "addAddress": "Add address",
+      "notes": "Notes",
+      "noCompany": "No company linked to this user"
+    },
+    "projectsTab": {
+      "noProjects": "No projects found",
+      "created": "Created",
+      "specs": "specs",
+      "paid": "paid",
+      "pending": "pending",
+      "invoices": "invoices",
+      "deleteProject": "Delete project?"
+    },
+    "specsTab": {
+      "title": "Specifications & Offers",
+      "specs": "spec",
+      "offers": "offer",
+      "noSpecs": "No specifications yet"
+    },
+    "finance": {
+      "revenue": "Revenue",
+      "paidInvoices": "paid invoices",
+      "pending": "Pending",
+      "pendingInvoices": "pending invoices",
+      "lifetimeValue": "Total Lifetime Value",
+      "invoices": "Invoices",
+      "total": "total",
+      "noInvoices": "No invoices yet",
+      "paid": "paid"
+    },
+    "activity": {
+      "noActivity": "No activity recorded"
+    },
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "cancel": "Cancel"
+  },
+  "pricing": {
+    "title": "Calculator Settings",
+    "subtitle": "Manage prices, coefficients, and calculator configuration",
+    "stats": {
+      "settings": "settings",
+      "prices": "prices",
+      "coefficients": "coefficients"
+    },
+    "search": "Search settings...",
+    "loading": "Loading settings...",
+    "noConfigs": "No price configurations found",
+    "noConfigsHint": "Run the migration to populate calculator settings",
+    "tryDifferentSearch": "Try a different search term",
+    "selectCategory": "Select a category from the sidebar",
+    "categories": {
+      "minimumOrder": "Minimum Order",
+      "conceptDocument": "Concept Document",
+      "symbols": "Symbols",
+      "backgrounds": "Backgrounds",
+      "popups": "Pop-ups",
+      "uiMenus": "UI Menus",
+      "marketing": "Marketing",
+      "styles": "Styles",
+      "animations": "Animations",
+      "usageRights": "Usage Rights",
+      "payment": "Payment",
+      "revisions": "Revisions",
+      "urgency": "Urgency",
+      "volumeDiscounts": "Volume Discounts",
+      "global": "Global"
+    },
+    "types": {
+      "basePrice": "Base Price",
+      "coefficient": "Coefficient",
+      "percent": "Percent",
+      "setting": "Setting",
+      "complexity": "Complexity",
+      "surcharge": "Surcharge"
+    },
+    "table": {
+      "name": "Name",
+      "value": "Value"
+    },
+    "modal": {
+      "current": "Current:",
+      "displayName": "Display Name",
+      "displayNameHint": "(shown in calculator)",
+      "value": "Value",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "saving": "Saving..."
+    },
+    "minimumOrder": {
+      "title": "Minimum Order",
+      "subtitle": "First order minimum amount",
+      "active": "Active",
+      "disabled": "Disabled",
+      "enable": "Enable Minimum Order",
+      "enableHint": "First order in every project must meet the minimum",
+      "amount": "Minimum Amount",
+      "amountHint": "Applies only to the first order (before any paid invoices)",
+      "messages": "Client Messages",
+      "messageEn": "English Message",
+      "messageRu": "Russian Message",
+      "messagePlaceholderEn": "e.g. Minimum order amount is $1,000 for your first order",
+      "messagePlaceholderRu": "e.g. Минимальная сумма заказа — $1,000 для первого заказа",
+      "preview": "Preview",
+      "previewEn": "English",
+      "previewRu": "Russian"
+    },
+    "statsLabel": {
+      "price": "price",
+      "prices": "prices",
+      "coefficient": "coefficient",
+      "coefficients": "coefficients",
+      "percent": "percent",
+      "percents": "percents",
+      "setting": "setting",
+      "settings": "settings"
+    }
+  }
+}

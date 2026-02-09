@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 import { getApprovalStatusInfo, getApprovalTypeLabel } from '../../hooks/useApprovals';
 
 export function ApprovalCard({ approval, onClick }) {
+  const { t } = useTranslation('common');
   const statusInfo = getApprovalStatusInfo(approval.status);
   const isPending = approval.status === 'pending';
   const isOverMaxRounds = approval.revision_round > approval.max_free_rounds;
@@ -71,7 +73,7 @@ export function ApprovalCard({ approval, onClick }) {
               }}
               className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
             >
-              Respond →
+              {t('approvals.respond')}
             </button>
           )}
         </div>

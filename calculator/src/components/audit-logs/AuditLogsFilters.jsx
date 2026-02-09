@@ -1,33 +1,35 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuditActionTypes, useAuditEntityTypes, useAuditUsers } from '../../hooks/useAuditLogs';
 import { Select } from '../Select';
-
-const ROLE_OPTIONS = [
-  { value: 'all', label: 'All Roles' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'am', label: 'AM' },
-  { value: 'client', label: 'Client' },
-];
-
-const PRESETS = [
-  { id: 'today', label: 'Today', getFilters: () => ({ dateFrom: new Date(new Date().setHours(0, 0, 0, 0)).toISOString() }) },
-  { id: '7d', label: '7 Days', getFilters: () => ({ dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() }) },
-  { id: '30d', label: '30 Days', getFilters: () => ({ dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }) },
-  { id: 'logins', label: 'Logins', getFilters: () => ({ action: 'login' }) },
-  { id: 'errors', label: 'Errors', getFilters: () => ({ action: 'failed_login' }) },
-  { id: 'creates', label: 'Creates', getFilters: () => ({ action: 'create' }) },
-  { id: 'deletes', label: 'Deletes', getFilters: () => ({ action: 'delete' }) },
-  { id: 'finance', label: 'Finance', getFilters: () => ({ entityType: 'invoice' }) },
-];
 
 /**
  * AuditLogsFilters — filter panel with presets, role/user/action/entity/date/ID filters
  */
 export function AuditLogsFilters({ filters, onChange, onReset }) {
+  const { t } = useTranslation('admin');
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: actionTypes } = useAuditActionTypes();
   const { data: entityTypes } = useAuditEntityTypes();
   const { data: users } = useAuditUsers();
+
+  const ROLE_OPTIONS = [
+    { value: 'all', label: t('auditLog.roles.all') },
+    { value: 'admin', label: t('auditLog.roles.admin') },
+    { value: 'am', label: t('auditLog.roles.am') },
+    { value: 'client', label: t('auditLog.roles.client') },
+  ];
+
+  const PRESETS = [
+    { id: 'today', labelKey: 'auditLog.presets.today', getFilters: () => ({ dateFrom: new Date(new Date().setHours(0, 0, 0, 0)).toISOString() }) },
+    { id: '7d', labelKey: 'auditLog.presets.7days', getFilters: () => ({ dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() }) },
+    { id: '30d', labelKey: 'auditLog.presets.30days', getFilters: () => ({ dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }) },
+    { id: 'logins', labelKey: 'auditLog.presets.logins', getFilters: () => ({ action: 'login' }) },
+    { id: 'errors', labelKey: 'auditLog.presets.errors', getFilters: () => ({ action: 'failed_login' }) },
+    { id: 'creates', labelKey: 'auditLog.presets.creates', getFilters: () => ({ action: 'create' }) },
+    { id: 'deletes', labelKey: 'auditLog.presets.deletes', getFilters: () => ({ action: 'delete' }) },
+    { id: 'finance', labelKey: 'auditLog.presets.finance', getFilters: () => ({ entityType: 'invoice' }) },
+  ];
 
   const handleChange = (key, value) => {
     onChange({ ...filters, [key]: value, offset: 0 });
@@ -48,19 +50,19 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
       {/* Presets row */}
       <div className="px-4 py-3 border-b border-neutral-100">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Quick Filters</span>
+          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">{t('auditLog.quickFilters.title')}</span>
           <div className="flex items-center gap-2">
             <button
               onClick={onReset}
               className="text-xs text-neutral-500 hover:text-neutral-700 transition-colors"
             >
-              Reset All
+              {t('auditLog.quickFilters.resetAll')}
             </button>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-xs text-neutral-500 hover:text-neutral-700 transition-colors sm:hidden"
             >
-              {isExpanded ? 'Collapse' : 'Expand'}
+              {isExpanded ? t('auditLog.quickFilters.collapse') : t('auditLog.quickFilters.expand')}
             </button>
           </div>
         </div>
@@ -75,7 +77,7 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
               }`}
             >
-              {preset.label}
+              {t(preset.labelKey)}
             </button>
           ))}
         </div>
@@ -86,7 +88,7 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
         <div className="px-4 py-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
           {/* Role filter */}
           <div>
-            <label className="block text-xs font-medium text-neutral-500 mb-1">Role</label>
+            <label className="block text-xs font-medium text-neutral-500 mb-1">{t('auditLog.filters.role')}</label>
             <Select
               value={filters.userRole || 'all'}
               onChange={(val) => handleChange('userRole', val)}
@@ -96,12 +98,12 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
 
           {/* User filter */}
           <div>
-            <label className="block text-xs font-medium text-neutral-500 mb-1">User</label>
+            <label className="block text-xs font-medium text-neutral-500 mb-1">{t('auditLog.filters.user')}</label>
             <Select
               value={filters.userId || ''}
               onChange={(val) => handleChange('userId', val || undefined)}
               options={[
-                { value: '', label: 'All Users' },
+                { value: '', label: t('auditLog.options.allUsers') },
                 ...(users || []).map(u => ({
                   value: u.id,
                   label: `${u.full_name || u.email} (${u.role})`,
@@ -112,12 +114,12 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
 
           {/* Action type filter */}
           <div>
-            <label className="block text-xs font-medium text-neutral-500 mb-1">Action</label>
+            <label className="block text-xs font-medium text-neutral-500 mb-1">{t('auditLog.filters.action')}</label>
             <Select
               value={filters.action || 'all'}
               onChange={(val) => handleChange('action', val)}
               options={[
-                { value: 'all', label: 'All Actions' },
+                { value: 'all', label: t('auditLog.options.allActions') },
                 ...(actionTypes || []).map(a => ({ value: a, label: a })),
               ]}
             />
@@ -125,12 +127,12 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
 
           {/* Entity type filter */}
           <div>
-            <label className="block text-xs font-medium text-neutral-500 mb-1">Entity Type</label>
+            <label className="block text-xs font-medium text-neutral-500 mb-1">{t('auditLog.filters.entityType')}</label>
             <Select
               value={filters.entityType || 'all'}
               onChange={(val) => handleChange('entityType', val)}
               options={[
-                { value: 'all', label: 'All Entities' },
+                { value: 'all', label: t('auditLog.options.allEntities') },
                 ...(entityTypes || []).map(e => ({ value: e, label: e })),
               ]}
             />
@@ -138,7 +140,7 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
 
           {/* Date from */}
           <div>
-            <label className="block text-xs font-medium text-neutral-500 mb-1">From</label>
+            <label className="block text-xs font-medium text-neutral-500 mb-1">{t('auditLog.filters.from')}</label>
             <input
               type="date"
               value={filters.dateFrom ? filters.dateFrom.split('T')[0] : ''}
@@ -149,7 +151,7 @@ export function AuditLogsFilters({ filters, onChange, onReset }) {
 
           {/* Date to */}
           <div>
-            <label className="block text-xs font-medium text-neutral-500 mb-1">To</label>
+            <label className="block text-xs font-medium text-neutral-500 mb-1">{t('auditLog.filters.to')}</label>
             <input
               type="date"
               value={filters.dateTo ? filters.dateTo.split('T')[0] : ''}

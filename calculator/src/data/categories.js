@@ -1,6 +1,8 @@
 export const CATEGORIES = [
   {
     name: "Concept Document",
+    nameRu: "Концепт-документ",
+    nameEn: "Concept Document",
     items: [
       {
         id: 'concept_doc',
@@ -29,6 +31,17 @@ export const CATEGORIES = [
             "Формат: PDF/Figma + исходники PSD/AI (по ТЗ)",
             "1 раунд обсуждения и корректировок направления",
             "Финальный документ: согласованный арт-дирекшн для запуска производства"
+          ],
+          techEn: [
+            "Moodboard: 20+ thematic references with annotations",
+            "Color palette: primary, accent and background colors (5-7 shades)",
+            "Style probes: 2-3 key symbol variants in different approaches",
+            "Sketches: main symbols (Low, High, Special), base background and UI",
+            "Text description: theme, mood, visual language, materials, lighting",
+            "Competitor and analog references (on request)",
+            "Format: PDF/Figma + PSD/AI source files (per spec)",
+            "1 round of direction discussion and adjustments",
+            "Final document: approved art direction for production launch"
           ]
         }
       }
@@ -36,6 +49,8 @@ export const CATEGORIES = [
   },
   {
     name: "Символы (Symbols)",
+    nameRu: "Символы",
+    nameEn: "Symbols",
     items: [
       { 
         id: 'sym_low', 
@@ -53,6 +68,13 @@ export const CATEGORIES = [
             "FX-слои (при необходимости): свечение, вспышки, фреймы, частицы",
             "До 2 раундов минорных правок (цвет, свет, контуры)",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "2 states: Idle (static) and Match (accent)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, flashes, frames, particles",
+            "Up to 2 rounds of minor revisions (color, light, outlines)",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -73,6 +95,14 @@ export const CATEGORIES = [
             "2 круга минорных правок",
             "Высокий уровень прорисовки (объём, текстура, материал)",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "2 states: Idle and Match (light, contrast, dynamics)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, flashes, frames, particles",
+            "2 rounds of minor revisions",
+            "High level of detail (volume, texture, material)",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -94,6 +124,15 @@ export const CATEGORIES = [
             "2 круга минорных правок",
             "Повышенная детализация и композиционный фокус",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "2 states: Idle and Match / Trigger",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, flashes, frames, particles",
+            "Mini-Icons / Feature Symbols — small auxiliary symbols for bonus mechanics (e.g., multipliers ×2, ×3, tokens, chests)",
+            "2 rounds of minor revisions",
+            "Enhanced detail and compositional focus",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -101,6 +140,8 @@ export const CATEGORIES = [
   },
   {
     name: "Фоны (Backgrounds)",
+    nameRu: "Фоны",
+    nameEn: "Backgrounds",
     items: [
       { 
         id: 'bg_base_s', 
@@ -119,6 +160,14 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): мягкие блики, дым, пыль, частицы",
             "2 круга минорных правок (цвет, свет, фон)",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: background + light decor or texture elements",
+            "Simple slot grid frame (Grid Frame) without architectural details",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): soft glare, smoke, dust, particles",
+            "2 rounds of minor revisions (color, light, background)",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -140,6 +189,15 @@ export const CATEGORIES = [
             "FX-слои (при необходимости): свечения, частицы, дым, искры, атмосферные эффекты",
             "2 раунда минорных правок (цвет, свет, детали)",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Main composition: background, architectural and natural elements, light, materials",
+            "Slot grid frame (Grid Frame): visually integrated into composition, with decor and light",
+            "Foreground layer if needed for scene depth",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glows, particles, smoke, sparks, atmospheric effects",
+            "2 rounds of minor revisions (color, light, details)",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -160,6 +218,14 @@ export const CATEGORIES = [
             "FX-слои (при необходимости): свечение, частицы, дым, поток света",
             "2 круга минорных правок (цвет, FX)",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Based on Base Background (Simple)",
+            "Palette, lighting, FX accent changes",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, particles, smoke, light stream",
+            "2 rounds of minor revisions (color, FX)",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -180,6 +246,14 @@ export const CATEGORIES = [
             "FX-слои (при необходимости): потоки света, дым, частицы, вспышки, атмосферные переходы",
             "2 круга минорных правок (цвет, свет, баланс FX)",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: background, environment, lighting, architectural or natural elements",
+            "Based on Base Background (Detailed) concept, but with new light and FX scene",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): light streams, smoke, particles, flashes, atmospheric transitions",
+            "2 rounds of minor revisions (color, light, FX balance)",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -187,6 +261,8 @@ export const CATEGORIES = [
   },
   {
     name: "Поп-апы (Pop-ups)",
+    nameRu: "Поп-апы",
+    nameEn: "Pop-ups",
     items: [
       { 
         id: 'pop_win_s', 
@@ -204,6 +280,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, частицы, блики, дым, искры",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: text + background + FX elements",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, particles, glare, smoke, sparks",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -224,6 +307,14 @@ export const CATEGORIES = [
             "Повышенная художественная детализация и проработка света",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: background, character/object, text, effects",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers: light, particles, fire, smoke, glow, neon, flashes",
+            "Enhanced artistic detail and light work",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -243,6 +334,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): пыль, частицы, кольца, вспышки",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: text + background + FX elements (glow, sparks, flashes)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): dust, particles, rings, flashes",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -263,6 +361,14 @@ export const CATEGORIES = [
             "Повышенная художественная детализация (персонаж, свет, текстуры)",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: background, character or object, text, FX elements",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): magic flashes, smoke, particles, light stream, fire, neon",
+            "Enhanced artistic detail (character, light, textures)",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -282,6 +388,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): вспышки, искры, частицы, световые кольца",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: text + background + basic FX elements",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): flashes, sparks, particles, light rings",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -302,6 +415,14 @@ export const CATEGORIES = [
             "Повышенная художественная детализация (свет, текстуры, композиция)",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: background, character or object, text, FX elements",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers: light, smoke, particles, neon, dissipation, sparks",
+            "Enhanced artistic detail (light, textures, composition)",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -321,6 +442,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, пульсация, частицы, дым",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma/Procreate (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: text + decorative FX elements (coins, sparks, rays, rings)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, pulsation, particles, smoke",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma/Procreate (per spec)"
           ]
         }
       },
@@ -340,6 +468,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, частицы, дым, потоки света, вспышки",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Composition: background, character / object, text, FX elements",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, particles, smoke, light streams, flashes",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -359,6 +494,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, лёгкая вибрация, импульс при ошибке",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: container with text, status icon (⚠, ⛔, ℹ), confirmation button",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, light vibration, pulse on error",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma (per spec)"
           ]
         }
       },
@@ -378,6 +520,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, дым, частицы, статический шум, вспышки",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: background, text, icon, character / object illustration, button",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, smoke, particles, static noise, flashes",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -385,6 +534,8 @@ export const CATEGORIES = [
   },
   {
     name: "UI Меню и Экраны",
+    nameRu: "UI Меню и экраны",
+    nameEn: "UI Menus & Screens",
     items: [
       { 
         id: 'menu_buy_s', 
@@ -403,6 +554,14 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение кнопки, подсветка активного выбора",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: buy button / badge, bonus selection window, confirmation window",
+            "Design focused on UI/UX — no characters and scenes",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): button glow, active selection highlight",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma (per spec)"
           ]
         }
       },
@@ -423,6 +582,14 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свет, частицы, дым, энергия, искры",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: buy button, bonus selection menu, confirmation window",
+            "Each part has its own mini-illustration and atmospheric background",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): light, particles, smoke, energy, sparks",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -442,6 +609,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): подсветка активного значения, hover-эффекты, вспышки при подтверждении",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: window with title, bet selection block (buttons / slider), confirmation button",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): active value highlight, hover effects, flashes on confirmation",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -461,6 +635,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, частицы, подсветка активных зон",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: window, background with illustration, decorative frames, buttons, indicators",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, particles, active zone highlights",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -480,6 +661,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): подсветка активных опций, hover-эффекты, световые переходы",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: window, selection fields, checkboxes, confirm / cancel buttons",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): active option highlights, hover effects, light transitions",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma (per spec)"
           ]
         }
       },
@@ -499,6 +687,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, дым, частицы, подсветка активных зон",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: window, background, decorative frames, indicators, buttons",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, smoke, particles, active zone highlights",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -520,6 +715,15 @@ export const CATEGORIES = [
             "Иконки: стандартные или стилизованные под общий UI",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: SPIN, AUTO SPIN, AUTOPLAY, BET / STAKE, MENU, GUIDE / INFO (paytable), SOUND ON/OFF, TURBO",
+            "Each button in 3 states: Normal / Hover / Pressed",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, outline, pulsation",
+            "Icons: standard or styled to match overall UI",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma (per spec)"
           ]
         }
       },
@@ -541,6 +745,15 @@ export const CATEGORIES = [
             "Уникальные иконки под сеттинг игры",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: SPIN, AUTO SPIN, AUTOPLAY, BET / STAKE, MENU, GUIDE / INFO, SOUND ON/OFF, TURBO",
+            "Each button in 3 states: Normal / Hover / Pressed",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, smoke, flashes, particles, pulse",
+            "Unique icons matching game setting",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -560,6 +773,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, лёгкие частицы, пульсация",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: logo, background, loading indicator (progress bar, ring, bar)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, light particles, pulsation",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma (per spec)"
           ]
         }
       },
@@ -579,6 +799,13 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): частицы, дым, свечение, движение света, искры",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Elements: background, illustration / character, logo, loading indicator",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): particles, smoke, glow, light movement, sparks",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -600,6 +827,15 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): подсветка активной вкладки, плавные переходы",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходник PSD/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Structure: tabs or scrollable screen (per client layout)",
+            "Content: text, symbol icons, paytable, images",
+            "Base: client materials (content provided by client)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): active tab highlight, smooth transitions",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma (per spec)"
           ]
         }
       },
@@ -620,6 +856,14 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): подсветка, свечение, анимация переходов",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Structure: tabs / pages with navigation (usually 3-5 screens) or scrollable screen",
+            "Content: text (can be written by studio), visual schemes, icons, illustrations, highlights, FX",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): highlight, glow, transition animations",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -640,6 +884,14 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, подсветка активного слайда",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/Figma/Procreate (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 2-3 slides (screens)",
+            "Elements: background, text, icons, arrows, Next / Continue button",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, active slide highlight",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/Figma/Procreate (per spec)"
           ]
         }
       },
@@ -660,6 +912,14 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, частицы, дым, свет, блики",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 2-3 slides with unique illustrations and text",
+            "Elements: background, characters / objects, texts, FX transition animations",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, particles, smoke, light, glare",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -667,6 +927,8 @@ export const CATEGORIES = [
   },
   {
     name: "Маркетинг (Promo)",
+    nameRu: "Маркетинг",
+    nameEn: "Marketing (Promo)",
     items: [
       { 
         id: 'promo_cover', 
@@ -686,6 +948,15 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, дым, частицы, световые акценты",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 5 cover variants, color and composition variants for A/B test",
+            "Formats: 1920×1080, 1080×1080, 1080×1920 (adaptives per spec)",
+            "Elements: logo, character / symbols, background, FX",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, smoke, particles, light accents",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -708,6 +979,16 @@ export const CATEGORIES = [
             "Цветовые / композиционные варианты под тест CTR",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 5 visual variants",
+            "Ratios per client spec: 1920×1080 (desktop), 1080×1080 (square), 1080×1920 (vertical / stories), 1200×628 (web banner)",
+            "Elements: logo, character / symbols, background, CTA text, FX",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, sparks, smoke, light trails",
+            "Color / composition variants for CTR testing",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -730,6 +1011,16 @@ export const CATEGORIES = [
             "Возможность создания вертикального и горизонтального формата",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP (4K) + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 1 main composition + 2 adaptive frames (per spec)",
+            "Elements: characters, logo, FX, environment, lighting scheme",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): smoke, light, particles, glow, energy streams",
+            "Versions: with and without logo",
+            "Option to create vertical and horizontal formats",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP (4K) + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -751,6 +1042,15 @@ export const CATEGORIES = [
             "FX-слои (по необходимости): свечение, дым, искры, поток света, пыль",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 2 compositions (per client spec)",
+            "Formats: 1920×1080, 1080×1920, 1080×1080 (adaptives for YouTube, TikTok, Telegram, Instagram)",
+            "Elements: background, characters / symbols, logo, CTA text, FX",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, smoke, sparks, light stream, dust",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },
@@ -773,6 +1073,16 @@ export const CATEGORIES = [
             "Варианты: «active / inactive» состояния (по запросу клиента)",
             "2 круга минорных правок",
             "Финальный экспорт: PNG/WebP + исходники PSD/AI/Procreate/Figma (по ТЗ)"
+          ],
+          techEn: [
+            "Contents: 1 main variant + 3 adaptive versions",
+            "Formats: 512×512, 1024×1024, 2048×2048 (PNG/WebP/SVG)",
+            "Elements: logo or object, background, FX, outline / frame (per game setting)",
+            "Layered artwork (PSD/AI/Procreate) for easy animation and adaptation to Spine / After Effects",
+            "FX layers (if needed): glow, smoke, particles, soft gradient",
+            "Variants: active / inactive states (per client request)",
+            "2 rounds of minor revisions",
+            "Final export: PNG/WebP + source PSD/AI/Procreate/Figma (per spec)"
           ]
         }
       },

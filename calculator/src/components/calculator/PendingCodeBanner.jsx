@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClaimSharedSession } from '../../hooks/useSharedSessions';
 import useCalculatorStore from '../../stores/calculatorStore';
 
@@ -10,6 +11,7 @@ const PENDING_CODE_KEY = 'pending_shared_code';
  * Auto-claims the shared session and redirects to calculator.
  */
 export function PendingCodeBanner() {
+  const { t } = useTranslation('calculator');
   const navigate = useNavigate();
   const claimSession = useClaimSharedSession();
   const { setProject, setSpecification } = useCalculatorStore();
@@ -75,10 +77,10 @@ export function PendingCodeBanner() {
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-blue-900">
-            You have a pending selection
+            {t('pendingCode.title')}
           </h3>
           <p className="text-sm text-blue-700 mt-1">
-            Code <span className="font-mono font-bold">{pendingCode}</span> — import it into a new project?
+            {t('pendingCode.description', { code: pendingCode })}
           </p>
           {claimError && (
             <p className="text-sm text-red-600 mt-2">{claimError}</p>
@@ -92,17 +94,17 @@ export function PendingCodeBanner() {
               {claiming ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Importing...
+                  {t('pendingCode.importing')}
                 </>
               ) : (
-                'Import Selection'
+                t('pendingCode.import')
               )}
             </button>
             <button
               onClick={handleDismiss}
               className="px-4 py-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
             >
-              Dismiss
+              {t('pendingCode.dismiss')}
             </button>
           </div>
         </div>

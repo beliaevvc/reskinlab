@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { usePromoCodes, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode, useTogglePromoCode } from '../../hooks/usePromoCodes';
 import { formatDate, formatCurrency } from '../../lib/utils';
 
@@ -7,7 +8,7 @@ import { formatDate, formatCurrency } from '../../lib/utils';
 /**
  * Delete confirmation modal
  */
-function DeleteConfirmModal({ isOpen, onClose, onConfirm, promoCode, isDeleting }) {
+function DeleteConfirmModal({ isOpen, onClose, onConfirm, promoCode, isDeleting, t }) {
   if (!isOpen) return null;
 
   return createPortal(
@@ -25,12 +26,12 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, promoCode, isDeleting 
         {/* Content */}
         <div className="text-center mb-6">
           <h2 className="text-lg font-semibold text-neutral-900 mb-2">
-            Delete Promo Code?
+            {t('promoCodes.modal.deleteTitle')}
           </h2>
           <p className="text-sm text-neutral-600">
-            You are about to delete{' '}
+            {t('promoCodes.modal.deleteMessage')}{' '}
             <span className="font-mono font-medium bg-neutral-100 px-1.5 py-0.5 rounded">{promoCode?.code}</span>.
-            This action cannot be undone.
+            {t('promoCodes.modal.cannotUndo')}
           </p>
         </div>
 
@@ -42,7 +43,7 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, promoCode, isDeleting 
             disabled={isDeleting}
             className="flex-1 px-4 py-2.5 rounded border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t('promoCodes.actions.cancel')}
           </button>
           <button
             type="button"
@@ -53,10 +54,10 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, promoCode, isDeleting 
             {isDeleting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                Deleting...
+                {t('promoCodes.actions.deleting')}
               </>
             ) : (
-              'Delete'
+              t('promoCodes.actions.delete')
             )}
           </button>
         </div>
@@ -81,7 +82,7 @@ function generatePromoCode(prefix = 'RESKIN') {
   return `${prefix}-${code}`;
 }
 
-function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
+function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving, t }) {
   const [formData, setFormData] = useState({
     code: promoCode?.code || '',
     type: promoCode?.discount_type === 'percent' ? 'percentage' : (promoCode?.discount_type || 'percentage'),
@@ -149,7 +150,7 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
               </svg>
             </div>
             <h2 className="text-lg font-semibold text-neutral-900">
-              {isEditing ? 'Edit Promo Code' : 'New Promo Code'}
+              {isEditing ? t('promoCodes.modal.editTitle') : t('promoCodes.modal.newTitle')}
             </h2>
           </div>
           <button
@@ -167,7 +168,7 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                Code <span className="text-red-500">*</span>
+                {t('promoCodes.form.code')} <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <input
@@ -186,13 +187,13 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    Generate
+                    {t('promoCodes.form.generate')}
                   </button>
                 )}
               </div>
               {!isEditing && (
                 <div className="mt-1.5 flex items-center gap-2">
-                  <span className="text-xs text-neutral-400">Prefix:</span>
+                  <span className="text-xs text-neutral-400">{t('promoCodes.form.prefix')}</span>
                   <input
                     type="text"
                     value={prefix}
@@ -208,19 +209,19 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
             <div className="border-t border-neutral-100 pt-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">Type</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t('promoCodes.form.type')}</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
                     className="w-full px-4 py-2.5 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm transition-colors"
                   >
-                    <option value="percentage">Percentage</option>
-                    <option value="fixed">Fixed Amount</option>
+                    <option value="percentage">{t('promoCodes.types.percent')}</option>
+                    <option value="fixed">{t('promoCodes.types.fixed')}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                    Value <span className="text-red-500">*</span>
+                    {t('promoCodes.form.value')} <span className="text-red-500">*</span>
                     <span className="text-neutral-400 font-normal ml-1">{formData.type === 'percentage' ? '%' : '$'}</span>
                   </label>
                   <input
@@ -241,25 +242,25 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                    Min Order <span className="text-neutral-400 font-normal">($)</span>
+                    {t('promoCodes.form.minOrder')} <span className="text-neutral-400 font-normal">($)</span>
                   </label>
                   <input
                     type="number"
                     value={formData.minOrder}
                     onChange={(e) => setFormData(prev => ({ ...prev, minOrder: e.target.value }))}
-                    placeholder="No minimum"
+                    placeholder={t('promoCodes.form.noMinimum')}
                     min="0"
                     step="0.01"
                     className="w-full px-4 py-2.5 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">Max Uses</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t('promoCodes.form.maxUses')}</label>
                   <input
                     type="number"
                     value={formData.maxUses}
                     onChange={(e) => setFormData(prev => ({ ...prev, maxUses: e.target.value }))}
-                    placeholder="Unlimited"
+                    placeholder={t('promoCodes.form.unlimited')}
                     min="1"
                     className="w-full px-4 py-2.5 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm transition-colors"
                   />
@@ -267,7 +268,7 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
               </div>
 
               <div className="mt-3">
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Expires At</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t('promoCodes.form.expiresAt')}</label>
                 <input
                   type="date"
                   value={formData.expiresAt}
@@ -296,7 +297,7 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
                   />
                 </span>
                 <span className="text-sm font-medium text-neutral-700">
-                  {formData.isActive ? 'Active' : 'Inactive'}
+                  {formData.isActive ? t('promoCodes.status.active') : t('promoCodes.status.inactive')}
                 </span>
               </button>
             </div>
@@ -310,7 +311,7 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
               disabled={isSaving}
               className="flex-1 px-4 py-2.5 rounded border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t('promoCodes.actions.cancel')}
             </button>
             <button
               type="submit"
@@ -320,12 +321,12 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
               {isSaving ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Saving...
+                  {t('promoCodes.actions.saving')}
                 </>
               ) : isEditing ? (
-                'Save Changes'
+                t('promoCodes.actions.save')
               ) : (
-                'Create Code'
+                t('promoCodes.actions.createCode')
               )}
             </button>
           </div>
@@ -337,6 +338,7 @@ function PromoCodeModal({ promoCode, isOpen, onClose, onSave, isSaving }) {
 }
 
 export function PromoCodesPage() {
+  const { t } = useTranslation('admin');
   const [showModal, setShowModal] = useState(false);
   const [editingCode, setEditingCode] = useState(null);
   const [deletingCode, setDeletingCode] = useState(null);
@@ -400,8 +402,8 @@ export function PromoCodesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Promo Codes</h1>
-          <p className="text-neutral-500 mt-1">Manage discount codes for the calculator</p>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('promoCodes.title')}</h1>
+          <p className="text-neutral-500 mt-1">{t('promoCodes.subtitle')}</p>
         </div>
         <button
           onClick={() => { setEditingCode(null); setShowModal(true); }}
@@ -410,18 +412,18 @@ export function PromoCodesPage() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Create Code
+          {t('promoCodes.create')}
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Total Codes</p>
+          <p className="text-sm text-neutral-500">{t('promoCodes.stats.total')}</p>
           <p className="text-2xl font-bold text-neutral-900 mt-1">{promoCodes?.length || 0}</p>
         </div>
         <div className="bg-white rounded-md border border-neutral-200 p-4">
-          <p className="text-sm text-neutral-500">Active Codes</p>
+          <p className="text-sm text-neutral-500">{t('promoCodes.stats.active')}</p>
           <p className="text-2xl font-bold text-emerald-600 mt-1">{activeCount}</p>
         </div>
       </div>
@@ -434,18 +436,18 @@ export function PromoCodesPage() {
           </div>
         ) : promoCodes?.length === 0 ? (
           <div className="text-center py-12 text-neutral-500">
-            No promo codes yet
+            {t('promoCodes.noCodesYet')}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-neutral-200">
               <thead className="bg-neutral-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Code</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Discount</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Usage</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Expires</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('promoCodes.table.code')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('promoCodes.table.discount')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('promoCodes.table.usage')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('promoCodes.table.expires')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase">{t('promoCodes.table.status')}</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-neutral-500 uppercase w-16"></th>
                 </tr>
               </thead>
@@ -461,14 +463,14 @@ export function PromoCodesPage() {
                         type="button"
                         onClick={(e) => handleCopyCode(e, code)}
                         className="group relative font-mono text-sm font-medium text-neutral-900 bg-neutral-100 hover:bg-emerald-50 hover:text-emerald-700 px-2 py-1 rounded transition-colors"
-                        title="Click to copy"
+                        title={t('promoCodes.actions.clickToCopy')}
                       >
                         {copiedId === code.id ? (
                           <span className="flex items-center gap-1 text-emerald-600">
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            Copied!
+                            {t('promoCodes.actions.copied')}
                           </span>
                         ) : (
                           <span className="flex items-center gap-1.5">
@@ -486,7 +488,7 @@ export function PromoCodesPage() {
                       </span>
                       {code.min_order_amount && (
                         <span className="text-xs text-neutral-500 block">
-                          Min: {formatCurrency(code.min_order_amount)}
+                          {t('promoCodes.min')} {formatCurrency(code.min_order_amount)}
                         </span>
                       )}
                     </td>
@@ -498,14 +500,14 @@ export function PromoCodesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm text-neutral-500">
-                        {code.valid_until ? formatDate(code.valid_until) : 'Never'}
+                        {code.valid_until ? formatDate(code.valid_until) : t('promoCodes.never')}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleToggle(code.id, code.is_active); }}
                         className="flex items-center gap-2 group"
-                        title={code.is_active ? 'Deactivate' : 'Activate'}
+                        title={code.is_active ? t('promoCodes.actions.deactivate') : t('promoCodes.actions.activate')}
                       >
                         <span
                           className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
@@ -519,7 +521,7 @@ export function PromoCodesPage() {
                           />
                         </span>
                         <span className={`text-xs font-medium ${code.is_active ? 'text-emerald-700' : 'text-neutral-400'}`}>
-                          {code.is_active ? 'Active' : 'Inactive'}
+                          {code.is_active ? t('promoCodes.status.active') : t('promoCodes.status.inactive')}
                         </span>
                       </button>
                     </td>
@@ -549,6 +551,7 @@ export function PromoCodesPage() {
         onClose={() => { setShowModal(false); setEditingCode(null); }}
         onSave={handleSave}
         isSaving={createCode.isPending || updateCode.isPending}
+        t={t}
       />
 
       {/* Delete Confirmation Modal */}
@@ -558,6 +561,7 @@ export function PromoCodesPage() {
         onConfirm={handleDeleteConfirm}
         promoCode={deletingCode}
         isDeleting={deleteCode.isPending}
+        t={t}
       />
     </div>
   );

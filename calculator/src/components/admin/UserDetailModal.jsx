@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useUser, useAdminUpdateProfile, useUpdateUserRole } from '../../hooks/useUsers';
 import { useUpdateClient } from '../../hooks/useClients';
 import { useDeleteProject } from '../../hooks/useProjects';
@@ -11,21 +12,21 @@ import { OfferModal } from '../project/OfferModal';
 import { SpecificationModal } from '../project/SpecificationModal';
 import UserAvatar from '../UserAvatar';
 
-const ROLE_CONFIG = {
+const ROLE_CONFIG_KEYS = {
   admin: {
-    label: 'Admin',
+    labelKey: 'users.roles.admin',
     badge: 'bg-purple-100 text-purple-700',
     avatarRing: 'ring-purple-400',
     dotColor: 'bg-purple-400',
   },
   am: {
-    label: 'Account Manager',
+    labelKey: 'users.roles.am',
     badge: 'bg-blue-100 text-blue-700',
     avatarRing: 'ring-blue-400',
     dotColor: 'bg-blue-400',
   },
   client: {
-    label: 'Client',
+    labelKey: 'users.roles.client',
     badge: 'bg-emerald-100 text-emerald-700',
     avatarRing: 'ring-emerald-400',
     dotColor: 'bg-emerald-400',
@@ -65,13 +66,13 @@ const TAB_ICONS = {
   ),
 };
 
-const TABS = [
-  { id: 'profile', label: 'Profile' },
-  { id: 'company', label: 'Company' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'specs', label: 'Specs / Offers' },
-  { id: 'finance', label: 'Finance' },
-  { id: 'activity', label: 'Activity' },
+const TAB_KEYS = [
+  { id: 'profile', labelKey: 'userDetail.tabs.profile' },
+  { id: 'company', labelKey: 'userDetail.tabs.company' },
+  { id: 'projects', labelKey: 'userDetail.tabs.projects' },
+  { id: 'specs', labelKey: 'userDetail.tabs.specs' },
+  { id: 'finance', labelKey: 'userDetail.tabs.finance' },
+  { id: 'activity', labelKey: 'userDetail.tabs.activity' },
 ];
 
 const ACTION_COLORS = {
@@ -205,7 +206,7 @@ function InlineField({ value, onSave, type = 'text', placeholder = '—', classN
 /**
  * Inline role selector — click to open dropdown.
  */
-function InlineRoleField({ value, onSave, roleConfig: currentRoleConfig }) {
+function InlineRoleField({ value, onSave, roleConfig: currentRoleConfig, t }) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const selectRef = useRef(null);
@@ -231,9 +232,9 @@ function InlineRoleField({ value, onSave, roleConfig: currentRoleConfig }) {
         disabled={saving}
         className={`text-xs font-medium border border-emerald-300 rounded-full px-2.5 py-0.5 outline-none bg-white cursor-pointer ${saving ? 'opacity-50' : ''}`}
       >
-        <option value="admin">Admin</option>
-        <option value="am">Account Manager</option>
-        <option value="client">Client</option>
+        <option value="admin">{t('users.roles.admin')}</option>
+        <option value="am">{t('users.roles.am')}</option>
+        <option value="client">{t('users.roles.client')}</option>
       </select>
     );
   }
@@ -246,13 +247,14 @@ function InlineRoleField({ value, onSave, roleConfig: currentRoleConfig }) {
     >
       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${currentRoleConfig.badge} group-hover/role:ring-1 group-hover/role:ring-emerald-300 transition-all`}>
         <span className={`w-1.5 h-1.5 rounded-full ${currentRoleConfig.dotColor}`} />
-        {currentRoleConfig.label}
+        {t(currentRoleConfig.labelKey)}
       </span>
     </button>
   );
 }
 
 export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile' }) {
+  const { t } = useTranslation('admin');
   const [activeTab, setActiveTab] = useState(initialTab);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [copiedId, setCopiedId] = useState(false);
@@ -307,7 +309,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
 
   if (!isOpen) return null;
 
-  const roleConfig = ROLE_CONFIG[user?.role] || ROLE_CONFIG.client;
+  const roleConfigKey = ROLE_CONFIG_KEYS[user?.role] || ROLE_CONFIG_KEYS.client;
   const recentlyActive = isRecentlyActive(user?.last_login_at);
 
   const renderHeroHeader = () => {
@@ -350,13 +352,13 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-lg font-semibold text-neutral-900 truncate">
-                  {user.full_name || 'No name'}
+                  {user.full_name || t('userDetail.noName')}
                 </h2>
                 <p className="text-sm text-neutral-500 truncate">{user.email}</p>
               </div>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${roleConfig.badge}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${roleConfig.dotColor}`} />
-                {roleConfig.label}
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${roleConfigKey.badge}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${roleConfigKey.dotColor}`} />
+                {t(roleConfigKey.labelKey)}
               </span>
             </div>
 
@@ -367,7 +369,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
                 <span className="font-medium text-neutral-700">{user.projects_count || user.projects?.length || 0}</span>
-                <span>projects</span>
+                <span>{t('userDetail.projects')}</span>
               </div>
               <div className="w-px h-3 bg-neutral-200" />
               <div className="flex items-center gap-1.5 text-xs text-neutral-500">
@@ -381,7 +383,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span>Joined {formatDate(user.created_at)}</span>
+                <span>{t('userDetail.joined')} {formatDate(user.created_at)}</span>
               </div>
             </div>
           </div>
@@ -410,7 +412,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
     }
 
     if (!user) {
-      return <div className="py-8 text-center text-neutral-500">User not found</div>;
+      return <div className="py-8 text-center text-neutral-500">{t('userDetail.userNotFound')}</div>;
     }
 
     switch (activeTab) {
@@ -420,32 +422,33 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
             {/* Personal info — editable */}
             <div className="bg-white rounded-lg border border-neutral-200 divide-y divide-neutral-100">
               <div className="flex items-center justify-between px-4 py-3.5">
-                <span className="text-xs text-neutral-400 uppercase tracking-wider">Full Name</span>
+                <span className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.fullName')}</span>
                 <InlineField
                   value={user.full_name}
                   onSave={(v) => saveProfileField('full_name', v)}
-                  placeholder="Add name"
+                  placeholder={t('userDetail.profile.addName')}
                 />
               </div>
               <div className="flex items-center justify-between px-4 py-3.5">
-                <span className="text-xs text-neutral-400 uppercase tracking-wider">Email</span>
+                <span className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.email')}</span>
                 <span className="text-sm text-neutral-900">{user.email}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-3.5">
-                <span className="text-xs text-neutral-400 uppercase tracking-wider">Phone</span>
+                <span className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.phone')}</span>
                 <InlineField
                   value={user.phone}
                   onSave={(v) => saveProfileField('phone', v)}
                   type="tel"
-                  placeholder="Add phone"
+                  placeholder={t('userDetail.profile.addPhone')}
                 />
               </div>
               <div className="flex items-center justify-between px-4 py-3.5">
-                <span className="text-xs text-neutral-400 uppercase tracking-wider">Role</span>
+                <span className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.role')}</span>
                 <InlineRoleField
                   value={user.role}
                   onSave={saveRole}
-                  roleConfig={roleConfig}
+                  roleConfig={roleConfigKey}
+                  t={t}
                 />
               </div>
             </div>
@@ -453,20 +456,20 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
             {/* System info — 2x2 grid */}
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                <p className="text-xs text-neutral-400 uppercase tracking-wider">Status</p>
+                <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.status')}</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className={`w-1.5 h-1.5 rounded-full ${user.is_active !== false ? 'bg-emerald-500' : 'bg-red-500'}`} />
                   <span className={`text-sm font-medium ${user.is_active !== false ? 'text-emerald-600' : 'text-red-600'}`}>
-                    {user.is_active !== false ? 'Active' : 'Blocked'}
+                    {user.is_active !== false ? t('userDetail.profile.active') : t('userDetail.profile.blocked')}
                   </span>
                 </div>
               </div>
               <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                <p className="text-xs text-neutral-400 uppercase tracking-wider">Joined</p>
+                <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.joined')}</p>
                 <p className="text-sm text-neutral-900 mt-1">{formatDate(user.created_at)}</p>
               </div>
               <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                <p className="text-xs text-neutral-400 uppercase tracking-wider">Last Login</p>
+                <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.lastLogin')}</p>
                 <p className="text-sm text-neutral-900 mt-1">
                   {user.last_login_at 
                     ? (getRelativeTime(user.last_login_at) || formatDateTime(user.last_login_at))
@@ -478,7 +481,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                 onClick={handleCopyId}
                 title="Click to copy"
               >
-                <p className="text-xs text-neutral-400 uppercase tracking-wider">{copiedId ? 'Copied!' : 'User ID'}</p>
+                <p className="text-xs text-neutral-400 uppercase tracking-wider">{copiedId ? t('userDetail.profile.copied') : t('userDetail.profile.userId')}</p>
                 <p className="text-xs font-mono text-neutral-500 mt-1 truncate">{user.id}</p>
               </div>
             </div>
@@ -490,7 +493,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                 className="w-full flex items-center justify-between px-4 py-3.5 bg-white rounded-lg border border-neutral-200 hover:border-neutral-300 transition-colors text-left group"
               >
                 <div className="min-w-0">
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider">Company</p>
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.profile.company')}</p>
                   <p className="text-sm font-medium text-neutral-900 mt-0.5">{user.client.company_name}</p>
                 </div>
                 <svg className="w-4 h-4 text-neutral-300 group-hover:text-neutral-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -508,12 +511,12 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
               <>
                 {/* Company name — prominent */}
                 <div className="bg-white rounded-lg border border-neutral-200 px-4 py-4">
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider">Company Name</p>
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.company.companyName')}</p>
                   <div className="mt-1">
                     <InlineField
                       value={user.client.company_name}
                       onSave={(v) => saveClientField('company_name', v)}
-                      placeholder="Add company name"
+                      placeholder={t('userDetail.company.addCompanyName')}
                       className="font-medium text-base"
                     />
                   </div>
@@ -522,38 +525,38 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                 {/* Contact details — 2x2 grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                    <p className="text-xs text-neutral-400 uppercase tracking-wider">Contact Email</p>
+                    <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.company.contactEmail')}</p>
                     <p className="text-sm text-neutral-900 mt-1 truncate">{user.email}</p>
                   </div>
                   <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                    <p className="text-xs text-neutral-400 uppercase tracking-wider">Phone</p>
+                    <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.company.phone')}</p>
                     <div className="mt-1">
                       <InlineField
                         value={user.client.contact_phone}
                         onSave={(v) => saveClientField('contact_phone', v)}
-                        placeholder="Add phone"
+                        placeholder={t('userDetail.company.addPhone')}
                         className="text-left"
                       />
                     </div>
                   </div>
                   <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                    <p className="text-xs text-neutral-400 uppercase tracking-wider">Country</p>
+                    <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.company.country')}</p>
                     <div className="mt-1">
                       <InlineField
                         value={user.client.country}
                         onSave={(v) => saveClientField('country', v)}
-                        placeholder="Add country"
+                        placeholder={t('userDetail.company.addCountry')}
                         className="text-left"
                       />
                     </div>
                   </div>
                   <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                    <p className="text-xs text-neutral-400 uppercase tracking-wider">Address</p>
+                    <p className="text-xs text-neutral-400 uppercase tracking-wider">{t('userDetail.company.address')}</p>
                     <div className="mt-1">
                       <InlineField
                         value={user.client.address}
                         onSave={(v) => saveClientField('address', v)}
-                        placeholder="Add address"
+                        placeholder={t('userDetail.company.addAddress')}
                         className="text-left"
                       />
                     </div>
@@ -563,14 +566,14 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                 {/* Notes — separate block */}
                 {user.client.notes && (
                   <div className="bg-white rounded-lg border border-neutral-200 px-4 py-3.5">
-                    <p className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Notes</p>
+                    <p className="text-xs text-neutral-400 uppercase tracking-wider mb-2">{t('userDetail.company.notes')}</p>
                     <p className="text-sm text-neutral-700 leading-relaxed">{user.client.notes}</p>
                   </div>
                 )}
               </>
             ) : (
               <div className="py-12 text-center">
-                <p className="text-sm text-neutral-400">No company linked to this user</p>
+                <p className="text-sm text-neutral-400">{t('userDetail.company.noCompany')}</p>
               </div>
             )}
           </div>
@@ -621,7 +624,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                             <p className="font-semibold text-neutral-900 hover:text-emerald-600 transition-colors text-sm">
                               {project.name}
                             </p>
-                            <p className="text-xs text-neutral-500 mt-0.5">Created {formatDate(project.created_at)}</p>
+                            <p className="text-xs text-neutral-500 mt-0.5">{t('userDetail.projectsTab.created')} {formatDate(project.created_at)}</p>
                           </div>
                         </div>
                         
@@ -631,7 +634,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                             <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span>{specCount} specs</span>
+                            <span>{specCount} {t('userDetail.projectsTab.specs')}</span>
                           </div>
 
                           <div className="w-px h-3 bg-neutral-200" />
@@ -640,10 +643,10 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                             <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
-                            {paidInvoices > 0 && <span className="text-emerald-600 font-medium">{paidInvoices} paid</span>}
+                            {paidInvoices > 0 && <span className="text-emerald-600 font-medium">{paidInvoices} {t('userDetail.projectsTab.paid')}</span>}
                             {paidInvoices > 0 && pendingInvoices > 0 && <span className="text-neutral-300">/</span>}
-                            {pendingInvoices > 0 && <span className="text-amber-600 font-medium">{pendingInvoices} pending</span>}
-                            {paidInvoices === 0 && pendingInvoices === 0 && <span className="text-neutral-500">0 invoices</span>}
+                            {pendingInvoices > 0 && <span className="text-amber-600 font-medium">{pendingInvoices} {t('userDetail.projectsTab.pending')}</span>}
+                            {paidInvoices === 0 && pendingInvoices === 0 && <span className="text-neutral-500">0 {t('userDetail.projectsTab.invoices')}</span>}
                           </div>
 
                           {totalStages > 0 && (
@@ -701,7 +704,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
                 </div>
-                <p className="text-sm text-neutral-500">No projects found</p>
+                <p className="text-sm text-neutral-500">{t('userDetail.projectsTab.noProjects')}</p>
               </div>
             )}
 
@@ -716,7 +719,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-neutral-900">Delete project?</h3>
+                    <h3 className="text-lg font-semibold text-neutral-900">{t('userDetail.projectsTab.deleteProject')}</h3>
                   </div>
                   <p className="text-sm text-neutral-600 mb-6">
                     <span className="font-medium text-neutral-900">{deleteConfirm.name}</span> and all its data will be permanently deleted.
@@ -726,14 +729,14 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                       onClick={() => setDeleteConfirm(null)}
                       className="flex-1 px-4 py-2.5 rounded-lg border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors text-sm"
                     >
-                      Cancel
+                      {t('userDetail.cancel')}
                     </button>
                     <button
                       onClick={() => handleDeleteProject(deleteConfirm.id)}
                       disabled={deleteProject.isPending}
                       className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50"
                     >
-                      {deleteProject.isPending ? 'Deleting...' : 'Delete'}
+                      {deleteProject.isPending ? t('userDetail.deleting') : t('userDetail.delete')}
                     </button>
                   </div>
                 </div>
@@ -781,11 +784,11 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-neutral-900">Specifications & Offers</h3>
+              <h3 className="text-sm font-semibold text-neutral-900">{t('userDetail.specsTab.title')}</h3>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-neutral-500">{specsList.length} spec{specsList.length !== 1 ? 's' : ''}</span>
+                <span className="text-xs text-neutral-500">{specsList.length} {t('userDetail.specsTab.specs')}{specsList.length !== 1 ? 's' : ''}</span>
                 {totalOffers > 0 && (
-                  <span className="text-xs text-neutral-400">{totalOffers} offer{totalOffers !== 1 ? 's' : ''}</span>
+                  <span className="text-xs text-neutral-400">{totalOffers} {t('userDetail.specsTab.offers')}{totalOffers !== 1 ? 's' : ''}</span>
                 )}
               </div>
             </div>
@@ -923,7 +926,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <p className="text-sm text-neutral-500">No specifications yet</p>
+                <p className="text-sm text-neutral-500">{t('userDetail.specsTab.noSpecs')}</p>
               </div>
             )}
           </div>
@@ -945,9 +948,9 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">Revenue</p>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">{t('userDetail.finance.revenue')}</p>
                     <p className="text-xl font-bold text-neutral-900 mt-1">{formatCurrency(user.finance?.total_revenue || 0)}</p>
-                    <p className="text-xs text-emerald-600 font-medium mt-1">{user.finance?.paid_invoices || 0} paid invoices</p>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">{user.finance?.paid_invoices || 0} {t('userDetail.finance.paidInvoices')}</p>
                   </div>
                 </div>
               </div>
@@ -961,9 +964,9 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">Pending</p>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">{t('userDetail.finance.pending')}</p>
                     <p className="text-xl font-bold text-neutral-900 mt-1">{formatCurrency(user.finance?.pending_revenue || 0)}</p>
-                    <p className="text-xs text-amber-600 font-medium mt-1">{user.finance?.pending_invoices || 0} pending invoices</p>
+                    <p className="text-xs text-amber-600 font-medium mt-1">{user.finance?.pending_invoices || 0} {t('userDetail.finance.pendingInvoices')}</p>
                   </div>
                 </div>
               </div>
@@ -973,7 +976,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
             <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 rounded-lg p-5 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider font-medium">Total Lifetime Value</p>
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider font-medium">{t('userDetail.finance.lifetimeValue')}</p>
                   <p className="text-3xl font-bold mt-1">
                     {formatCurrency((user.finance?.total_revenue || 0) + (user.finance?.pending_revenue || 0))}
                   </p>
@@ -989,8 +992,8 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
             {/* Invoices grouped by project */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-neutral-900">Invoices</h3>
-                <span className="text-xs text-neutral-500">{invoicesList.length} total</span>
+                <h3 className="text-sm font-semibold text-neutral-900">{t('userDetail.finance.invoices')}</h3>
+                <span className="text-xs text-neutral-500">{invoicesList.length} {t('userDetail.finance.total')}</span>
               </div>
 
               {invoicesList.length > 0 ? (
@@ -1152,7 +1155,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <p className="text-sm text-neutral-500">No invoices yet</p>
+                  <p className="text-sm text-neutral-500">{t('userDetail.finance.noInvoices')}</p>
                 </div>
               )}
             </div>
@@ -1224,7 +1227,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="text-sm text-neutral-500">No activity recorded</p>
+                <p className="text-sm text-neutral-500">{t('userDetail.activity.noActivity')}</p>
               </div>
             )}
           </div>
@@ -1248,7 +1251,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
         {/* Tabs */}
         <div className="bg-white px-6 border-b border-neutral-200">
           <div className="flex gap-1 -mb-px">
-            {TABS.map(tab => (
+            {TAB_KEYS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -1261,7 +1264,7 @@ export function UserDetailModal({ userId, isOpen, onClose, initialTab = 'profile
                 <span className={activeTab === tab.id ? 'text-emerald-500' : 'text-neutral-400'}>
                   {TAB_ICONS[tab.id]}
                 </span>
-                {tab.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </div>

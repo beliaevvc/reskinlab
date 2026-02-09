@@ -1,4 +1,5 @@
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { useAuditStats, useAuditDailyActivity, useAuditAnomalyCheck } from '../../hooks/useAuditLogs';
 
 /**
@@ -58,6 +59,7 @@ function StatCard({ label, value, sparklineData, sparklineColor, suffix = '' }) 
  * AuditLogsStats — stat cards with sparklines at the top of the page
  */
 export function AuditLogsStats() {
+  const { t } = useTranslation('admin');
   const { data: stats } = useAuditStats();
   const { data: dailyActivity } = useAuditDailyActivity();
   const { data: anomaly } = useAuditAnomalyCheck();
@@ -70,19 +72,19 @@ export function AuditLogsStats() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
-        label="Last 24 Hours"
+        label={t('auditLog.stats.last24h')}
         value={stats?.last24h}
         sparklineData={last7dData}
         sparklineColor="#10B981"
       />
       <StatCard
-        label="Last 7 Days"
+        label={t('auditLog.stats.last7d')}
         value={stats?.last7d}
         sparklineData={last7dData}
         sparklineColor="#3B82F6"
       />
       <StatCard
-        label="Last 30 Days"
+        label={t('auditLog.stats.last30d')}
         value={stats?.last30d}
         sparklineData={last30dData}
         sparklineColor="#8B5CF6"
@@ -91,21 +93,21 @@ export function AuditLogsStats() {
         anomaly?.isAnomaly ? 'border-orange-300 bg-orange-50' : 'border-neutral-200'
       }`}>
         <div>
-          <p className="text-sm text-neutral-500">Today vs Average</p>
+          <p className="text-sm text-neutral-500">{t('auditLog.stats.todayVsAverage')}</p>
           <div className="flex items-baseline gap-2 mt-1">
             <p className={`text-2xl font-bold ${anomaly?.isAnomaly ? 'text-orange-600' : 'text-neutral-900'}`}>
               {anomaly ? `${anomaly.ratio}x` : '—'}
             </p>
             {anomaly && (
               <span className="text-sm text-neutral-500">
-                {anomaly.todayCount} today / {anomaly.dailyAvg} avg
+                {anomaly.todayCount} {t('auditLog.stats.today')} / {anomaly.dailyAvg} {t('auditLog.stats.avg')}
               </span>
             )}
           </div>
         </div>
         {anomaly?.isAnomaly && (
           <p className="text-xs text-orange-600 mt-2 font-medium">
-            Unusual activity detected
+            {t('auditLog.stats.unusualActivity')}
           </p>
         )}
         {!anomaly?.isAnomaly && dailyActivity && (

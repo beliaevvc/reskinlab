@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useProjects, useAllProjects, useDeleteProject, useUpdateProject } from '../../hooks/useProjects';
 import { useAuth } from '../../contexts/AuthContext';
 import { CreateProjectModal } from '../../components/projects';
@@ -16,6 +17,7 @@ function useProjectBasePath() {
 }
 
 export function ProjectsPage() {
+  const { t } = useTranslation('projects');
   const { isAdmin, isAM } = useAuth();
   const isStaff = isAdmin || isAM;
   const basePath = useProjectBasePath();
@@ -85,12 +87,10 @@ export function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900">
-            {isStaff ? 'All Projects' : 'My Projects'}
+            {isStaff ? t('titleAll') : t('titleMy')}
           </h1>
           <p className="text-neutral-500 mt-1">
-            {isStaff
-              ? 'Manage all client projects and specifications'
-              : 'Manage your game art projects and specifications'}
+            {isStaff ? t('subtitleAll') : t('subtitleMy')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ export function ProjectsPage() {
                     ? 'bg-white text-neutral-900 shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-700'
                 }`}
-                title="Card view"
+                title={t('filters.cardView')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -117,7 +117,7 @@ export function ProjectsPage() {
                     ? 'bg-white text-neutral-900 shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-700'
                 }`}
-                title="List view"
+                title={t('filters.listView')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -142,7 +142,7 @@ export function ProjectsPage() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            New Project
+            {t('actions.newProject')}
           </button>
         </div>
       </div>
@@ -152,28 +152,28 @@ export function ProjectsPage() {
         <div className="bg-white rounded-lg border border-neutral-200 p-4">
           <div className="flex items-center gap-3">
             <div className="w-52">
-              <label className="block text-xs font-medium text-neutral-500 mb-1.5">Client</label>
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">{t('filters.client')}</label>
               <Select
                 value={filter.client}
                 onChange={(value) => setFilter(prev => ({ ...prev, client: value }))}
                 options={[
-                  { value: '', label: 'All clients' },
+                  { value: '', label: t('filters.allClients') },
                   ...clients.map(c => ({ value: c.id, label: c.name }))
                 ]}
               />
             </div>
             <div className="w-44">
-              <label className="block text-xs font-medium text-neutral-500 mb-1.5">Status</label>
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">{t('filters.status')}</label>
               <Select
                 value={filter.status}
                 onChange={(value) => setFilter(prev => ({ ...prev, status: value }))}
                 options={[
-                  { value: '', label: 'All statuses' },
-                  { value: 'draft', label: 'Draft' },
-                  { value: 'active', label: 'Active' },
-                  { value: 'in_production', label: 'In Production' },
-                  { value: 'completed', label: 'Completed' },
-                  { value: 'archived', label: 'Archived' },
+                  { value: '', label: t('filters.allStatuses') },
+                  { value: 'draft', label: t('status.draft') },
+                  { value: 'active', label: t('status.active') },
+                  { value: 'in_production', label: t('status.in_production') },
+                  { value: 'completed', label: t('status.completed') },
+                  { value: 'archived', label: t('status.archived') },
                 ]}
               />
             </div>
@@ -182,13 +182,13 @@ export function ProjectsPage() {
             {(filter.client || filter.status) && (
               <div className="flex items-center gap-3 ml-auto">
                 <span className="text-sm text-neutral-400">
-                  {filteredProjects.length} of {projects?.length || 0}
+                  {t('filters.ofCount', { filtered: filteredProjects.length, total: projects?.length || 0 })}
                 </span>
                 <button
                   onClick={() => setFilter({ client: '', status: '' })}
                   className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                 >
-                  Clear
+                  {t('filters.clear')}
                 </button>
               </div>
             )}
@@ -202,7 +202,7 @@ export function ProjectsPage() {
                     ? 'bg-white shadow-sm text-neutral-900'
                     : 'text-neutral-500 hover:text-neutral-700'
                 }`}
-                title="Card view"
+                title={t('filters.cardView')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -215,7 +215,7 @@ export function ProjectsPage() {
                     ? 'bg-white shadow-sm text-neutral-900'
                     : 'text-neutral-500 hover:text-neutral-700'
                 }`}
-                title="Table view"
+                title={t('filters.tableView')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -231,7 +231,7 @@ export function ProjectsPage() {
         <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-            <p className="text-sm text-neutral-500">Loading projects...</p>
+            <p className="text-sm text-neutral-500">{t('detail.loading')}</p>
           </div>
         </div>
       )}
@@ -240,7 +240,7 @@ export function ProjectsPage() {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-6">
           <p className="text-red-800">
-            Failed to load projects: {error.message}
+            {t('detail.loadError')}: {error.message}
           </p>
         </div>
       )}
@@ -264,12 +264,10 @@ export function ProjectsPage() {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-neutral-900 mb-2">
-            {isStaff ? 'No projects found' : 'No projects yet'}
+            {isStaff ? t('empty.titleStaff') : t('empty.title')}
           </h3>
           <p className="text-neutral-500 mb-6 max-w-sm mx-auto">
-            {isStaff
-              ? 'No projects match the current filters.'
-              : 'Create your first project to start building game art specifications.'}
+            {isStaff ? t('empty.subtitleStaff') : t('empty.clientSubtitle')}
           </p>
           {!isStaff && (
             <button
@@ -289,7 +287,7 @@ export function ProjectsPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Create First Project
+              {t('empty.createFirst')}
             </button>
           )}
         </div>
@@ -301,13 +299,13 @@ export function ProjectsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-neutral-200">
-                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Project</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Client</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Specs</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Offers</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Invoices</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Tasks</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.project')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.client')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.status')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.specs')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.offers')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.invoices')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.tasks')}</th>
                 <th className="px-4 py-3 w-10"></th>
               </tr>
             </thead>
@@ -349,7 +347,7 @@ export function ProjectsPage() {
                       <button 
                         onClick={(e) => { e.stopPropagation(); setDeleteConfirm(project); }} 
                         className="p-1.5 rounded hover:bg-red-50 text-neutral-300 hover:text-red-500 transition-colors"
-                        title="Delete"
+                        title={t('actions.delete')}
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -393,12 +391,12 @@ export function ProjectsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-neutral-200">
-                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Project</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Specs</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Offers</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Invoices</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">Tasks</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.project')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.status')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.specs')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.offers')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.invoices')}</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('table.tasks')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
@@ -456,13 +454,13 @@ export function ProjectsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-neutral-900">Delete Project</h3>
+                <h3 className="text-lg font-semibold text-neutral-900">{t('delete.title')}</h3>
               </div>
               <p className="text-neutral-600 mb-2">
-                Are you sure you want to delete <strong className="text-neutral-900">{deleteConfirm.name}</strong>?
+                {t('delete.confirm')} <strong className="text-neutral-900">{deleteConfirm.name}</strong>?
               </p>
               <p className="text-sm text-neutral-500">
-                This will permanently remove all specifications, offers, invoices, and files.
+                {t('delete.warning')}
               </p>
             </div>
             <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex justify-end gap-3">
@@ -470,14 +468,14 @@ export function ProjectsPage() {
                 onClick={() => setDeleteConfirm(null)}
                 className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors"
               >
-                Cancel
+                {t('actions.cancel')}
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm.id)}
                 disabled={deleteProject.isPending}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors disabled:opacity-50"
               >
-                {deleteProject.isPending ? 'Deleting...' : 'Delete Project'}
+                {deleteProject.isPending ? t('actions.deleting') : t('actions.deleteProject')}
               </button>
             </div>
           </div>
@@ -491,6 +489,7 @@ export function ProjectsPage() {
 
 // Admin Project Card — vertical card style with inline editing
 function AdminProjectCard({ project, basePath, onDelete }) {
+  const { t } = useTranslation('projects');
   const navigate = useNavigate();
   const updateProject = useUpdateProject();
   const clientName = project.client?.company_name || project.client?.profile?.full_name || '—';
@@ -517,7 +516,7 @@ function AdminProjectCard({ project, basePath, onDelete }) {
           <InlineEdit
             value={project.name}
             onSave={(value) => handleSave('name', value)}
-            placeholder="Project name"
+            placeholder={t('create.namePlaceholder')}
             inputClassName="text-base font-semibold"
           />
         </h3>
@@ -529,7 +528,7 @@ function AdminProjectCard({ project, basePath, onDelete }) {
         <InlineEdit
           value={project.description}
           onSave={(value) => handleSave('description', value)}
-          placeholder="Add description..."
+          placeholder={t('create.descriptionPlaceholder')}
           multiline
           inputClassName="text-sm"
         />
@@ -539,19 +538,19 @@ function AdminProjectCard({ project, basePath, onDelete }) {
       <div className="grid grid-cols-4 gap-2 mb-4">
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{specsCount}</div>
-          <div className="text-xs text-neutral-500">Specs</div>
+          <div className="text-xs text-neutral-500">{t('card.specs')}</div>
         </div>
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{offersCount}</div>
-          <div className="text-xs text-neutral-500">Offers</div>
+          <div className="text-xs text-neutral-500">{t('card.offers')}</div>
         </div>
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{invoicesCount}</div>
-          <div className="text-xs text-neutral-500">Invoices</div>
+          <div className="text-xs text-neutral-500">{t('card.invoices')}</div>
         </div>
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{tasksCount}</div>
-          <div className="text-xs text-neutral-500">Tasks</div>
+          <div className="text-xs text-neutral-500">{t('tasks.title')}</div>
         </div>
       </div>
 
@@ -568,7 +567,7 @@ function AdminProjectCard({ project, basePath, onDelete }) {
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
             className="p-1.5 rounded hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-colors"
-            title="Delete"
+            title={t('actions.delete')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -582,6 +581,7 @@ function AdminProjectCard({ project, basePath, onDelete }) {
 
 // Client Project Card — same as AdminProjectCard but without client info
 function ClientProjectCard({ project, basePath }) {
+  const { t } = useTranslation('projects');
   const navigate = useNavigate();
   const updateProject = useUpdateProject();
   const specsCount = project.specifications?.[0]?.count || 0;
@@ -607,7 +607,7 @@ function ClientProjectCard({ project, basePath }) {
           <InlineEdit
             value={project.name}
             onSave={(value) => handleSave('name', value)}
-            placeholder="Project name"
+            placeholder={t('create.namePlaceholder')}
             inputClassName="text-base font-semibold"
           />
         </h3>
@@ -619,7 +619,7 @@ function ClientProjectCard({ project, basePath }) {
         <InlineEdit
           value={project.description}
           onSave={(value) => handleSave('description', value)}
-          placeholder="Add description..."
+          placeholder={t('create.descriptionPlaceholder')}
           multiline
           inputClassName="text-sm"
         />
@@ -629,19 +629,19 @@ function ClientProjectCard({ project, basePath }) {
       <div className="grid grid-cols-4 gap-2 mb-4">
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{specsCount}</div>
-          <div className="text-xs text-neutral-500">Specs</div>
+          <div className="text-xs text-neutral-500">{t('card.specs')}</div>
         </div>
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{offersCount}</div>
-          <div className="text-xs text-neutral-500">Offers</div>
+          <div className="text-xs text-neutral-500">{t('card.offers')}</div>
         </div>
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{invoicesCount}</div>
-          <div className="text-xs text-neutral-500">Invoices</div>
+          <div className="text-xs text-neutral-500">{t('card.invoices')}</div>
         </div>
         <div className="text-center p-2 bg-neutral-50 rounded">
           <div className="text-lg font-semibold text-neutral-900">{tasksCount}</div>
-          <div className="text-xs text-neutral-500">Tasks</div>
+          <div className="text-xs text-neutral-500">{t('tasks.title')}</div>
         </div>
       </div>
 
@@ -649,7 +649,7 @@ function ClientProjectCard({ project, basePath }) {
       <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
         <span className="text-xs text-neutral-400">{formatDate(project.created_at)}</span>
         <span className="text-sm font-medium text-emerald-600 group-hover:text-emerald-700">
-          Open →
+          {t('card.open')} →
         </span>
       </div>
     </div>
@@ -658,6 +658,7 @@ function ClientProjectCard({ project, basePath }) {
 
 // Status badge
 function StatusBadge({ status }) {
+  const { t } = useTranslation('projects');
   const styles = {
     draft: 'bg-neutral-100 text-neutral-700',
     active: 'bg-emerald-100 text-emerald-800',
@@ -666,17 +667,9 @@ function StatusBadge({ status }) {
     archived: 'bg-neutral-100 text-neutral-500',
   };
 
-  const labels = {
-    draft: 'Draft',
-    active: 'Active',
-    in_production: 'In Progress',
-    completed: 'Completed',
-    archived: 'Archived',
-  };
-
   return (
     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${styles[status] || styles.draft}`}>
-      {labels[status] || status}
+      {t(`status.${status}`, { defaultValue: status })}
     </span>
   );
 }

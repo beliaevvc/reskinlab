@@ -1,0 +1,77 @@
+{
+  "title": "Уведомления",
+  "markAllRead": "Отметить все как прочитанные",
+  "all": "Все",
+  "unread": "Непрочитанные",
+  "noNotifications": "Нет уведомлений",
+  "allCaughtUp": "Вы все прочитали!",
+  "nothingYet": "Пока ничего нет",
+  "categories": {
+    "all": "Все",
+    "comments": "Комментарии",
+    "tasks": "Задачи",
+    "payments": "Платежи",
+    "projects": "Проекты",
+    "users": "Пользователи"
+  },
+  "types": {
+    "comment": {
+      "someone": "Кто-то",
+      "commentedOn": "прокомментировал",
+      "aTask": "задачу"
+    },
+    "task_status_change": {
+      "movedTo": "перемещено в"
+    },
+    "offer_created": {
+      "newOffer": "Новая оферта",
+      "for": "для",
+      "project": "проекта"
+    },
+    "offer_accepted": {
+      "offer": "Оферта"
+    },
+    "offer_cancelled": {
+      "offer": "Оферта"
+    },
+    "invoice_created": {
+      "newInvoice": "Новый счёт"
+    },
+    "payment_received": {
+      "paymentSubmitted": "Платёж отправлен для"
+    },
+    "payment_confirmed": {
+      "payment": "Платёж",
+      "for": "для"
+    },
+    "project_created": {
+      "newProject": "Новый проект",
+      "by": "от"
+    },
+    "project_status_change": {
+      "status": "статус"
+    },
+    "stage_change": {
+      "stage": "Этап",
+      "activatedStagesUpTo": "Активированы этапы до",
+      "deactivatedStagesFrom": "Деактивированы этапы от",
+      "activated": "активирован",
+      "deactivated": "деактивирован"
+    },
+    "spec_finalized": {
+      "specFinalized": "Спецификация финализирована"
+    },
+    "new_client": {
+      "newClient": "Новый клиент:",
+      "unknown": "Неизвестно"
+    },
+    "am_action": {
+      "am": "AM"
+    },
+    "file_uploaded": {
+      "someone": "Кто-то",
+      "uploaded": "загрузил",
+      "aFile": "файл"
+    }
+  }
+}

@@ -11,3 +11,4 @@ export { PromoSection } from './PromoSection';
 export { Sidebar } from './Sidebar';
 export { MobileFooter } from './MobileFooter';
 export { SpecificationView } from './SpecificationView';
+export { LanguageSwitcher } from './LanguageSwitcher';

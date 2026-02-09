@@ -1,0 +1,150 @@
+{
+  "title": "Offers",
+  "subtitle": "Manage your project offers",
+  "create": {
+    "title": "Create Offer",
+    "selectSpec": "Select Specification",
+    "selectTemplate": "Select Template",
+    "milestones": "Milestones",
+    "addMilestone": "Add Milestone",
+    "milestoneName": "Milestone Name",
+    "milestonePercent": "Percentage",
+    "creating": "Creating...",
+    "submit": "Create Offer"
+  },
+  "card": {
+    "offer": "Offer",
+    "amount": "Amount",
+    "status": "Status",
+    "viewDetails": "View Details",
+    "spec": "Spec",
+    "version": "v{{version}}",
+    "milestones": "{{count}} milestone",
+    "milestones_other": "{{count}} milestones",
+    "invoicesPaid": "{{paid}}/{{total}} invoices paid",
+    "paidAmount": "Paid: {{amount}}",
+    "remaining": "Remaining: {{amount}}"
+  },
+  "status": {
+    "draft": "Draft",
+    "pending": "Pending",
+    "sent": "Sent",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "expired": "Expired",
+    "cancelled": "Cancelled"
+  },
+  "detail": {
+    "loading": "Loading offer...",
+    "loadError": "Failed to load offer: {{error}}",
+    "notFound": "Offer not found",
+    "backToOffers": "Back to offers",
+    "breadcrumbOffers": "Offers",
+    "specification": "Specification",
+    "viewSpec": "View Full Specification ({{count}} items)",
+    "milestones": "Payment Milestones",
+    "milestone": "Milestone",
+    "invoices": "Invoices",
+    "legalText": "Legal Terms",
+    "viewLegalText": "View Legal Terms",
+    "acceptOffer": "Accept Offer",
+    "declineOffer": "Decline Offer",
+    "sendToClient": "Send to Client",
+    "resend": "Resend",
+    "cancelOffer": "Cancel Offer",
+    "offerExpired": "This offer has expired",
+    "offerDeclined": "This offer was declined",
+    "offerCancelled": "This offer was cancelled",
+    "reviewTerms": "Review the legal terms of this offer"
+  },
+  "modal": {
+    "validUntil": "Valid until",
+    "accepted": "Accepted",
+    "costSummary": "Cost Summary",
+    "production": "Production",
+    "revisionRounds": "Revision Rounds",
+    "discount": "Discount",
+    "paymentSchedule": "Payment Schedule"
+  },
+  "accept": {
+    "title": "Accept Offer",
+    "confirmTitle": "Confirm Acceptance",
+    "description": "Please read the terms carefully before accepting",
+    "agreementCheckbox": "I have read and agree to the legal terms",
+    "accepting": "Accepting...",
+    "submit": "Accept Offer",
+    "cancel": "Cancel",
+    "readTerms": "Read terms",
+    "confirmAgreement": "Confirm agreement",
+    "accept": "Accept",
+    "scrollToRead": "Scroll to read all terms",
+    "agreementText": "I have read and understood the terms of this offer. I agree to all conditions and confirm my intention to proceed with the order as specified."
+  },
+  "legal": {
+    "title": "Terms & Conditions",
+    "subtitle": "Official offer agreement",
+    "noLegalText": "No legal terms available for this offer.",
+    "close": "Close",
+    "viewFull": "View Full Terms"
+  },
+  "page": {
+    "title": "Offers",
+    "subtitle": "View and manage offers for your projects",
+    "loading": "Loading offers...",
+    "loadError": "Failed to load offers: {{error}}",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "allOffers": "All Offers",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "filter": {
+      "client": "Client",
+      "project": "Project",
+      "status": "Status",
+      "allClients": "All clients",
+      "allProjects": "All projects",
+      "allStatuses": "All statuses"
+    },
+    "clear": "Clear"
+  },
+  "filter": {
+    "searchClients": "Search clients...",
+    "noClientsFound": "No clients found"
+  },
+  "emptyState": {
+    "title": "No offers yet",
+    "subtitle": "Offers will appear here after specifications are created.",
+    "goToCalculator": "Go to Calculator",
+    "noMatch": "No offers match your filters",
+    "adjustFilters": "Try adjusting your filters to see more results."
+  },
+  "table": {
+    "offer": "Offer",
+    "projectSpec": "Project / Spec",
+    "client": "Client",
+    "status": "Status",
+    "date": "Date",
+    "amount": "Amount",
+    "noOffers": "No offers"
+  },
+  "templates": {
+    "title": "Offer Templates",
+    "subtitle": "Manage legal text templates for offers",
+    "create": "Create Template",
+    "edit": "Edit Template",
+    "delete": "Delete Template",
+    "name": "Template Name",
+    "language": "Language",
+    "legalTextRu": "Legal Text (Russian)",
+    "legalTextEn": "Legal Text (English)",
+    "isDefault": "Default Template",
+    "setDefault": "Set as Default",
+    "preview": "Preview",
+    "save": "Save Template",
+    "saving": "Saving...",
+    "deleteConfirm": "Are you sure you want to delete this template?",
+    "noTemplates": "No templates yet",
+    "createFirst": "Create your first offer template"
+  }
+}

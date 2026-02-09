@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useCalculatorStore from '../../stores/calculatorStore';
 import { CreateProjectModal } from '../projects';
 
@@ -10,6 +11,7 @@ export function SaveDraftButton({
   minimumAmount = 0,
   variant = 'primary', // 'primary' | 'secondary'
 }) {
+  const { t } = useTranslation('calculator');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { currentProjectId, setProject, resetSpecification } = useCalculatorStore();
 
@@ -57,7 +59,7 @@ export function SaveDraftButton({
           {isSaving ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-              <span>Saving...</span>
+              <span>{t('saveButton.saving')}</span>
             </>
           ) : currentProjectId ? (
             <>
@@ -74,7 +76,7 @@ export function SaveDraftButton({
                   d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
                 />
               </svg>
-              <span>Save Draft</span>
+              <span>{t('saveButton.saveDraft')}</span>
             </>
           ) : (
             <>
@@ -91,7 +93,7 @@ export function SaveDraftButton({
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span>Create Project</span>
+              <span>{t('saveButton.createProject')}</span>
             </>
           )}
         </button>
@@ -99,7 +101,7 @@ export function SaveDraftButton({
         {/* Tooltip when blocked by minimum order */}
         {belowMinimum && !isSaving && (
           <div className="absolute right-0 top-full mt-2 w-56 px-3 py-2 bg-neutral-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-            Minimum order ${minimumAmount.toLocaleString()} for first order in project
+            {t('saveButton.minimumOrderTooltip', { amount: minimumAmount.toLocaleString() })}
           </div>
         )}
       </div>

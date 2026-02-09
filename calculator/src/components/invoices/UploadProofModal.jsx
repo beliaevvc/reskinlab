@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUploadPaymentProof } from '../../hooks/useInvoices';
 import { formatInvoiceAmount } from '../../lib/invoiceUtils';
 
 export function UploadProofModal({ isOpen, onClose, invoice }) {
+  const { t } = useTranslation('invoices');
   const [file, setFile] = useState(null);
   const [txHash, setTxHash] = useState('');
   const [preview, setPreview] = useState(null);
@@ -70,10 +72,10 @@ export function UploadProofModal({ isOpen, onClose, invoice }) {
         {/* Header */}
         <div className="px-6 py-4 border-b border-neutral-200">
           <h2 className="text-xl font-semibold text-neutral-900">
-            Upload Payment Proof
+            {t('uploadProof.title')}
           </h2>
           <p className="text-sm text-neutral-500 mt-1">
-            Invoice {invoice.number} — {formatInvoiceAmount(invoice.amount_usd)}
+            {t('uploadProof.subtitle', { number: invoice.number, amount: formatInvoiceAmount(invoice.amount_usd) })}
           </p>
         </div>
 
@@ -144,10 +146,10 @@ export function UploadProofModal({ isOpen, onClose, invoice }) {
                   />
                 </svg>
                 <p className="text-neutral-600">
-                  Drop your screenshot here or click to browse
+                  {t('uploadProof.dropzone')}
                 </p>
                 <p className="text-sm text-neutral-400">
-                  PNG, JPG, or PDF up to 10MB
+                  {t('uploadProof.dropzoneFormats')}
                 </p>
               </div>
             )}
@@ -156,24 +158,24 @@ export function UploadProofModal({ isOpen, onClose, invoice }) {
           {/* Transaction hash */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-2">
-              Transaction Hash (optional)
+              {t('uploadProof.txHashLabel')}
             </label>
             <input
               type="text"
               value={txHash}
               onChange={(e) => setTxHash(e.target.value)}
-              placeholder="0x..."
+              placeholder={t('uploadProof.txHashPlaceholder')}
               className="w-full px-4 py-2.5 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono text-sm"
             />
             <p className="text-xs text-neutral-500 mt-1">
-              Providing the transaction hash helps us verify your payment faster
+              {t('uploadProof.txHashHint')}
             </p>
           </div>
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded p-3">
               <p className="text-sm text-red-700">
-                Failed to upload: {error.message}
+                {t('uploadProof.uploadFailed', { error: error.message })}
               </p>
             </div>
           )}
@@ -185,7 +187,7 @@ export function UploadProofModal({ isOpen, onClose, invoice }) {
             onClick={onClose}
             className="px-4 py-2.5 text-neutral-700 font-medium hover:bg-neutral-100 rounded transition-colors"
           >
-            Cancel
+            {t('actions.cancel', { ns: 'common', defaultValue: 'Cancel' })}
           </button>
           <button
             onClick={handleSubmit}
@@ -199,7 +201,7 @@ export function UploadProofModal({ isOpen, onClose, invoice }) {
             {isPending ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                Uploading...
+                {t('uploadProof.uploading')}
               </>
             ) : (
               <>
@@ -216,7 +218,7 @@ export function UploadProofModal({ isOpen, onClose, invoice }) {
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                   />
                 </svg>
-                Upload Proof
+                {t('uploadProof.uploadButton')}
               </>
             )}
           </button>

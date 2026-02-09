@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getFileIcon, getFileCategory, formatFileSize, downloadFile } from '../../hooks/useFiles';
 import { useFileUrl, useDeleteFile } from '../../hooks/useFiles';
 import { useAuth } from '../../contexts/AuthContext';
@@ -25,7 +26,7 @@ export function FileCard({ file, onPreview, showActions = true }) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${file.filename}"?`)) return;
+    if (!confirm(t('preview.deleteConfirm'))) return;
     
     setIsDeleting(true);
     try {
@@ -72,7 +73,7 @@ export function FileCard({ file, onPreview, showActions = true }) {
           <button
             onClick={handlePreview}
             className="p-2 bg-white rounded-full text-neutral-700 hover:bg-neutral-100"
-            title="Preview"
+            title={t('browser.preview')}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -113,7 +114,7 @@ export function FileCard({ file, onPreview, showActions = true }) {
               disabled={isDeleting}
               className="text-xs text-red-500 hover:text-red-700 disabled:text-neutral-400"
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? t('preview.deleting') : t('preview.delete')}
             </button>
           </div>
         )}

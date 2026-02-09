@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   useTaskChecklist,
   useCreateChecklistItem,
@@ -7,6 +8,7 @@ import {
 } from '../../hooks/useTaskChecklist';
 
 export function TaskChecklist({ taskId, canEdit = true }) {
+  const { t } = useTranslation('tasks');
   const { data: items = [], isLoading } = useTaskChecklist(taskId);
   const createItem = useCreateChecklistItem();
   const updateItem = useUpdateChecklistItem();
@@ -44,7 +46,7 @@ export function TaskChecklist({ taskId, canEdit = true }) {
   };
 
   const handleDeleteItem = async (itemId) => {
-    if (window.confirm('Удалить этот пункт из чеклиста?')) {
+    if (window.confirm(t('checklist.deleteConfirm', { defaultValue: 'Delete this checklist item?' }))) {
       await deleteItem.mutateAsync({ itemId, taskId });
     }
   };
@@ -73,7 +75,7 @@ export function TaskChecklist({ taskId, canEdit = true }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h4 className="text-sm font-medium text-neutral-900">Чеклист</h4>
+          <h4 className="text-sm font-medium text-neutral-900">{t('checklist.title')}</h4>
           {totalCount > 0 && (
             <span className="text-xs text-neutral-500">
               {completedCount}/{totalCount}
@@ -85,7 +87,7 @@ export function TaskChecklist({ taskId, canEdit = true }) {
             onClick={() => setIsAdding(true)}
             className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
           >
-            + Добавить пункт
+            + {t('checklist.addItem')}
           </button>
         )}
       </div>
@@ -152,7 +154,7 @@ export function TaskChecklist({ taskId, canEdit = true }) {
               <button
                 onClick={() => handleDeleteItem(item.id)}
                 className="shrink-0 opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 p-1 transition-all"
-                title="Удалить пункт"
+                title={t('checklist.deleteItem', { defaultValue: 'Delete item' })}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -180,7 +182,7 @@ export function TaskChecklist({ taskId, canEdit = true }) {
                   setNewItemTitle('');
                 }
               }}
-              placeholder="Введите название пункта..."
+              placeholder={t('checklist.itemPlaceholder')}
               autoFocus
               className="flex-1 text-sm border border-neutral-200 rounded px-2 py-1 focus:border-emerald-500 focus:outline-none"
             />
@@ -208,7 +210,7 @@ export function TaskChecklist({ taskId, canEdit = true }) {
 
       {items.length === 0 && !isAdding && (
         <p className="text-sm text-neutral-400 text-center py-2">
-          Чеклист пуст. Добавьте первый пункт.
+          {t('checklist.empty', { defaultValue: 'Checklist is empty. Add first item.' })}
         </p>
       )}
     </div>

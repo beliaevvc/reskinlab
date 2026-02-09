@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 import { getInvoiceStatusInfo, formatInvoiceAmount, isInvoiceOverdue } from '../../lib/invoiceUtils';
 
 export function InvoiceCard({ invoice, onClick, showClient = false }) {
+  const { t } = useTranslation('invoices');
   const project = invoice.project;
   const offer = invoice.offer;
   const spec = offer?.specification;
@@ -26,21 +28,21 @@ export function InvoiceCard({ invoice, onClick, showClient = false }) {
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-neutral-900">{invoice.number}</span>
           <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusInfo.bgClass} ${statusInfo.textClass}`}>
-            {statusInfo.label}
+            {t(`status.${isOverdue ? 'overdue' : invoice.status}`)}
           </span>
           {invoice.status === 'pending' && invoice.rejection_reason && (
             <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01" />
               </svg>
-              Retry
+              {t('card.retry')}
             </span>
           )}
         </div>
 
         {/* Row 2: Project + Milestone */}
         <div className="flex items-center gap-2 mt-1 text-sm">
-          <span className="text-neutral-600 truncate">{project?.name || 'Unknown'}</span>
+          <span className="text-neutral-600 truncate">{project?.name || t('card.unknown')}</span>
           <span className="text-neutral-300">·</span>
           <span className="text-neutral-400 truncate">{invoice.milestone_name}</span>
         </div>
@@ -75,13 +77,13 @@ export function InvoiceCard({ invoice, onClick, showClient = false }) {
         </div>
         <div className="text-xs text-neutral-400 mt-1">
           {invoice.paid_at ? (
-            <span className="text-emerald-500">Paid {formatDate(invoice.paid_at)}</span>
+            <span className="text-emerald-500">{t('status.paid')} {formatDate(invoice.paid_at)}</span>
           ) : invoice.due_date && invoice.status === 'pending' ? (
             <span className={isOverdue ? 'text-red-500 font-medium' : ''}>
-              Due {formatDate(invoice.due_date)}
+              {t('card.dueDate')} {formatDate(invoice.due_date)}
             </span>
           ) : invoice.status === 'awaiting_confirmation' ? (
-            <span className="text-amber-500">Awaiting</span>
+            <span className="text-amber-500">{t('card.awaiting')}</span>
           ) : (
             formatDate(invoice.created_at)
           )}

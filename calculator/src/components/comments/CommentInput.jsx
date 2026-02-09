@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAddComment } from '../../hooks/useComments';
 import { useUploadFiles, BUCKETS, getFileIcon, formatFileSize } from '../../hooks/useFiles';
 import { useAuth } from '../../contexts/AuthContext';
@@ -12,6 +13,7 @@ export function CommentInput({
   onCancelReply,
   onCommentAdded 
 }) {
+  const { t } = useTranslation('comments');
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
@@ -111,7 +113,7 @@ export function CommentInput({
         <div className="flex items-center gap-2 px-3 py-2 bg-neutral-100 rounded-lg text-sm">
           <div className="w-1 h-8 bg-emerald-500 rounded-full" />
           <div className="flex-1 min-w-0">
-            <span className="text-neutral-500">Replying to </span>
+            <span className="text-neutral-500">{t('input.replyTo', { name: '' })}</span>
             <span className="font-medium text-neutral-700">{replyingTo.author?.full_name}</span>
             <p className="text-neutral-500 truncate text-xs">{replyingTo.content}</p>
           </div>
@@ -183,7 +185,7 @@ export function CommentInput({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={replyingTo ? 'Write a reply...' : 'Type a message...'}
+            placeholder={t('input.placeholder')}
             rows={1}
             disabled={isPending}
             className="w-full px-4 py-2.5 border border-neutral-200 rounded-2xl resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm disabled:opacity-50 disabled:bg-neutral-50 block"

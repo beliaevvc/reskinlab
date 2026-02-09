@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function TemplateChecklistEditor({ checklistItems = [], onChange }) {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState(checklistItems || []);
 
   // Синхронизируем items при изменении checklistItems извне
@@ -60,20 +62,20 @@ export function TemplateChecklistEditor({ checklistItems = [], onChange }) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-neutral-700">
-          Чеклист для задачи
+          {t('taskSettings.checklist.title')}
         </label>
         <button
           type="button"
           onClick={handleAddItem}
           className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
         >
-          + Добавить пункт
+          {t('taskSettings.checklist.addItem')}
         </button>
       </div>
 
       {items.length === 0 ? (
         <p className="text-sm text-neutral-400 text-center py-2">
-          Чеклист пуст. Добавьте первый пункт.
+          {t('taskSettings.checklist.emptyList')}
         </p>
       ) : (
         <div className="space-y-2 border border-neutral-200 rounded-lg p-3 bg-neutral-50">
@@ -88,7 +90,7 @@ export function TemplateChecklistEditor({ checklistItems = [], onChange }) {
                   onClick={() => handleMoveItem(index, 'up')}
                   disabled={index === 0}
                   className="p-1 text-neutral-400 hover:text-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Переместить вверх"
+                  title={t('taskSettings.checklist.moveUp')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -99,7 +101,7 @@ export function TemplateChecklistEditor({ checklistItems = [], onChange }) {
                   onClick={() => handleMoveItem(index, 'down')}
                   disabled={index === items.length - 1}
                   className="p-1 text-neutral-400 hover:text-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Переместить вниз"
+                  title={t('taskSettings.checklist.moveDown')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -110,14 +112,14 @@ export function TemplateChecklistEditor({ checklistItems = [], onChange }) {
                 type="text"
                 value={item.title}
                 onChange={(e) => handleUpdateItem(index, 'title', e.target.value)}
-                placeholder="Название пункта чеклиста..."
+                placeholder={t('taskSettings.checklist.itemPlaceholder')}
                 className="flex-1 text-sm border border-neutral-300 rounded px-2 py-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
               <button
                 type="button"
                 onClick={() => handleDeleteItem(index)}
                 className="p-1 text-red-500 hover:text-red-700"
-                title="Удалить пункт"
+                title={t('taskSettings.checklist.deleteItem')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path

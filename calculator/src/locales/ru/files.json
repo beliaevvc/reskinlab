@@ -1,0 +1,62 @@
+{
+  "upload": {
+    "clickToUpload": "Нажмите для загрузки",
+    "orDragDrop": "или перетащите файлы",
+    "maxFiles": "Макс. {{count}} файлов, до {{size}} каждый",
+    "filesSelected": "Выбрано файлов: {{count}}",
+    "clearAll": "Очистить все",
+    "uploading": "Загрузка...",
+    "uploadFiles": "Загрузить файлов: {{count}}",
+    "fileTooLarge": "Файл \"{{name}}\" слишком большой. Макс. размер: {{size}}"
+  },
+  "browser": {
+    "allFiles": "Все файлы",
+    "noFilesYet": "Файлов пока нет",
+    "uploadToStart": "Загрузите файлы для начала",
+    "failedToLoad": "Не удалось загрузить файлы",
+    "gridView": "Сетка",
+    "listView": "Список",
+    "preview": "Предпросмотр",
+    "download": "Скачать"
+  },
+  "buckets": {
+    "references": "Референсы",
+    "deliverables": "Готовые работы",
+    "sources": "Исходники",
+    "proofs": "Подтверждения оплаты"
+  },
+  "preview": {
+    "close": "Закрыть",
+    "download": "Скачать",
+    "delete": "Удалить",
+    "previewNotAvailable": "Предпросмотр недоступен",
+    "deleteConfirm": "Вы уверены, что хотите удалить этот файл?",
+    "deleting": "Удаление..."
+  },
+  "card": {
+    "uploaded": "Загружен",
+    "by": "от"
+  },
+  "gallery": {
+    "title": "Файлы проекта",
+    "projectFiles": "Файлы проекта",
+    "filesCount": "Всего {{total}} файлов • Показано {{shown}}",
+    "searchPlaceholder": "Поиск файлов...",
+    "noFilesFound": "Файлы не найдены",
+    "adjustFilters": "Попробуйте изменить фильтры",
+    "filesWillAppear": "Файлы, загруженные к задачам, появятся здесь",
+    "filter": {
+      "allTypes": "Все типы",
+      "images": "Изображения",
+      "documents": "Документы",
+      "design": "Файлы дизайна",
+      "archives": "Архивы",
+      "videos": "Видео"
+    },
+    "sort": {
+      "newest": "Сначала новые",
+      "name": "По имени А-Я",
+      "largest": "Сначала большие"
+    }
+  }
+}

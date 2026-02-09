@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useClientActivity } from '../../hooks/useClientActivity';
 import { formatDistanceToNow } from '../../lib/utils';
@@ -7,6 +8,7 @@ import { getHumanDescription, getActionIcon } from '../../components/audit-logs/
 import { PendingCodeBanner } from '../../components/calculator/PendingCodeBanner';
 
 export function DashboardPage() {
+  const { t } = useTranslation(['navigation', 'common', 'projects', 'invoices', 'calculator']);
   const { profile, client, isClient, isAM, isAdmin } = useAuth();
   const { data: activity, isLoading: activityLoading } = useClientActivity();
   const [activityOpen, setActivityOpen] = useState(false);
@@ -19,14 +21,14 @@ export function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-neutral-900">
-          Welcome back, {profile?.full_name || 'User'}
+          {t('navigation:dashboard')}, {profile?.full_name || 'User'}!
         </h1>
         <p className="text-neutral-500 mt-1">
           {isClient
-            ? 'Manage your projects and specifications'
+            ? t('projects:subtitle')
             : isAM
-            ? 'Manage your clients and projects'
-            : 'System administration'}
+            ? t('navigation:clients') + ' & ' + t('navigation:projects')
+            : t('admin:dashboard.subtitle', { ns: 'admin' })}
         </p>
       </div>
 
@@ -54,10 +56,10 @@ export function DashboardPage() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-1">
-              Price Calculator
+              {t('calculator:title')}
             </h3>
             <p className="text-sm text-neutral-500">
-              Calculate project costs and create specifications
+              {t('calculator:subtitle')}
             </p>
           </Link>
 
@@ -82,10 +84,10 @@ export function DashboardPage() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-1">
-              My Projects
+              {t('navigation:projects')}
             </h3>
             <p className="text-sm text-neutral-500">
-              View and manage your active projects
+              {t('projects:subtitle')}
             </p>
           </Link>
 
@@ -110,10 +112,10 @@ export function DashboardPage() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-1">
-              Invoices
+              {t('navigation:invoices')}
             </h3>
             <p className="text-sm text-neutral-500">
-              View and pay your invoices
+              {t('invoices:subtitle')}
             </p>
           </Link>
         </div>
@@ -140,18 +142,16 @@ export function DashboardPage() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-amber-900 mb-1">
-                Complete your profile
+                {t('navigation:profile')}
               </h3>
               <p className="text-sm text-amber-700 mb-4">
-                Please complete your profile information to get the best
-                experience. This information is required for creating projects
-                and invoices.
+                {t('common:empty.noData')}
               </p>
               <Link
                 to="/profile"
                 className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium px-4 py-2 rounded transition-colors text-sm"
               >
-                Complete Profile
+                {t('navigation:profile')}
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -192,7 +192,7 @@ export function DashboardPage() {
         >
           <div className="flex items-center gap-3">
             <h3 className="text-lg font-semibold text-neutral-900">
-              Recent Activity
+              {t('common:empty.noActivity').replace('No ', '')}
             </h3>
             {!activityLoading && activity?.length > 0 && (
               <span className="text-xs font-medium text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">
@@ -237,7 +237,7 @@ export function DashboardPage() {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p>No recent activity</p>
+                <p>{t('common:empty.noActivity')}</p>
               </div>
             )}
           </div>

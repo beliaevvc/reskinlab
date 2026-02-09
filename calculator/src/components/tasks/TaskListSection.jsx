@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TaskListRow } from './TaskListRow';
 
 const SECTION_DOT_COLORS = {
@@ -46,6 +47,7 @@ export function TaskListSection({
   onDragEnd,
   isDragOver,
 }) {
+  const { t } = useTranslation('tasks');
   const taskCount = tasks.length;
 
   return (
@@ -131,11 +133,11 @@ export function TaskListSection({
             /* Empty state / drop zone */
             isDragOver ? (
               <div className="flex items-center justify-center py-6 border-2 border-dashed border-emerald-300 rounded-lg text-emerald-400 text-xs mx-1 my-1">
-                Drop here
+                {t('files.dropHere', { defaultValue: 'Drop here' })}
               </div>
             ) : (
               <div className="flex items-center justify-center py-4 text-neutral-300 text-xs">
-                No tasks
+                {t('kanban.noTasks')}
               </div>
             )
           )}

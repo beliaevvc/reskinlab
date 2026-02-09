@@ -28,7 +28,7 @@ export function useUpdatePriceConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, value, description, display_name }) => {
+    mutationFn: async ({ id, value, description, display_name, config_data }) => {
       const updateData = { 
         value, 
         updated_at: new Date().toISOString() 
@@ -42,6 +42,11 @@ export function useUpdatePriceConfig() {
       // Only include display_name if provided (can be null to clear)
       if (display_name !== undefined) {
         updateData.display_name = display_name;
+      }
+      
+      // Only include config_data if provided
+      if (config_data !== undefined) {
+        updateData.config_data = config_data;
       }
 
       const { data, error } = await supabase
@@ -58,6 +63,8 @@ export function useUpdatePriceConfig() {
       queryClient.invalidateQueries({ queryKey: ['price-configs'] });
       // Also invalidate public-pricing cache so calculator picks up changes
       queryClient.invalidateQueries({ queryKey: ['public-pricing'] });
+      // Invalidate minimum order settings cache
+      queryClient.invalidateQueries({ queryKey: ['minimum-order-settings'] });
     },
   });
 }

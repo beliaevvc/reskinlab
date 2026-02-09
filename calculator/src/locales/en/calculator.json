@@ -1,0 +1,173 @@
+{
+  "title": "Price Calculator",
+  "subtitle": "Calculate project costs and create specifications",
+  "categories": {
+    "conceptDocument": "Concept Document",
+    "symbols": "Symbols",
+    "backgrounds": "Backgrounds",
+    "popups": "Pop-ups",
+    "uiMenus": "UI Menus & Screens",
+    "promo": "Marketing (Promo)"
+  },
+  "sidebar": {
+    "total": "Total",
+    "revisions": "Revisions",
+    "rights": "Rights",
+    "model": "Payment",
+    "promo": "Promo",
+    "viewSpecification": "View Specification",
+    "minOrderMessage": "Min. ${{amount}} for first order",
+    "promoCapped": "Promo capped at minimum order amount",
+    "estimatedTotal": "Estimated Total",
+    "production": "Production",
+    "discount": "Discount",
+    "usageRights": "Usage Rights",
+    "payment": "Payment"
+  },
+  "options": {
+    "title": "Options",
+    "orderType": "Order Type",
+    "usageRights": "Usage Rights",
+    "paymentModel": "Payment Model",
+    "style": "Visual Style",
+    "revisions": "Revision Rounds",
+    "revisionsDesc": "Extra rounds (+2.5% budget each)",
+    "animation": "Animation"
+  },
+  "orderTypes": {
+    "newAssets": "New Assets",
+    "reskin": "Reskin",
+    "artOnly": "Art Only",
+    "artOnlyDesc": "Art Only — no animation",
+    "animOnly": "Anim Only",
+    "animOnlyDesc": "Animation Only — client provides art",
+    "artAndAnim": "Art+Anim",
+    "artAndAnimDesc": "Art + Animation"
+  },
+  "styles": {
+    "standard": "Standard",
+    "premium": "Premium",
+    "ultra": "Ultra Premium"
+  },
+  "promo": {
+    "title": "Promo Code",
+    "placeholder": "Enter promo code",
+    "apply": "Apply",
+    "applied": "Applied",
+    "invalid": "Invalid promo code",
+    "expired": "Promo code expired",
+    "remove": "Remove"
+  },
+  "presets": {
+    "title": "Preset Bundles",
+    "apply": "Apply Preset",
+    "clear": "Clear All"
+  },
+  "item": {
+    "quantity": "Qty",
+    "price": "Price",
+    "remove": "Remove",
+    "details": "Item",
+    "examples": "Examples",
+    "techSpecs": "Technical Specifications",
+    "base": "Base",
+    "ofSpec": "of spec",
+    "animComplexity": "Anim Cplx",
+    "recommended": "Recommended"
+  },
+  "settings": {
+    "title": "Settings",
+    "locked": "locked",
+    "lockedTooltip": "Inherited from the first paid specification in this project"
+  },
+  "draft": {
+    "saved": "Draft saved",
+    "saving": "Saving...",
+    "lastSaved": "Last saved {{time}}",
+    "save": "Save Draft",
+    "load": "Load Draft"
+  },
+  "share": {
+    "title": "Share Calculator",
+    "code": "Share Code",
+    "copy": "Copy Link",
+    "copied": "Copied!",
+    "import": "Import from Code",
+    "importPlaceholder": "Enter share code"
+  },
+  "actions": {
+    "createSpecification": "Create Specification",
+    "addToProject": "Add to Project",
+    "reset": "Reset Calculator",
+    "importCode": "Import Code",
+    "publicCalculator": "Public Calculator",
+    "getCode": "Get Code",
+    "getSelectionCode": "Get Selection Code",
+    "registerToSave": "Register to Save",
+    "registerToSaveSelection": "Register to Save Your Selection",
+    "backToEditor": "Back to Editor",
+    "print": "Print",
+    "generating": "Generating...",
+    "startFresh": "Start Fresh Calculator"
+  },
+  "empty": {
+    "title": "Your specification is empty",
+    "subtitle": "Add items from the categories above to start building your project specification."
+  },
+  "editor": {
+    "importCodeTitle": "Import a selection from a shared code",
+    "publicCalculatorTitle": "Open public calculator — share this link with anyone"
+  },
+  "public": {
+    "calculatorTitle": "Calculator",
+    "banner": "ReSkin Lab Calculator — Build your selection and get a shareable code",
+    "fallbackWarning": "Using cached prices. Some values may not reflect latest changes.",
+    "loadingSelection": "Loading selection...",
+    "invalidCode": "Invalid Code",
+    "codeExpires": "Share this code or link. It expires in 30 days.",
+    "yourSelectionCode": "Your Selection Code",
+    "copyCode": "Copy Code",
+    "shareLink": "Share Link",
+    "copyLink": "Copy Link",
+    "alreadyHaveAccount": "Already have an account? Log in and enter the code in your dashboard.",
+    "specification": "Specification",
+    "spec": "Spec"
+  },
+  "importModal": {
+    "title": "Import Selection",
+    "description": "Enter the code from a shared calculator to import the selection into a new project.",
+    "placeholder": "Enter 8-character code",
+    "import": "Import",
+    "importing": "Importing...",
+    "cancel": "Cancel",
+    "enterCode": "Please enter a code"
+  },
+  "projectSelector": {
+    "selectProject": "Select Project",
+    "newProject": "New Project",
+    "clearSelection": "Clear Selection",
+    "loadingProjects": "Loading projects...",
+    "noProjects": "No projects yet"
+  },
+  "draftStatus": {
+    "notSaved": "Not saved",
+    "saving": "Saving...",
+    "finalized": "Finalized",
+    "draft": "Draft",
+    "saved": "Saved",
+    "newSpecification": "New specification"
+  },
+  "pendingCode": {
+    "title": "You have a pending selection",
+    "description": "Code {{code}} — import it into a new project?",
+    "import": "Import Selection",
+    "importing": "Importing...",
+    "dismiss": "Dismiss"
+  },
+  "saveButton": {
+    "saving": "Saving...",
+    "saveDraft": "Save Draft",
+    "createProject": "Create Project",
+    "minimumOrderTooltip": "Minimum order ${{amount}} for first order in project"
+  }
+}

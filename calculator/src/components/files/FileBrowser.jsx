@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProjectFiles, BUCKETS } from '../../hooks/useFiles';
 import { FileCard } from './FileCard';
 import { FilePreviewModal } from './FilePreviewModal';
 
-const BUCKET_LABELS = {
-  [BUCKETS.REFERENCES]: 'References',
-  [BUCKETS.DELIVERABLES]: 'Deliverables',
-  [BUCKETS.SOURCES]: 'Sources',
-  [BUCKETS.PROOFS]: 'Payment Proofs',
+const BUCKET_KEYS = {
+  [BUCKETS.REFERENCES]: 'references',
+  [BUCKETS.DELIVERABLES]: 'deliverables',
+  [BUCKETS.SOURCES]: 'sources',
+  [BUCKETS.PROOFS]: 'proofs',
 };
 
 export function FileBrowser({ projectId, defaultBucket = null }) {
+  const { t } = useTranslation('files');
   const [selectedBucket, setSelectedBucket] = useState(defaultBucket);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [previewFile, setPreviewFile] = useState(null);
@@ -51,9 +53,9 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
                 : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
             }`}
           >
-            All Files
+            {t('browser.allFiles')}
           </button>
-          {Object.entries(BUCKET_LABELS).map(([bucket, label]) => (
+          {Object.entries(BUCKET_KEYS).map(([bucket, key]) => (
             <button
               key={bucket}
               onClick={() => setSelectedBucket(bucket)}
@@ -75,7 +77,7 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
             className={`p-1.5 rounded ${
               viewMode === 'grid' ? 'bg-white shadow-sm' : ''
             }`}
-            title="Grid view"
+            title={t('browser.gridView')}
           >
             <svg className="w-5 h-5 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -86,7 +88,7 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
             className={`p-1.5 rounded ${
               viewMode === 'list' ? 'bg-white shadow-sm' : ''
             }`}
-            title="List view"
+            title={t('browser.listView')}
           >
             <svg className="w-5 h-5 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -105,7 +107,7 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
       {/* Error */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded p-4 text-red-700">
-          Failed to load files: {error.message}
+          {t('browser.failedToLoad')}: {error.message}
         </div>
       )}
 
@@ -117,8 +119,8 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-neutral-900">No files yet</h3>
-          <p className="text-neutral-500 mt-1">Upload files to get started</p>
+          <h3 className="text-lg font-medium text-neutral-900">{t('browser.noFilesYet')}</h3>
+          <p className="text-neutral-500 mt-1">{t('browser.uploadToStart')}</p>
         </div>
       )}
 
@@ -128,7 +130,7 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
           <div key={bucket}>
             {!selectedBucket && (
               <h3 className="text-lg font-medium text-neutral-900 mb-3 flex items-center gap-2">
-                {BUCKET_LABELS[bucket] || bucket}
+                {t(`buckets.${BUCKET_KEYS[bucket]}`) || bucket}
                 <span className="text-sm font-normal text-neutral-500">
                   ({bucketFiles.length})
                 </span>
@@ -174,6 +176,7 @@ export function FileBrowser({ projectId, defaultBucket = null }) {
 
 // List view item
 function FileListItem({ file, onPreview }) {
+  const { t } = useTranslation('files');
   const { getFileIcon, formatFileSize, downloadFile } = require('../../hooks/useFiles');
   const { formatDate } = require('../../lib/utils');
 
@@ -191,7 +194,7 @@ function FileListItem({ file, onPreview }) {
         <button
           onClick={() => onPreview(file, null)}
           className="p-1.5 text-neutral-400 hover:text-neutral-600"
-          title="Preview"
+          title={t('browser.preview')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -201,7 +204,7 @@ function FileListItem({ file, onPreview }) {
         <button
           onClick={() => downloadFile(file.bucket, file.path, file.filename)}
           className="p-1.5 text-neutral-400 hover:text-neutral-600"
-          title="Download"
+          title={t('browser.download')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

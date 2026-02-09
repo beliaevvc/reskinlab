@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AuditLogDiff } from './AuditLogDiff';
 
 /**
@@ -70,6 +71,7 @@ function isMetadataRich(metadata) {
  * Inner content of the expanded row — shared between table and mobile views
  */
 function ExpandedContent({ log }) {
+  const { t } = useTranslation('admin');
   const [copied, setCopied] = useState(false);
 
   const handleCopyJSON = () => {
@@ -100,8 +102,8 @@ function ExpandedContent({ log }) {
   if (!hasAnyContent) {
     return (
       <div className="flex items-center justify-between">
-        <span className="text-xs text-neutral-400">No additional details</span>
-        <CopyButton copied={copied} onClick={handleCopyJSON} />
+        <span className="text-xs text-neutral-400">{t('auditLog.details.noAdditional')}</span>
+        <CopyButton copied={copied} onClick={handleCopyJSON} t={t} />
       </div>
     );
   }
@@ -111,7 +113,7 @@ function ExpandedContent({ log }) {
       {/* Diff — only if there are actual changes */}
       {showDiff && (
         <div>
-          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-2">Changes</h4>
+          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-2">{t('auditLog.details.changes')}</h4>
           <AuditLogDiff oldData={log.old_data} newData={log.new_data} />
         </div>
       )}
@@ -119,7 +121,7 @@ function ExpandedContent({ log }) {
       {/* Metadata — only if rich enough */}
       {showMetadata && (
         <div>
-          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-1">Metadata</h4>
+          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-1">{t('auditLog.details.metadata')}</h4>
           <pre className="bg-white border border-neutral-200 rounded p-2 text-xs font-mono text-neutral-700 overflow-x-auto max-h-[200px]">
             {JSON.stringify(
               Object.fromEntries(Object.entries(log.metadata).filter(([k]) => !k.startsWith('_'))),
@@ -135,7 +137,7 @@ function ExpandedContent({ log }) {
           {log.ip_address && (
             <div className="flex items-center gap-2 flex-wrap">
               <span>
-                <span className="font-medium text-neutral-400">IP:</span>{' '}
+                <span className="font-medium text-neutral-400">{t('auditLog.details.ip')}</span>{' '}
                 <span className="font-mono">{log.ip_address}</span>
               </span>
               {log.metadata?._geo && (
@@ -150,7 +152,7 @@ function ExpandedContent({ log }) {
           )}
           {log.user_agent && (
             <div>
-              <span className="font-medium text-neutral-400">Browser:</span>{' '}
+              <span className="font-medium text-neutral-400">{t('auditLog.details.browser')}</span>{' '}
               <span>{parseUserAgent(log.user_agent)}</span>
             </div>
           )}
@@ -164,13 +166,13 @@ function ExpandedContent({ log }) {
         ) : (
           <span />
         )}
-        <CopyButton copied={copied} onClick={handleCopyJSON} />
+        <CopyButton copied={copied} onClick={handleCopyJSON} t={t} />
       </div>
     </div>
   );
 }
 
-function CopyButton({ copied, onClick }) {
+function CopyButton({ copied, onClick, t }) {
   return (
     <button
       onClick={onClick}
@@ -179,7 +181,7 @@ function CopyButton({ copied, onClick }) {
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
       </svg>
-      {copied ? 'Copied!' : 'Copy JSON'}
+      {copied ? t('auditLog.details.copied') : t('auditLog.details.copyJson')}
     </button>
   );
 }

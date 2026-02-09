@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency } from '../../lib/utils';
 import { getOfferStatusInfo } from '../../lib/offerUtils';
 
@@ -11,6 +12,7 @@ function useOfferBasePath() {
 }
 
 export function OfferCard({ offer, onClick }) {
+  const { t } = useTranslation('offers');
   const basePath = useOfferBasePath();
   const spec = offer.specification;
   const project = spec?.project;
@@ -36,7 +38,7 @@ export function OfferCard({ offer, onClick }) {
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-neutral-900">{offer.number}</span>
           <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusInfo.bgClass} ${statusInfo.textClass}`}>
-            {statusInfo.label}
+            {t(`status.${offer.status}`)}
           </span>
           {spec && (
             <span className="text-xs bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">
@@ -47,7 +49,7 @@ export function OfferCard({ offer, onClick }) {
 
         {/* Row 2: Project */}
         <div className="text-sm text-neutral-600 mt-1 truncate">
-          {project?.name || 'Unknown Project'}
+          {project?.name || t('common:unknown', { defaultValue: 'Unknown Project' })}
         </div>
 
         {/* Row 3: Client + Date */}
@@ -63,7 +65,7 @@ export function OfferCard({ offer, onClick }) {
             )}
             {spec?.totals_json?.lineItems && (
               <span className="text-xs text-neutral-400">
-                {spec.totals_json.lineItems.length} items
+                {spec.totals_json.lineItems.length} {t('common:items', { defaultValue: 'items' })}
               </span>
             )}
           </div>
@@ -79,7 +81,7 @@ export function OfferCard({ offer, onClick }) {
           {offer.accepted_at ? (
             <span className="text-emerald-500">{formatDate(offer.accepted_at)}</span>
           ) : offer.status === 'pending' && offer.valid_until ? (
-            <span>Until {formatDate(offer.valid_until)}</span>
+            <span>{t('common:until', { defaultValue: 'Until' })} {formatDate(offer.valid_until)}</span>
           ) : (
             formatDate(offer.created_at)
           )}

@@ -2,25 +2,33 @@ export const PAYMENT_MODELS = [
   { 
     id: 'Standard', 
     name: 'Standard (Milestones)', 
-    desc: '15% предоплата + оплата по вехам', 
+    nameRu: 'Стандарт (по вехам)',
+    desc: '15% предоплата + оплата по вехам',
+    descEn: '15% prepayment + milestone payments',
     coeff: 1.0 
   },
   { 
     id: 'Pre50', 
     name: 'Pre-50%', 
-    desc: '50% аванс + 50% поэтапно', 
+    nameRu: 'Аванс 50%',
+    desc: '50% аванс + 50% поэтапно',
+    descEn: '50% advance + 50% staged',
     coeff: 0.9 
   },
   { 
     id: 'FullPre', 
     name: 'Full Prepay', 
-    desc: '100% предоплата до старта', 
+    nameRu: 'Полная предоплата',
+    desc: '100% предоплата до старта',
+    descEn: '100% prepayment before start',
     coeff: 0.7 
   },
   { 
     id: 'Zero', 
     name: 'Zero-Prepay Model', 
-    desc: 'Начало работы без предоплаты + оплата по вехам', 
+    nameRu: 'Без предоплаты',
+    desc: 'Начало работы без предоплаты + оплата по вехам',
+    descEn: 'Start without prepayment + milestone payments',
     coeff: 1.2 
   },
 ];

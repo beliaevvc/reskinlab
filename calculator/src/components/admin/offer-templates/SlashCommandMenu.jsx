@@ -3,13 +3,31 @@ import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react
 // ── Slash Command Menu React Component ─────────────
 
 const SOURCE_LABELS = {
-  client: 'Клиент',
-  project: 'Проект',
-  specification: 'Спецификация',
-  invoice: 'Счёт',
-  manual: 'Ручные',
-  computed: 'Вычисляемые',
+  ru: {
+    client: 'Клиент',
+    project: 'Проект',
+    specification: 'Спецификация',
+    invoice: 'Счёт',
+    manual: 'Ручные',
+    computed: 'Вычисляемые',
+  },
+  en: {
+    client: 'Client',
+    project: 'Project',
+    specification: 'Specification',
+    invoice: 'Invoice',
+    manual: 'Manual',
+    computed: 'Computed',
+  },
 };
+
+// Helper to get localized label
+function getLocalizedLabel(variable, lang) {
+  if (lang === 'en' && variable.label_en) {
+    return variable.label_en;
+  }
+  return variable.label;
+}
 
 const TYPE_ICONS = {
   currency: '$',
@@ -19,13 +37,13 @@ const TYPE_ICONS = {
   text: 'T',
 };
 
-export function SlashCommandMenu({ isOpen, coords, query, variables, onSelect, onClose }) {
+export function SlashCommandMenu({ isOpen, coords, query, variables, contentLang = 'en', onSelect, onClose }) {
   const menuRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const itemRefs = useRef([]);
 
   // Build flat selectable items + display items
-  const { displayItems, selectableItems } = buildItems(variables, query);
+  const { displayItems, selectableItems } = buildItems(variables, query, contentLang);
 
   // Reset selection when query changes
   useEffect(() => {
@@ -178,31 +196,33 @@ export function SlashCommandMenu({ isOpen, coords, query, variables, onSelect, o
 
 // ── Build items list from variables ────────────────
 
-function buildItems(variables, query) {
+function buildItems(variables, query, contentLang = 'en') {
   const displayItems = [];
   const selectableItems = [];
   const q = (query || '').toLowerCase().trim();
+  const sourceLabels = SOURCE_LABELS[contentLang] || SOURCE_LABELS.en;
 
   // Group variables by source
   const grouped = {};
   for (const v of variables || []) {
-    if (q && !v.label.toLowerCase().includes(q) && !v.key.toLowerCase().includes(q)) continue;
+    const localizedLabel = getLocalizedLabel(v, contentLang);
+    if (q && !localizedLabel.toLowerCase().includes(q) && !v.key.toLowerCase().includes(q)) continue;
 
     const src = v.data_source;
     if (!grouped[src]) grouped[src] = [];
-    grouped[src].push(v);
+    grouped[src].push({ ...v, _localizedLabel: localizedLabel });
   }
 
   for (const [source, vars] of Object.entries(grouped)) {
     displayItems.push({
       type: 'divider',
-      label: SOURCE_LABELS[source] || source,
+      label: sourceLabels[source] || source,
     });
     for (const v of vars) {
       const item = {
         type: 'variable',
         key: v.key,
-        label: v.label,
+        label: v._localizedLabel,
         variable: v,
         _itemIndex: displayItems.length,
       };

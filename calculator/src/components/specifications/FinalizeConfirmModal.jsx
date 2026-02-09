@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFinalizeSpecification } from '../../hooks/useSpecifications';
 import { useCreateOffer } from '../../hooks/useOffers';
 
 export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess }) {
+  const { t } = useTranslation('specs');
   const finalizeSpec = useFinalizeSpecification();
   const createOffer = useCreateOffer();
   const [step, setStep] = useState('confirm'); // 'confirm' | 'finalizing' | 'creating_offer'
@@ -67,10 +69,10 @@ export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess
         {/* Content */}
         <div className="text-center mb-6">
           <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-            Finalize Specification?
+            {t('modal.finalizeTitle', { defaultValue: 'Finalize Specification?' })}
           </h2>
           <p className="text-neutral-600">
-            You are about to finalize{' '}
+            {t('modal.finalizeAbout', { defaultValue: 'You are about to finalize' })}{' '}
             <span className="font-medium">{specification?.number || specification?.version}</span>.
           </p>
         </div>
@@ -93,11 +95,10 @@ export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess
             </svg>
             <div>
               <p className="text-sm text-amber-800 font-medium">
-                This action cannot be undone
+                {t('modal.cannotUndo', { defaultValue: 'This action cannot be undone' })}
               </p>
               <p className="text-sm text-amber-700 mt-1">
-                Once finalized, this specification cannot be edited. An offer
-                will be automatically created for client approval.
+                {t('modal.finalizeWarning', { defaultValue: 'Once finalized, this specification cannot be edited. An offer will be automatically created for client approval.' })}
               </p>
             </div>
           </div>
@@ -118,7 +119,7 @@ export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess
             disabled={isPending}
             className="flex-1 px-4 py-2.5 rounded border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t('common:actions.cancel')}
           </button>
           <button
             type="button"
@@ -129,7 +130,7 @@ export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess
             {isPending ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                {step === 'finalizing' ? 'Finalizing...' : 'Creating Offer...'}
+                {step === 'finalizing' ? t('modal.finalizing', { defaultValue: 'Finalizing...' }) : t('modal.creatingOffer', { defaultValue: 'Creating Offer...' })}
               </>
             ) : (
               <>
@@ -146,7 +147,7 @@ export function FinalizeConfirmModal({ isOpen, onClose, specification, onSuccess
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Finalize &amp; Create Offer
+                {t('modal.finalizeAndCreate', { defaultValue: 'Finalize & Create Offer' })}
               </>
             )}
           </button>

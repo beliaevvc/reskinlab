@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function LegalTextViewer({ text, onScrolledToBottom }) {
+  const { t } = useTranslation('offers');
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const containerRef = useRef(null);
 
@@ -50,7 +52,7 @@ export function LegalTextViewer({ text, onScrolledToBottom }) {
                 d="M19 14l-7 7m0 0l-7-7m7 7V3"
               />
             </svg>
-            Scroll to read all terms
+            {t('accept.scrollToRead', { defaultValue: 'Scroll to read all terms' })}
           </div>
         </div>
       )}

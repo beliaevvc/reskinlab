@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -14,10 +15,13 @@ const PIE_COLORS = [
  * AuditLogsCharts — analytics section with activity, top users, action distribution
  */
 export function AuditLogsCharts() {
+  const { t, i18n } = useTranslation('admin');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { data: dailyActivity } = useAuditDailyActivity();
   const { data: topUsers } = useAuditTopUsers();
   const { data: actionDistribution } = useAuditActionDistribution();
+
+  const currentLang = i18n.language?.startsWith('ru') ? 'ru' : 'en';
 
   if (isCollapsed) {
     return (
@@ -28,7 +32,7 @@ export function AuditLogsCharts() {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
-        Show Charts
+        {t('auditLog.charts.showCharts')}
       </button>
     );
   }
@@ -36,19 +40,19 @@ export function AuditLogsCharts() {
   return (
     <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
       <div className="px-4 py-3 border-b border-neutral-100 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-neutral-700">Analytics (Last 7 Days)</h3>
+        <h3 className="text-sm font-medium text-neutral-700">{t('auditLog.charts.analyticsTitle')}</h3>
         <button
           onClick={() => setIsCollapsed(true)}
           className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
         >
-          Hide
+          {t('auditLog.charts.hide')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:divide-x divide-y lg:divide-y-0 divide-neutral-100">
         {/* Activity chart (30 days) */}
         <div className="p-4">
-          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-3">Activity (30 Days)</h4>
+          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-3">{t('auditLog.charts.activity30d')}</h4>
           {dailyActivity && dailyActivity.length > 0 ? (
             <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={dailyActivity} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
@@ -68,7 +72,7 @@ export function AuditLogsCharts() {
                 <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} />
                 <Tooltip
                   contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
-                  labelFormatter={(d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  labelFormatter={(d) => new Date(d).toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric' })}
                 />
                 <Area
                   type="monotone"
@@ -82,14 +86,14 @@ export function AuditLogsCharts() {
             </ResponsiveContainer>
           ) : (
             <div className="h-[180px] flex items-center justify-center text-neutral-400 text-sm">
-              No data
+              {t('auditLog.charts.noData')}
             </div>
           )}
         </div>
 
         {/* Top users — custom bars */}
         <div className="p-4">
-          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-3">Top Users</h4>
+          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-3">{t('auditLog.charts.topUsers')}</h4>
           {topUsers && topUsers.length > 0 ? (
             <div className="flex flex-col justify-center gap-3 h-[180px]">
               {topUsers.slice(0, 5).map((user, i) => {
@@ -118,14 +122,14 @@ export function AuditLogsCharts() {
             </div>
           ) : (
             <div className="h-[180px] flex items-center justify-center text-neutral-400 text-sm">
-              No data
+              {t('auditLog.charts.noData')}
             </div>
           )}
         </div>
 
         {/* Action distribution pie chart */}
         <div className="p-4">
-          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-3">Action Distribution</h4>
+          <h4 className="text-xs font-medium text-neutral-500 uppercase mb-3">{t('auditLog.charts.actionDistribution')}</h4>
           {actionDistribution && actionDistribution.length > 0 ? (
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
@@ -155,7 +159,7 @@ export function AuditLogsCharts() {
             </ResponsiveContainer>
           ) : (
             <div className="h-[180px] flex items-center justify-center text-neutral-400 text-sm">
-              No data
+              {t('auditLog.charts.noData')}
             </div>
           )}
         </div>

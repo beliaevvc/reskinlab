@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
 import { useValidatePromoCode } from '../hooks/usePromoCodes';
 
 export function PromoSection({ appliedPromo, onApplyPromo }) {
+  const { t } = useTranslation('calculator');
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
   const [isValidating, setIsValidating] = useState(false);
@@ -32,7 +34,7 @@ export function PromoSection({ appliedPromo, onApplyPromo }) {
       });
     } catch (err) {
       onApplyPromo(null);
-      setPromoError(err.message || 'Invalid code');
+      setPromoError(err.message || t('promo.invalid'));
     } finally {
       setIsValidating(false);
     }
@@ -41,7 +43,7 @@ export function PromoSection({ appliedPromo, onApplyPromo }) {
   return (
     <div className="border-t border-neutral-200 pt-8 mt-8 mb-8">
       <h2 className="text-lg font-semibold text-neutral-900 mb-5 flex items-center gap-2">
-        <Icon name="tag" className="text-emerald-500" /> Promo
+        <Icon name="tag" className="text-emerald-500" /> {t('promo.title')}
       </h2>
       <div className={`bg-white border p-4 rounded-md flex gap-3 ${appliedPromo ? 'border-emerald-200 bg-emerald-50/30' : 'border-neutral-200'}`}>
         {appliedPromo ? (
@@ -57,14 +59,14 @@ export function PromoSection({ appliedPromo, onApplyPromo }) {
               onClick={() => { onApplyPromo(null); setPromoInput(''); setPromoError(''); }}
               className="border border-neutral-300 hover:bg-neutral-50 text-neutral-500 hover:text-neutral-700 font-medium px-4 rounded transition-colors duration-150 shrink-0"
             >
-              Clear
+              {t('presets.clear')}
             </button>
           </>
         ) : (
           <>
             <input
               type="text"
-              placeholder="Enter code"
+              placeholder={t('promo.placeholder')}
               className="bg-neutral-50 border border-neutral-200 rounded p-3 text-neutral-900 w-full uppercase outline-none focus:border-emerald-500 transition-colors duration-150 placeholder-neutral-400 font-mono text-sm"
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
@@ -75,7 +77,7 @@ export function PromoSection({ appliedPromo, onApplyPromo }) {
               disabled={isValidating || !promoInput.trim()}
               className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white font-medium px-5 rounded cursor-pointer transition-colors duration-150 disabled:cursor-not-allowed shrink-0"
             >
-              {isValidating ? '...' : 'Apply'}
+              {isValidating ? '...' : t('promo.apply')}
             </button>
           </>
         )}

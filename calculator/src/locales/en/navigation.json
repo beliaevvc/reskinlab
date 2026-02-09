@@ -1,0 +1,29 @@
+{
+  "dashboard": "Dashboard",
+  "calculator": "Calculator",
+  "projects": "Projects",
+  "specifications": "Specifications",
+  "offers": "Offers",
+  "invoices": "Invoices",
+  "clients": "Clients",
+  "users": "Users",
+  "profile": "Profile",
+  "settings": "Settings",
+  "signOut": "Sign Out",
+  "admin": {
+    "title": "Admin",
+    "dashboard": "Admin Dashboard",
+    "users": "Users",
+    "pricing": "Pricing",
+    "promoCodes": "Promo Codes",
+    "offerTemplates": "Offer Templates",
+    "taskSettings": "Task Settings",
+    "wallets": "Wallets",
+    "auditLog": "Audit Log"
+  },
+  "roles": {
+    "client": "Client",
+    "am": "Account Manager",
+    "admin": "Admin"
+  }
+}

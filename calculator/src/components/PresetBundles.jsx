@@ -1,11 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
 import { PRESETS } from '../data';
+import { useLanguage } from '../hooks/useLanguage';
 
 export function PresetBundles({ onApplyPreset }) {
+  const { t } = useTranslation('calculator');
+  const { getLocalized } = useLanguage();
+  
   return (
     <div>
       <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2 mb-4">
-        <Icon name="bundle" className="text-emerald-500" /> Quick Bundles
+        <Icon name="bundle" className="text-emerald-500" /> {t('presets.title')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {PRESETS.map((preset) => (
@@ -17,7 +22,7 @@ export function PresetBundles({ onApplyPreset }) {
             <div className="font-medium text-neutral-900 group-hover:text-emerald-600 mb-1">
               {preset.name}
             </div>
-            <div className="text-xs text-neutral-500">{preset.desc}</div>
+            <div className="text-xs text-neutral-500">{getLocalized(preset, 'desc')}</div>
           </button>
         ))}
       </div>

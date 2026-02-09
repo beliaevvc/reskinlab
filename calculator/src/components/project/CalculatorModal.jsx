@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CATEGORIES as LOCAL_CATEGORIES } from '../../data';
 import { useCalculator } from '../../hooks/useCalculator';
 import { useDynamicPricing } from '../../hooks/useDynamicPricing';
@@ -20,6 +21,9 @@ import { SpecificationView } from '../SpecificationView';
  * Calculator Modal - Opens calculator in a modal for creating/editing specifications
  */
 export function CalculatorModal({ isOpen, onClose, projectId, projectName, specificationId = null }) {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('ru') ? 'ru' : 'en';
+  
   // Dynamic pricing from Supabase (falls back to local data)
   const { data: pricingData } = useDynamicPricing();
 
@@ -401,7 +405,7 @@ export function CalculatorModal({ isOpen, onClose, projectId, projectName, speci
             {/* Minimum order warnings */}
             {minimumOrder.isMinimumActive && minimumOrder.isBelowMinimum(totals.grandTotal) && (
               <span className="text-xs text-amber-600 mr-auto">
-                {minimumOrder.message || `Min. $${minimumOrder.amount.toLocaleString()} for first order`}
+                {minimumOrder.getMessage?.(currentLang) || minimumOrder.message || `Min. $${minimumOrder.amount.toLocaleString()} for first order`}
               </span>
             )}
             {totals.minimumApplied && (

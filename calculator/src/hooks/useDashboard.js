@@ -1,6 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
+import i18n from '../lib/i18n';
 import { supabase } from '../lib/supabase';
 import { enrichLogsWithParentNames } from '../lib/auditLog';
+
+/**
+ * Get locale string for date formatting
+ */
+function getDateLocale() {
+  return i18n.language?.startsWith('ru') ? 'ru-RU' : 'en-US';
+}
 
 /**
  * Dashboard overview stats for admin
@@ -167,8 +175,9 @@ export function useRecentActivity(limit = 10) {
  * Revenue chart data (last 6 months)
  */
 export function useRevenueChart() {
+  const locale = getDateLocale();
   return useQuery({
-    queryKey: ['revenue-chart'],
+    queryKey: ['revenue-chart', locale],
     queryFn: async () => {
       const { data: invoices } = await supabase
         .from('invoices')
@@ -181,7 +190,7 @@ export function useRevenueChart() {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        const monthName = date.toLocaleDateString('en', { month: 'short' });
+        const monthName = date.toLocaleDateString(locale, { month: 'short' });
         
         const monthInvoices = invoices?.filter(inv => {
           const paymentDate = inv.paid_at || inv.updated_at || inv.created_at;
@@ -207,8 +216,9 @@ export function useRevenueChart() {
  * Projects chart data (last 6 months)
  */
 export function useProjectsChart() {
+  const locale = getDateLocale();
   return useQuery({
-    queryKey: ['projects-chart'],
+    queryKey: ['projects-chart', locale],
     queryFn: async () => {
       const { data: projects } = await supabase
         .from('projects')
@@ -220,7 +230,7 @@ export function useProjectsChart() {
       for (let i = 5; i >= 0; i--) {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
-        const monthName = date.toLocaleDateString('en', { month: 'short' });
+        const monthName = date.toLocaleDateString(locale, { month: 'short' });
         
         const monthProjects = projects?.filter(p => {
           const pDate = new Date(p.created_at);

@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
+import { useTranslation } from 'react-i18next';
 import { VariableMention } from './VariableMention';
 import { SlashCommandMenu } from './SlashCommandMenu';
 
@@ -12,7 +13,7 @@ import { SlashCommandMenu } from './SlashCommandMenu';
  * Unified single-editor for offer template content.
  * Floating BubbleMenu on text selection, slash commands for variables.
  */
-export function OfferTemplateEditor({ content, onChange, variables }) {
+export function OfferTemplateEditor({ content, onChange, variables, contentLang = 'en' }) {
   const [slashState, setSlashState] = useState(null);
   const slashStateRef = useRef(null);
   const contentLoadedRef = useRef(false);
@@ -27,7 +28,7 @@ export function OfferTemplateEditor({ content, onChange, variables }) {
         heading: { levels: [1, 2, 3, 4] },
       }),
       Placeholder.configure({
-        placeholder: 'Начните писать оферту... Нажмите / чтобы вставить переменную',
+        placeholder: '', // Set dynamically via CSS or keep empty
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
@@ -185,6 +186,7 @@ export function OfferTemplateEditor({ content, onChange, variables }) {
         coords={slashState?.coords}
         query={slashState?.query || ''}
         variables={variables || []}
+        contentLang={contentLang}
         onSelect={handleSlashSelect}
         onClose={handleSlashClose}
       />
@@ -196,29 +198,30 @@ export function OfferTemplateEditor({ content, onChange, variables }) {
 }
 
 function FormatHints() {
+  const { t } = useTranslation('admin');
   return (
     <div className="shrink-0 sticky bottom-0 border-t border-neutral-100 bg-neutral-50/95 backdrop-blur-sm px-4 py-2">
       <div className="flex items-center gap-4 text-[11px] flex-wrap">
-        <span className="text-neutral-400 font-medium shrink-0">Формат:</span>
+        <span className="text-neutral-400 font-medium shrink-0">{t('offerTemplates.editor.formatHints.format')}</span>
         <div className="flex items-center gap-1.5">
-          <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">1. ЗАГЛАВНЫМИ</code>
-          <span className="text-neutral-400">секция</span>
+          <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">1. UPPERCASE</code>
+          <span className="text-neutral-400">{t('offerTemplates.editor.formatHints.section')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">•</code>
-          <span className="text-neutral-400">буллет</span>
+          <span className="text-neutral-400">{t('offerTemplates.editor.formatHints.bullet')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">1.1.</code>
-          <span className="text-neutral-400">подпункт</span>
+          <span className="text-neutral-400">{t('offerTemplates.editor.formatHints.subitem')}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">Текст:</code>
-          <span className="text-neutral-400">label</span>
+          <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">Text:</code>
+          <span className="text-neutral-400">{t('offerTemplates.editor.formatHints.label')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <code className="px-1 py-0.5 bg-neutral-200/70 rounded text-neutral-600 font-mono">/</code>
-          <span className="text-neutral-400">переменная</span>
+          <span className="text-neutral-400">{t('offerTemplates.editor.formatHints.variable')}</span>
         </div>
       </div>
     </div>

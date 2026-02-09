@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClaimSharedSession } from '../../hooks/useSharedSessions';
 import useCalculatorStore from '../../stores/calculatorStore';
 
@@ -8,6 +9,7 @@ import useCalculatorStore from '../../stores/calculatorStore';
  * Used by existing authenticated users to claim a shared session.
  */
 export function ImportCodeModal({ isOpen, onClose }) {
+  const { t } = useTranslation('calculator');
   const navigate = useNavigate();
   const claimSession = useClaimSharedSession();
   const { setProject, setSpecification } = useCalculatorStore();
@@ -16,7 +18,7 @@ export function ImportCodeModal({ isOpen, onClose }) {
 
   const handleImport = useCallback(async () => {
     if (!code.trim()) {
-      setError('Please enter a code');
+      setError(t('importModal.enterCode'));
       return;
     }
 
@@ -60,9 +62,9 @@ export function ImportCodeModal({ isOpen, onClose }) {
         </button>
 
         {/* Content */}
-        <h3 className="text-lg font-bold text-neutral-900 mb-2">Import Selection</h3>
+        <h3 className="text-lg font-bold text-neutral-900 mb-2">{t('importModal.title')}</h3>
         <p className="text-sm text-neutral-500 mb-4">
-          Enter the code from a shared calculator to import the selection into a new project.
+          {t('importModal.description')}
         </p>
 
         {/* Code input */}
@@ -73,7 +75,7 @@ export function ImportCodeModal({ isOpen, onClose }) {
             setCode(e.target.value.toUpperCase());
             setError(null);
           }}
-          placeholder="Enter 8-character code"
+          placeholder={t('importModal.placeholder')}
           maxLength={8}
           autoFocus
           className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors text-neutral-900 placeholder-neutral-400 font-mono text-center text-lg tracking-widest"
@@ -97,17 +99,17 @@ export function ImportCodeModal({ isOpen, onClose }) {
             {claimSession.isPending ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                Importing...
+                {t('importModal.importing')}
               </>
             ) : (
-              'Import'
+              t('importModal.import')
             )}
           </button>
           <button
             onClick={handleClose}
             className="px-4 py-2.5 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
           >
-            Cancel
+            {t('importModal.cancel')}
           </button>
         </div>
       </div>

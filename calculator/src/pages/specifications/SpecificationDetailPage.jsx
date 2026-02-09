@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSpecification } from '../../hooks/useSpecifications';
 import { useOfferBySpecification, useCreateOffer } from '../../hooks/useOffers';
 import { formatDate } from '../../lib/utils';
@@ -17,6 +18,7 @@ function useBasePath() {
 }
 
 export function SpecificationDetailPage() {
+  const { t } = useTranslation('specs');
   const { id: specId } = useParams();
   const navigate = useNavigate();
   const basePath = useBasePath();
@@ -61,7 +63,7 @@ export function SpecificationDetailPage() {
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-          <p className="text-sm text-neutral-500">Loading specification...</p>
+          <p className="text-sm text-neutral-500">{t('detail.loading')}</p>
         </div>
       </div>
     );
@@ -71,13 +73,13 @@ export function SpecificationDetailPage() {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-6">
         <p className="text-red-800">
-          Failed to load specification: {error.message}
+          {t('detail.loadError', { error: error.message })}
         </p>
         <Link
           to={`${basePath}/projects`}
           className="mt-4 inline-flex items-center text-red-700 hover:text-red-800"
         >
-          Back to projects
+          {t('projects:backToProjects')}
         </Link>
       </div>
     );
@@ -86,12 +88,12 @@ export function SpecificationDetailPage() {
   if (!specification) {
     return (
       <div className="bg-neutral-50 border border-neutral-200 rounded-md p-6 text-center">
-        <p className="text-neutral-600">Specification not found</p>
+        <p className="text-neutral-600">{t('detail.notFound')}</p>
         <Link
           to={`${basePath}/projects`}
           className="mt-4 inline-flex items-center text-emerald-600 hover:text-emerald-700"
         >
-          Back to projects
+          {t('projects:backToProjects')}
         </Link>
       </div>
     );
@@ -100,12 +102,12 @@ export function SpecificationDetailPage() {
   if (!specData) {
     return (
       <div className="bg-neutral-50 border border-neutral-200 rounded-md p-6 text-center">
-        <p className="text-neutral-600">Specification data is incomplete</p>
+        <p className="text-neutral-600">{t('detail.incomplete', { defaultValue: 'Specification data is incomplete' })}</p>
         <Link
           to={`${basePath}/projects`}
           className="mt-4 inline-flex items-center text-emerald-600 hover:text-emerald-700"
         >
-          Back to projects
+          {t('projects:backToProjects')}
         </Link>
       </div>
     );
@@ -122,7 +124,7 @@ export function SpecificationDetailPage() {
               to={`${basePath}/projects`}
               className="text-neutral-500 hover:text-neutral-700 transition-colors"
             >
-              Projects
+              {t('projects:title')}
             </Link>
             <svg
               className="w-4 h-4 text-neutral-400"
@@ -184,10 +186,10 @@ export function SpecificationDetailPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-1">
-                    Client
+                    {t('common:labels.client')}
                   </div>
                   <div className="text-sm font-semibold text-neutral-900">
-                    {specification.project.client.company_name || specification.project.client.user?.full_name || 'Unknown'}
+                    {specification.project.client.company_name || specification.project.client.user?.full_name || t('common:unknown')}
                   </div>
                   {specification.project.client.user && (
                     <div className="text-xs text-neutral-600 mt-1">
@@ -203,7 +205,7 @@ export function SpecificationDetailPage() {
                   )}
                   {specification.project.client.contact_name && (
                     <div className="text-xs text-neutral-500 mt-1">
-                      Contact: {specification.project.client.contact_name}
+                      {t('detail.contact', { defaultValue: 'Contact' })}: {specification.project.client.contact_name}
                       {specification.project.client.contact_phone && (
                         <span> • {specification.project.client.contact_phone}</span>
                       )}
@@ -218,7 +220,7 @@ export function SpecificationDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-neutral-900">
-                Specification {specification.number || specification.version}
+                {t('view.header')} {specification.number || specification.version}
               </h1>
               <span
                 className={`px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -227,7 +229,7 @@ export function SpecificationDetailPage() {
                     : 'bg-emerald-100 text-emerald-800'
                 }`}
               >
-                {isDraft ? 'Draft' : 'Finalized'}
+                {isDraft ? t('card.draft') : t('card.finalized')}
               </span>
             </div>
 
@@ -251,7 +253,7 @@ export function SpecificationDetailPage() {
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    Edit
+                    {t('card.edit')}
                   </button>
                   <button
                     onClick={() => setShowFinalizeModal(true)}
@@ -270,7 +272,7 @@ export function SpecificationDetailPage() {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    Finalize
+                    {t('detail.finalize', { defaultValue: 'Finalize' })}
                   </button>
                 </>
               )}
@@ -283,7 +285,7 @@ export function SpecificationDetailPage() {
                   {isCreatingOffer ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                      Creating...
+                      {t('detail.creating', { defaultValue: 'Creating...' })}
                     </>
                   ) : (
                     <>
@@ -300,7 +302,7 @@ export function SpecificationDetailPage() {
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
-                      Create Offer
+                      {t('detail.createOffer', { defaultValue: 'Create Offer' })}
                     </>
                   )}
                 </button>
@@ -329,7 +331,7 @@ export function SpecificationDetailPage() {
                       d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                     />
                   </svg>
-                  View Offer
+                  {t('detail.viewOffer', { defaultValue: 'View Offer' })}
                 </Link>
               )}
             </div>

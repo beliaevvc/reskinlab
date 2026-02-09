@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 
 const PENDING_CODE_KEY = 'pending_shared_code';
 
 export function RegisterPage() {
+  const { t } = useTranslation('auth');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,13 +29,13 @@ export function RegisterPage() {
 
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('register.errors.passwordMismatch'));
       return;
     }
 
     // Validate password strength
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('register.errors.weakPassword'));
       return;
     }
 
@@ -91,10 +94,10 @@ export function RegisterPage() {
               </svg>
             </div>
             <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-              Account created!
+              {t('register.title')} ✓
             </h2>
             <p className="text-neutral-600 mb-4">
-              Your account has been created successfully. Redirecting to login...
+              {t('login.subtitle')}
             </p>
             {sharedCode && (
               <p className="text-sm text-blue-600 mb-4">
@@ -105,7 +108,7 @@ export function RegisterPage() {
               to="/login"
               className="text-emerald-600 hover:text-emerald-700 font-medium"
             >
-              Go to login now
+              {t('register.signIn')}
             </Link>
           </div>
         </div>
@@ -116,6 +119,11 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
       <div className="max-w-md w-full">
+        {/* Language Switcher */}
+        <div className="flex justify-end mb-4">
+          <LanguageSwitcher />
+        </div>
+
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-neutral-900">
@@ -127,7 +135,7 @@ export function RegisterPage() {
         {/* Card */}
         <div className="bg-white rounded-md shadow-sm border border-neutral-200 p-6 md:p-8">
           <h2 className="text-xl font-semibold text-neutral-900 mb-6">
-            Create your account
+            {t('register.title')}
           </h2>
 
           {/* Shared code banner */}
@@ -169,7 +177,7 @@ export function RegisterPage() {
                 htmlFor="fullName"
                 className="block text-sm font-medium text-neutral-700 mb-1.5"
               >
-                Full name
+                {t('register.fullName')}
               </label>
               <input
                 id="fullName"
@@ -188,7 +196,7 @@ export function RegisterPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-neutral-700 mb-1.5"
               >
-                Email address
+                {t('register.email')}
               </label>
               <input
                 id="email"
@@ -207,7 +215,7 @@ export function RegisterPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-neutral-700 mb-1.5"
               >
-                Password
+                {t('register.password')}
               </label>
               <input
                 id="password"
@@ -219,9 +227,6 @@ export function RegisterPage() {
                 className="w-full px-4 py-2.5 rounded border border-neutral-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors text-neutral-900 placeholder-neutral-400"
                 placeholder="••••••••"
               />
-              <p className="mt-1 text-xs text-neutral-500">
-                At least 6 characters
-              </p>
             </div>
 
             <div>
@@ -229,7 +234,7 @@ export function RegisterPage() {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-neutral-700 mb-1.5"
               >
-                Confirm password
+                {t('register.confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
@@ -251,22 +256,22 @@ export function RegisterPage() {
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Creating account...
+                  {t('register.submit')}...
                 </>
               ) : (
-                'Create account'
+                t('register.submit')
               )}
             </button>
           </form>
 
           {/* Login link */}
           <p className="mt-6 text-center text-sm text-neutral-600">
-            Already have an account?{' '}
+            {t('register.haveAccount')}{' '}
             <Link
               to="/login"
               className="text-emerald-600 hover:text-emerald-700 font-medium"
             >
-              Sign in
+              {t('register.signIn')}
             </Link>
           </p>
         </div>

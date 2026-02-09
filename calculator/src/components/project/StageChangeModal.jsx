@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { useUpdateStageStatus, useActivateStageWithPrevious, useDeactivateStageWithPrevious } from '../../hooks/useStages';
 
 export function StageChangeModal({ isOpen, onClose, stage, projectId, allStages = [] }) {
+  const { t } = useTranslation('common');
   const updateStage = useUpdateStageStatus();
   const activateWithPrevious = useActivateStageWithPrevious();
   const deactivateWithPrevious = useDeactivateStageWithPrevious();
@@ -61,21 +63,21 @@ export function StageChangeModal({ isOpen, onClose, stage, projectId, allStages 
       {/* Modal */}
       <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-          {isDeactivating || isCompleted ? 'Деактивировать этап?' : 'Активировать этап?'}
+          {isDeactivating || isCompleted ? t('stageChange.deactivateTitle') : t('stageChange.activateTitle')}
         </h3>
 
         <div className="mb-6">
           <p className="text-sm text-neutral-600 mb-2">
-            <span className="font-medium">Этап:</span> {stage.name}
+            <span className="font-medium">{t('stageChange.stageLabel')}</span> {stage.name}
           </p>
           <p className="text-sm text-neutral-600 mb-2">
             {isDeactivating || isCompleted
               ? stagesToDeactivate.length > 1
-                ? `Будут деактивированы следующие этапы: ${stagesToDeactivate.map(s => s.name).join(', ')}. Все этапы будут возвращены в статус "Ожидает".`
-                : `Вы уверены, что хотите деактивировать этап "${stage.name}"? Этап будет возвращен в статус "Ожидает".`
+                ? t('stageChange.deactivateMultiple', { stages: stagesToDeactivate.map(s => s.name).join(', ') })
+                : t('stageChange.deactivateSingle', { name: stage.name })
               : stagesToActivate.length > 1
-              ? `Будут активированы следующие этапы: ${stagesToActivate.map(s => s.name).join(', ')}`
-              : `Вы уверены, что хотите активировать этап "${stage.name}"?`}
+              ? t('stageChange.activateMultiple', { stages: stagesToActivate.map(s => s.name).join(', ') })
+              : t('stageChange.activateSingle', { name: stage.name })}
           </p>
         </div>
 
@@ -85,7 +87,7 @@ export function StageChangeModal({ isOpen, onClose, stage, projectId, allStages 
             disabled={updateStage.isPending}
             className="px-4 py-2 text-neutral-700 hover:bg-neutral-100 rounded font-medium disabled:opacity-50"
           >
-            Отмена
+            {t('stageChange.cancel')}
           </button>
           <button
             onClick={handleConfirm}
@@ -97,10 +99,10 @@ export function StageChangeModal({ isOpen, onClose, stage, projectId, allStages 
             }`}
           >
             {updateStage.isPending || activateWithPrevious.isPending || deactivateWithPrevious.isPending
-              ? 'Обработка...'
+              ? t('stageChange.processing')
               : isDeactivating || isCompleted
-              ? 'Деактивировать'
-              : 'Активировать'}
+              ? t('stageChange.deactivate')
+              : t('stageChange.activate')}
           </button>
         </div>
       </div>

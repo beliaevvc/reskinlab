@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCreateTask } from '../../hooks/useTasks';
 import { useStages } from '../../hooks/useStages';
 
 export function CreateTaskModal({ isOpen, onClose, projectId }) {
+  const { t, i18n } = useTranslation('tasks');
+  const currentLang = i18n.language?.substring(0, 2) || 'en';
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stageId, setStageId] = useState('');
@@ -18,12 +21,18 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
     
     if (!title.trim()) return;
 
+    const trimmedDesc = description.trim() || null;
+    
     createTask(
       {
         projectId,
         stageId: stageId || null,
         title: title.trim(),
-        description: description.trim() || null,
+        title_ru: currentLang === 'ru' ? title.trim() : null,
+        title_en: currentLang === 'en' ? title.trim() : null,
+        description: trimmedDesc,
+        description_ru: currentLang === 'ru' ? trimmedDesc : null,
+        description_en: currentLang === 'en' ? trimmedDesc : null,
         dueDate: dueDate || null,
       },
       {
@@ -48,7 +57,7 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
         {/* Header */}
         <div className="px-6 py-4 border-b border-neutral-200">
           <h2 className="text-lg font-semibold text-neutral-900">
-            Create New Task
+            {t('create.title')}
           </h2>
         </div>
 
@@ -57,13 +66,13 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Title <span className="text-red-500">*</span>
+              {t('create.titleLabel')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Task title"
+              placeholder={t('create.titlePlaceholder')}
               className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               autoFocus
             />
@@ -72,12 +81,12 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Description
+              {t('create.description')}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Task description (optional)"
+              placeholder={t('create.descriptionPlaceholder')}
               rows={3}
               className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
             />
@@ -86,14 +95,14 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
           {/* Stage */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Stage
+              {t('create.stage')}
             </label>
             <select
               value={stageId}
               onChange={(e) => setStageId(e.target.value)}
               className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             >
-              <option value="">No stage</option>
+              <option value="">{t('create.noStage')}</option>
               {stages?.map((stage) => (
                 <option key={stage.id} value={stage.id}>
                   {stage.name}
@@ -105,7 +114,7 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
           {/* Due date */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Due Date
+              {t('create.dueDate')}
             </label>
             <input
               type="date"
@@ -122,14 +131,14 @@ export function CreateTaskModal({ isOpen, onClose, projectId }) {
               onClick={onClose}
               className="px-4 py-2 text-neutral-700 hover:bg-neutral-100 rounded font-medium"
             >
-              Cancel
+              {t('actions.cancel')}
             </button>
             <button
               type="submit"
               disabled={isPending || !title.trim()}
               className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded font-medium disabled:opacity-50"
             >
-              {isPending ? 'Creating...' : 'Create Task'}
+              {isPending ? t('create.creating') : t('create.submit')}
             </button>
           </div>
         </form>

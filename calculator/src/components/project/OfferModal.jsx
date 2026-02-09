@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useOffer, useLogOfferView } from '../../hooks/useOffers';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatDate, formatCurrency } from '../../lib/utils';
@@ -12,6 +13,7 @@ import { printSpecification } from '../../lib/printUtils';
 import { InvoiceModal } from './InvoiceModal';
 
 export function OfferModal({ isOpen, onClose, offerId }) {
+  const { t } = useTranslation('offers');
   const { isAdmin } = useAuth();
   const { data: offer, isLoading, error } = useOffer(isOpen ? offerId : null);
   const { mutate: logView } = useLogOfferView();
@@ -39,11 +41,13 @@ export function OfferModal({ isOpen, onClose, offerId }) {
   // Loading state
   if (isLoading) {
     return createPortal(
-      <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50">
+      <div 
+      className="flex items-center justify-center bg-black/50"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 99999 }}>
         <div className="bg-white rounded-lg p-8">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
-            <p className="text-sm text-neutral-500">Loading offer...</p>
+            <p className="text-sm text-neutral-500">{t('detail.loading')}</p>
           </div>
         </div>
       </div>,
@@ -54,16 +58,18 @@ export function OfferModal({ isOpen, onClose, offerId }) {
   // Error state
   if (error || !offer) {
     return createPortal(
-      <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50">
+      <div 
+      className="flex items-center justify-center bg-black/50"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 99999 }}>
         <div className="bg-white rounded-lg p-6 max-w-md">
           <div className="text-red-600 mb-4">
-            {error ? `Failed to load offer: ${error.message}` : 'Offer not found'}
+            {error ? t('detail.loadError', { error: error.message }) : t('detail.notFound')}
           </div>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-sm"
           >
-            Close
+            {t('legal.close')}
           </button>
         </div>
       </div>,
@@ -82,7 +88,9 @@ export function OfferModal({ isOpen, onClose, offerId }) {
   // Specification view
   if (view === 'specification' && specData) {
     return createPortal(
-      <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+      <div 
+      className="flex items-center justify-center bg-black/50 p-4"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 99999 }}>
         <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
@@ -96,7 +104,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
                 </svg>
               </button>
               <h2 className="text-lg font-semibold text-neutral-900">
-                Specification Details
+                {t('detail.specification')}
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -107,7 +115,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Print
+                {t('common:print', { defaultValue: 'Print' })}
               </button>
               <button
                 onClick={onClose}
@@ -141,16 +149,18 @@ export function OfferModal({ isOpen, onClose, offerId }) {
   }
 
   return createPortal(
-    <div className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+    <div 
+      className="flex items-center justify-center bg-black/50 p-4"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 99999 }}>
       <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold text-neutral-900">
-              Offer {offer.number}
+              {t('card.offer')} {offer.number}
             </h2>
             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.bgClass} ${statusInfo.textClass}`}>
-              {statusInfo.label}
+              {t(`status.${offer.status}`)}
             </span>
           </div>
           <button
@@ -167,17 +177,17 @@ export function OfferModal({ isOpen, onClose, offerId }) {
         <div className="flex-1 overflow-auto p-6 space-y-6">
           {/* Project & Dates Info */}
           <div className="flex items-center justify-between text-sm text-neutral-500">
-            <span>Project: {project?.name || 'Unknown'}</span>
+            <span>{t('detail.project', { ns: 'invoices' })}: {project?.name || t('common:unknown')}</span>
             <div className="flex items-center gap-4">
-              <span>Created {formatDate(offer.created_at)}</span>
+              <span>{t('detail.created', { ns: 'invoices', date: formatDate(offer.created_at) })}</span>
               {offer.valid_until && offer.status === 'pending' && (
                 <span className={expired ? 'text-red-600' : ''}>
-                  {expired ? 'Expired' : 'Valid until'} {formatDate(offer.valid_until)}
+                  {expired ? t('status.expired') : t('modal.validUntil', { defaultValue: 'Valid until' })} {formatDate(offer.valid_until)}
                 </span>
               )}
               {offer.accepted_at && (
                 <span className="text-emerald-600">
-                  Accepted {formatDate(offer.accepted_at)}
+                  {t('modal.accepted', { defaultValue: 'Accepted' })} {formatDate(offer.accepted_at)}
                 </span>
               )}
             </div>
@@ -185,26 +195,26 @@ export function OfferModal({ isOpen, onClose, offerId }) {
 
           {/* Cost Summary */}
           <div className="bg-neutral-50 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-neutral-700 mb-3">Cost Summary</h3>
+            <h3 className="text-sm font-semibold text-neutral-700 mb-3">{t('modal.costSummary', { defaultValue: 'Cost Summary' })}</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-neutral-600">Production</span>
+                <span className="text-neutral-600">{t('modal.production', { defaultValue: 'Production' })}</span>
                 <span className="font-medium">{formatCurrency(totals.productionSum || 0)}</span>
               </div>
               {totals.revisionCost > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-600">Revision Rounds ({totals.revisionRounds})</span>
+                  <span className="text-neutral-600">{t('modal.revisionRounds', { defaultValue: 'Revision Rounds', count: totals.revisionRounds })} ({totals.revisionRounds})</span>
                   <span className="font-medium">{formatCurrency(totals.revisionCost)}</span>
                 </div>
               )}
               {totals.discountAmount > 0 && (
                 <div className="flex justify-between text-sm text-emerald-600">
-                  <span>Discount</span>
+                  <span>{t('modal.discount', { defaultValue: 'Discount' })}</span>
                   <span className="font-medium">-{formatCurrency(totals.discountAmount)}</span>
                 </div>
               )}
               <div className="pt-2 border-t border-neutral-200 flex justify-between">
-                <span className="font-semibold text-neutral-900">Total</span>
+                <span className="font-semibold text-neutral-900">{t('common:labels.total', { defaultValue: 'Total' })}</span>
                 <span className="font-bold text-neutral-900">{formatCurrency(totals.grandTotal || 0)}</span>
               </div>
             </div>
@@ -219,7 +229,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                View Full Specification ({totals.lineItems.length} items)
+                {t('detail.viewSpec', { count: totals.lineItems.length, defaultValue: 'View Full Specification ({{count}} items)' })}
               </button>
             )}
           </div>
@@ -227,7 +237,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
           {/* Invoices / Payment Schedule */}
           {offer.invoices?.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-neutral-700 mb-3">Payment Schedule</h3>
+              <h3 className="text-sm font-semibold text-neutral-700 mb-3">{t('modal.paymentSchedule', { defaultValue: 'Payment Schedule' })}</h3>
               <div className="space-y-2">
                 {offer.invoices.map((invoice) => {
                   const invStatus = getInvoiceStatusInfo(invoice.status);
@@ -248,7 +258,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${invStatus.bgClass} ${invStatus.textClass}`}>
-                          {invStatus.label}
+                          {t(`status.${invoice.status}`, { ns: 'invoices' })}
                         </span>
                         <span className="font-semibold text-sm text-neutral-900">
                           {formatInvoiceAmount(invoice.amount_usd)}
@@ -276,10 +286,10 @@ export function OfferModal({ isOpen, onClose, offerId }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-neutral-700">Terms & Conditions</span>
+                <span className="text-sm font-medium text-neutral-700">{t('legal.title')}</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <span>View</span>
+                <span>{t('common:actions.view')}</span>
                 <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
@@ -298,7 +308,7 @@ export function OfferModal({ isOpen, onClose, offerId }) {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Accept Offer
+              {t('detail.acceptOffer')}
             </button>
           </div>
         )}

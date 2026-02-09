@@ -1,0 +1,77 @@
+{
+  "title": "Notifications",
+  "markAllRead": "Mark all as read",
+  "all": "All",
+  "unread": "Unread",
+  "noNotifications": "No notifications",
+  "allCaughtUp": "You're all caught up!",
+  "nothingYet": "Nothing here yet",
+  "categories": {
+    "all": "All",
+    "comments": "Comments",
+    "tasks": "Tasks",
+    "payments": "Payments",
+    "projects": "Projects",
+    "users": "Users"
+  },
+  "types": {
+    "comment": {
+      "someone": "Someone",
+      "commentedOn": "commented on",
+      "aTask": "a task"
+    },
+    "task_status_change": {
+      "movedTo": "moved to"
+    },
+    "offer_created": {
+      "newOffer": "New offer",
+      "for": "for",
+      "project": "project"
+    },
+    "offer_accepted": {
+      "offer": "Offer"
+    },
+    "offer_cancelled": {
+      "offer": "Offer"
+    },
+    "invoice_created": {
+      "newInvoice": "New invoice"
+    },
+    "payment_received": {
+      "paymentSubmitted": "Payment submitted for"
+    },
+    "payment_confirmed": {
+      "payment": "Payment",
+      "for": "for"
+    },
+    "project_created": {
+      "newProject": "New project",
+      "by": "by"
+    },
+    "project_status_change": {
+      "status": "status"
+    },
+    "stage_change": {
+      "stage": "Stage",
+      "activatedStagesUpTo": "Activated stages up to",
+      "deactivatedStagesFrom": "Deactivated stages from",
+      "activated": "activated",
+      "deactivated": "deactivated"
+    },
+    "spec_finalized": {
+      "specFinalized": "Specification finalized"
+    },
+    "new_client": {
+      "newClient": "New client:",
+      "unknown": "Unknown"
+    },
+    "am_action": {
+      "am": "AM"
+    },
+    "file_uploaded": {
+      "someone": "Someone",
+      "uploaded": "uploaded",
+      "aFile": "a file"
+    }
+  }
+}

@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import { AccountSwitcher } from '../admin';
 import { NotificationBell } from '../notifications';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 export function AppHeader({ onMenuClick }) {
+  const { t } = useTranslation('common');
+
   return (
     <header className="sticky top-0 z-40 h-16 bg-white border-b border-neutral-200 px-4 md:px-6 flex items-center justify-between">
       {/* Mobile menu button */}
       <button
         onClick={onMenuClick}
         className="lg:hidden p-2 -ml-2 rounded text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors"
-        aria-label="Open menu"
+        aria-label={t('actions.expand')}
       >
         <svg
           className="w-6 h-6"
@@ -30,6 +34,9 @@ export function AppHeader({ onMenuClick }) {
 
       {/* Right side */}
       <div className="flex items-center gap-3">
+        {/* Language Switcher */}
+        <LanguageSwitcher />
+
         {/* Notification center */}
         <NotificationBell />
 

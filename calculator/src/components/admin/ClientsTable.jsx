@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
 
 export function ClientsTable({ clients, isLoading, onViewDetails }) {
+  const { t } = useTranslation('admin');
   const [sortField, setSortField] = useState('created_at');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -55,7 +57,7 @@ export function ClientsTable({ clients, isLoading, onViewDetails }) {
   if (!clients || clients.length === 0) {
     return (
       <div className="text-center py-12 text-neutral-500">
-        No clients found
+        {t('clients.noClientsFound')}
       </div>
     );
   }
@@ -91,7 +93,7 @@ export function ClientsTable({ clients, isLoading, onViewDetails }) {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-neutral-900">
-                      {client.company_name || 'No company'}
+                      {client.company_name || t('clients.table.noCompany')}
                     </p>
                     {client.user && (
                       <p className="text-xs text-neutral-500">
@@ -117,7 +119,7 @@ export function ClientsTable({ clients, isLoading, onViewDetails }) {
                   </span>
                   {client.activeProjects > 0 && (
                     <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-medium">
-                      {client.activeProjects} active
+                      {t('clients.table.active', { count: client.activeProjects })}
                     </span>
                   )}
                 </div>
@@ -132,7 +134,7 @@ export function ClientsTable({ clients, isLoading, onViewDetails }) {
                   onClick={() => onViewDetails?.(client)}
                   className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                 >
-                  View Details
+                  {t('clients.viewDetails')}
                 </button>
               </td>
             </tr>

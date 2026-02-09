@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTaskAutoCreationSettings, useUpdateTaskAutoCreationSettings } from '../../hooks/useTaskAutoCreationSettings';
 import { useTaskAutoTemplates, useCreateTaskAutoTemplate, useUpdateTaskAutoTemplate, useDeleteTaskAutoTemplate } from '../../hooks/useTaskAutoTemplates';
 import { useTaskSpecItemTemplates, useUpdateTaskSpecItemTemplate, useCreateTaskSpecItemTemplate } from '../../hooks/useTaskSpecItemTemplates';
 import { ALL_ITEMS } from '../../data/categories';
 import { TemplateChecklistEditor } from '../../components/admin/TemplateChecklistEditor';
-const STAGE_OPTIONS = [
-  { value: 'briefing', label: 'Briefing' },
-  { value: 'moodboard', label: 'Moodboard & Concept' },
-  { value: 'symbols', label: 'Symbol Design' },
-  { value: 'ui', label: 'UI & Layout' },
-  { value: 'animation', label: 'Animation Production' },
-  { value: 'revisions', label: 'Revisions' },
-  { value: 'delivery', label: 'Final Delivery' },
-];
+
+const STAGE_KEYS = ['briefing', 'moodboard', 'symbols', 'ui', 'animation', 'revisions', 'delivery'];
 
 export function TaskAutoCreationSettingsPage() {
+  const { t } = useTranslation('admin');
   const { data: settings, isLoading: settingsLoading } = useTaskAutoCreationSettings();
   const { data: templates, isLoading: templatesLoading } = useTaskAutoTemplates();
   const { data: specTemplates, isLoading: specTemplatesLoading } = useTaskSpecItemTemplates();
@@ -24,6 +19,12 @@ export function TaskAutoCreationSettingsPage() {
   const deleteTemplate = useDeleteTaskAutoTemplate();
   const updateSpecTemplate = useUpdateTaskSpecItemTemplate();
   const createSpecTemplate = useCreateTaskSpecItemTemplate();
+  
+  // Localized stage options
+  const STAGE_OPTIONS = STAGE_KEYS.map(key => ({
+    value: key,
+    label: t(`taskSettings.stages.${key}`)
+  }));
 
   const [formData, setFormData] = useState({
     spec_tasks_enabled: true,
@@ -34,8 +35,10 @@ export function TaskAutoCreationSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [editingTemplateId, setEditingTemplateId] = useState(null);
   const [newTemplate, setNewTemplate] = useState({
-    title: '',
-    description: '',
+    title_ru: '',
+    title_en: '',
+    description_ru: '',
+    description_en: '',
     stage_key: 'briefing',
     order: 0,
     due_days_offset: 7,
@@ -63,10 +66,10 @@ export function TaskAutoCreationSettingsPage() {
 
     try {
       await updateSettings.mutateAsync(formData);
-      alert('Настройки успешно сохранены!');
+      alert(t('taskSettings.alerts.saved'));
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Ошибка при сохранении настроек: ' + error.message);
+      alert(t('taskSettings.alerts.saveError') + ' ' + error.message);
     } finally {
       setIsSaving(false);
     }
@@ -86,8 +89,10 @@ export function TaskAutoCreationSettingsPage() {
       } else {
         await createTemplate.mutateAsync(template);
         setNewTemplate({
-          title: '',
-          description: '',
+          title_ru: '',
+          title_en: '',
+          description_ru: '',
+          description_en: '',
           stage_key: 'briefing',
           order: 0,
           due_days_offset: 7,
@@ -99,19 +104,19 @@ export function TaskAutoCreationSettingsPage() {
       setEditingTemplateId(null);
     } catch (error) {
       console.error('Error saving template:', error);
-      alert('Ошибка при сохранении шаблона: ' + error.message);
+      alert(t('taskSettings.alerts.templateSaveError') + ' ' + error.message);
     }
   };
 
   const handleDeleteTemplate = async (id) => {
-    if (!confirm('Вы уверены, что хотите удалить этот шаблон?')) {
+    if (!confirm(t('taskSettings.confirms.deleteTemplate'))) {
       return;
     }
     try {
       await deleteTemplate.mutateAsync(id);
     } catch (error) {
       console.error('Error deleting template:', error);
-      alert('Ошибка при удалении шаблона: ' + error.message);
+      alert(t('taskSettings.alerts.templateDeleteError') + ' ' + error.message);
     }
   };
 
@@ -127,7 +132,7 @@ export function TaskAutoCreationSettingsPage() {
       setEditingSpecTemplateId(null);
     } catch (error) {
       console.error('Error saving spec template:', error);
-      alert('Ошибка при сохранении шаблона: ' + error.message);
+      alert(t('taskSettings.alerts.templateSaveError') + ' ' + error.message);
     }
   };
 
@@ -139,7 +144,7 @@ export function TaskAutoCreationSettingsPage() {
   if (settingsLoading || templatesLoading || specTemplatesLoading) {
     return (
       <div className="p-6">
-        <div className="animate-pulse">Загрузка настроек...</div>
+        <div className="animate-pulse">{t('taskSettings.loading')}</div>
       </div>
     );
   }
@@ -148,9 +153,9 @@ export function TaskAutoCreationSettingsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">Настройки автоматического создания задач</h1>
+        <h1 className="text-2xl font-bold text-neutral-900">{t('taskSettings.title')}</h1>
         <p className="text-sm text-neutral-500 mt-1">
-          Настройте параметры автоматического создания задач при подтверждении первой оплаты проекта
+          {t('taskSettings.subtitle')}
         </p>
       </div>
 
@@ -159,9 +164,9 @@ export function TaskAutoCreationSettingsPage() {
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-neutral-900">Дополнительные автоматические задачи</h2>
+              <h2 className="text-lg font-semibold text-neutral-900">{t('taskSettings.sections.additionalTasks.title')}</h2>
               <p className="text-xs text-neutral-500 mt-1">
-                Задачи, которые создаются автоматически при первой оплате (не из спецификации)
+                {t('taskSettings.sections.additionalTasks.subtitle')}
               </p>
             </div>
             <button
@@ -169,56 +174,82 @@ export function TaskAutoCreationSettingsPage() {
               onClick={() => setShowNewTemplateForm(true)}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm"
             >
-              + Добавить шаблон
+              {t('taskSettings.actions.addTemplate')}
             </button>
           </div>
 
           {/* Форма создания нового шаблона */}
           {showNewTemplateForm && (
             <div className="mb-6 p-4 bg-neutral-50 rounded-lg border border-neutral-200">
-              <h3 className="text-md font-semibold text-neutral-900 mb-4">Новый шаблон задачи</h3>
+              <h3 className="text-md font-semibold text-neutral-900 mb-4">{t('taskSettings.newTemplate.title')}</h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Название задачи *
+                      {t('taskSettings.form.titleRu')} *
                     </label>
                     <input
                       type="text"
-                      value={newTemplate.title}
-                      onChange={(e) => setNewTemplate({ ...newTemplate, title: e.target.value })}
+                      value={newTemplate.title_ru}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, title_ru: e.target.value })}
                       className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      placeholder="Например: Брифинг клиента"
+                      placeholder={t('taskSettings.form.titleRuPlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Этап проекта *
+                      {t('taskSettings.form.titleEn')} *
                     </label>
-                    <select
-                      value={newTemplate.stage_key}
-                      onChange={(e) => setNewTemplate({ ...newTemplate, stage_key: e.target.value })}
+                    <input
+                      type="text"
+                      value={newTemplate.title_en}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, title_en: e.target.value })}
                       className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      {STAGE_OPTIONS.map((stage) => (
-                        <option key={stage.value} value={stage.value}>
-                          {stage.label}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder={t('taskSettings.form.titleEnPlaceholder')}
+                    />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Описание задачи
+                    {t('taskSettings.form.projectStageRequired')}
                   </label>
-                  <textarea
-                    value={newTemplate.description}
-                    onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
-                    rows={2}
+                  <select
+                    value={newTemplate.stage_key}
+                    onChange={(e) => setNewTemplate({ ...newTemplate, stage_key: e.target.value })}
                     className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Описание задачи..."
-                  />
+                  >
+                    {STAGE_OPTIONS.map((stage) => (
+                      <option key={stage.value} value={stage.value}>
+                        {stage.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      {t('taskSettings.form.descriptionRu')}
+                    </label>
+                    <textarea
+                      value={newTemplate.description_ru}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, description_ru: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder={t('taskSettings.form.descriptionRuPlaceholder')}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      {t('taskSettings.form.descriptionEn')}
+                    </label>
+                    <textarea
+                      value={newTemplate.description_en}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, description_en: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder={t('taskSettings.form.descriptionEnPlaceholder')}
+                    />
+                  </div>
                 </div>
                 <TemplateChecklistEditor
                   checklistItems={newTemplate.checklist_items || []}
@@ -227,7 +258,7 @@ export function TaskAutoCreationSettingsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Порядок создания
+                      {t('taskSettings.form.order')}
                     </label>
                     <input
                       type="number"
@@ -238,7 +269,7 @@ export function TaskAutoCreationSettingsPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Дней до дедлайна
+                      {t('taskSettings.form.dueDays')}
                     </label>
                     <input
                       type="number"
@@ -258,7 +289,7 @@ export function TaskAutoCreationSettingsPage() {
                     id="new-template-enabled"
                   />
                   <label htmlFor="new-template-enabled" className="text-sm text-neutral-700 cursor-pointer">
-                    Включено (задача будет создаваться автоматически)
+                    {t('taskSettings.form.enabled')}
                   </label>
                 </div>
                 <div className="flex justify-end gap-2">
@@ -267,8 +298,10 @@ export function TaskAutoCreationSettingsPage() {
                     onClick={() => {
                       setShowNewTemplateForm(false);
                       setNewTemplate({
-                        title: '',
-                        description: '',
+                        title_ru: '',
+                        title_en: '',
+                        description_ru: '',
+                        description_en: '',
                         stage_key: 'briefing',
                         order: 0,
                         due_days_offset: 7,
@@ -278,15 +311,15 @@ export function TaskAutoCreationSettingsPage() {
                     }}
                     className="px-4 py-2 text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50"
                   >
-                    Отмена
+                    {t('taskSettings.actions.cancel')}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSaveTemplate(newTemplate)}
-                    disabled={!newTemplate.title || createTemplate.isPending}
+                    disabled={(!newTemplate.title_ru && !newTemplate.title_en) || createTemplate.isPending}
                     className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {createTemplate.isPending ? 'Сохранение...' : 'Создать'}
+                    {createTemplate.isPending ? t('taskSettings.actions.saving') : t('taskSettings.actions.create')}
                   </button>
                 </div>
               </div>
@@ -306,51 +339,85 @@ export function TaskAutoCreationSettingsPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Название задачи *
+                            {t('taskSettings.form.titleRu')}
                           </label>
                           <input
                             type="text"
-                            value={template.title}
+                            value={template.title_ru || ''}
                             onChange={(e) => {
-                              const updated = { ...template, title: e.target.value };
+                              const updated = { ...template, title_ru: e.target.value };
                               handleSaveTemplate(updated);
                             }}
                             className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            placeholder={t('taskSettings.form.titleRuPlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Этап проекта *
+                            {t('taskSettings.form.titleEn')}
                           </label>
-                          <select
-                            value={template.stage_key}
+                          <input
+                            type="text"
+                            value={template.title_en || ''}
                             onChange={(e) => {
-                              const updated = { ...template, stage_key: e.target.value };
+                              const updated = { ...template, title_en: e.target.value };
                               handleSaveTemplate(updated);
                             }}
                             className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                          >
-                            {STAGE_OPTIONS.map((stage) => (
-                              <option key={stage.value} value={stage.value}>
-                                {stage.label}
-                              </option>
-                            ))}
-                          </select>
+                            placeholder={t('taskSettings.form.titleEnPlaceholder')}
+                          />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Описание задачи
+                          {t('taskSettings.form.projectStageRequired')}
                         </label>
-                        <textarea
-                          value={template.description || ''}
+                        <select
+                          value={template.stage_key}
                           onChange={(e) => {
-                            const updated = { ...template, description: e.target.value };
+                            const updated = { ...template, stage_key: e.target.value };
                             handleSaveTemplate(updated);
                           }}
-                          rows={2}
                           className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                        />
+                        >
+                          {STAGE_OPTIONS.map((stage) => (
+                            <option key={stage.value} value={stage.value}>
+                              {stage.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            {t('taskSettings.form.descriptionRu')}
+                          </label>
+                          <textarea
+                            value={template.description_ru || ''}
+                            onChange={(e) => {
+                              const updated = { ...template, description_ru: e.target.value };
+                              handleSaveTemplate(updated);
+                            }}
+                            rows={2}
+                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            placeholder={t('taskSettings.form.descriptionRuPlaceholder')}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            {t('taskSettings.form.descriptionEn')}
+                          </label>
+                          <textarea
+                            value={template.description_en || ''}
+                            onChange={(e) => {
+                              const updated = { ...template, description_en: e.target.value };
+                              handleSaveTemplate(updated);
+                            }}
+                            rows={2}
+                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            placeholder={t('taskSettings.form.descriptionEnPlaceholder')}
+                          />
+                        </div>
                       </div>
                       <TemplateChecklistEditor
                         checklistItems={template.checklist_items || []}
@@ -362,7 +429,7 @@ export function TaskAutoCreationSettingsPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Порядок создания
+                            {t('taskSettings.form.order')}
                           </label>
                           <input
                             type="number"
@@ -376,7 +443,7 @@ export function TaskAutoCreationSettingsPage() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Дней до дедлайна
+                            {t('taskSettings.form.dueDays')}
                           </label>
                           <input
                             type="number"
@@ -401,14 +468,14 @@ export function TaskAutoCreationSettingsPage() {
                             }}
                             className="w-4 h-4 text-emerald-600 border-neutral-300 rounded focus:ring-emerald-500"
                           />
-                          <span className="text-sm text-neutral-700">Включено</span>
+                          <span className="text-sm text-neutral-700">{t('taskSettings.status.enabled')}</span>
                         </label>
                         <button
                           type="button"
                           onClick={() => setEditingTemplateId(null)}
                           className="px-3 py-1 text-sm text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50"
                         >
-                          Готово
+                          {t('taskSettings.actions.done')}
                         </button>
                       </div>
                     </div>
@@ -416,22 +483,35 @@ export function TaskAutoCreationSettingsPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-neutral-900">{template.title}</h3>
+                          <div>
+                            <h3 className="font-semibold text-neutral-900">
+                              {template.title_en || template.title}
+                            </h3>
+                            {template.title_ru && template.title_ru !== template.title_en && (
+                              <p className="text-sm text-neutral-500">{template.title_ru}</p>
+                            )}
+                          </div>
                           <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded">
                             {STAGE_OPTIONS.find((s) => s.value === template.stage_key)?.label || template.stage_key}
                           </span>
                           {template.is_enabled ? (
-                            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Включено</span>
+                            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">{t('taskSettings.status.enabled')}</span>
                           ) : (
-                            <span className="text-xs px-2 py-1 bg-neutral-100 text-neutral-700 rounded">Отключено</span>
+                            <span className="text-xs px-2 py-1 bg-neutral-100 text-neutral-700 rounded">{t('taskSettings.status.disabled')}</span>
                           )}
                         </div>
-                        {template.description && (
-                          <p className="text-sm text-neutral-600 mb-2">{template.description}</p>
+                        {(template.description_ru || template.description_en || template.description) && (
+                          <div className="text-sm text-neutral-600 mb-2 space-y-1">
+                            {template.description_ru && <p><span className="text-neutral-400">RU:</span> {template.description_ru}</p>}
+                            {template.description_en && <p><span className="text-neutral-400">EN:</span> {template.description_en}</p>}
+                            {!template.description_ru && !template.description_en && template.description && (
+                              <p>{template.description}</p>
+                            )}
+                          </div>
                         )}
                         <div className="flex items-center gap-4 text-xs text-neutral-500">
-                          <span>Порядок: {template.order}</span>
-                          <span>Дедлайн: +{template.due_days_offset} дней</span>
+                          <span>{t('taskSettings.labels.order')} {template.order}</span>
+                          <span>{t('taskSettings.labels.deadline')} +{template.due_days_offset} {t('taskSettings.labels.days')}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -440,7 +520,7 @@ export function TaskAutoCreationSettingsPage() {
                           onClick={() => setEditingTemplateId(template.id)}
                           className="px-3 py-1 text-sm text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50"
                         >
-                          Изменить
+                          {t('taskSettings.actions.edit')}
                         </button>
                         <button
                           type="button"
@@ -448,7 +528,7 @@ export function TaskAutoCreationSettingsPage() {
                           disabled={deleteTemplate.isPending}
                           className="px-3 py-1 text-sm text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50"
                         >
-                          Удалить
+                          {t('taskSettings.actions.delete')}
                         </button>
                       </div>
                     </div>
@@ -457,7 +537,7 @@ export function TaskAutoCreationSettingsPage() {
               ))
             ) : (
               <div className="text-center py-8 text-neutral-500">
-                Нет шаблонов задач. Добавьте первый шаблон, нажав кнопку выше.
+                {t('taskSettings.noTemplates')}
               </div>
             )}
           </div>
@@ -466,9 +546,9 @@ export function TaskAutoCreationSettingsPage() {
         {/* Шаблоны задач из спецификации */}
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-neutral-900">Шаблоны задач из спецификации</h2>
+            <h2 className="text-lg font-semibold text-neutral-900">{t('taskSettings.sections.specTemplates.title')}</h2>
             <p className="text-xs text-neutral-500 mt-1">
-              Настройте названия задач для каждого пункта спецификации калькулятора
+              {t('taskSettings.sections.specTemplates.subtitle')}
             </p>
           </div>
 
@@ -486,10 +566,14 @@ export function TaskAutoCreationSettingsPage() {
               const template = existingTemplate || {
                 id: null,
                 item_id: item.id,
-                task_title: newTemplateData.task_title || item.name,
-                task_description: newTemplateData.task_description || `Задача по созданию ${item.name.toLowerCase()}`,
-                animation_task_title_template: newTemplateData.animation_task_title_template || `Анимация: {item_name} ({anim_name})`,
-                animation_task_description_template: newTemplateData.animation_task_description_template || `Задача по созданию анимации для {item_name}: {anim_name}`,
+                task_title_ru: newTemplateData.task_title_ru || item.name,
+                task_title_en: newTemplateData.task_title_en || item.name,
+                task_description_ru: newTemplateData.task_description_ru || `Задача по созданию ${item.name.toLowerCase()} в количестве {qty} шт.`,
+                task_description_en: newTemplateData.task_description_en || `Task for creating ${item.name.toLowerCase()} in quantity of {qty} pcs.`,
+                animation_task_title_template_ru: newTemplateData.animation_task_title_template_ru || `Анимация: {item_name} ({anim_name})`,
+                animation_task_title_template_en: newTemplateData.animation_task_title_template_en || `Animation: {item_name} ({anim_name})`,
+                animation_task_description_template_ru: newTemplateData.animation_task_description_template_ru || `Задача по созданию анимации для {item_name}: {anim_name}`,
+                animation_task_description_template_en: newTemplateData.animation_task_description_template_en || `Animation task for {item_name}: {anim_name}`,
                 checklist_items: newTemplateData.checklist_items || [],
               };
               const itemName = item.name;
@@ -504,102 +588,199 @@ export function TaskAutoCreationSettingsPage() {
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Пункт спецификации
+                            {t('taskSettings.specForm.specItem')}
                           </label>
                           <div className="px-3 py-2 bg-neutral-100 rounded-lg text-sm text-neutral-600">
                             {itemName} ({template.item_id})
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Название задачи *
-                          </label>
-                          <input
-                            type="text"
-                            value={template.task_title || ''}
-                            onChange={(e) => {
-                              if (isNewTemplate) {
-                                setNewSpecTemplates(prev => ({
-                                  ...prev,
-                                  [editingKey]: { ...prev[editingKey], task_title: e.target.value }
-                                }));
-                              } else {
-                                const updated = { ...template, task_title: e.target.value };
-                                handleSaveSpecTemplate(updated);
-                              }
-                            }}
-                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                          />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.titleRuHint')}
+                            </label>
+                            <input
+                              type="text"
+                              value={template.task_title_ru || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], task_title_ru: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, task_title_ru: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.titleRuPlaceholder')}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.titleEnHint')}
+                            </label>
+                            <input
+                              type="text"
+                              value={template.task_title_en || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], task_title_en: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, task_title_en: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.titleEnPlaceholder')}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.descriptionRuHint')}
+                            </label>
+                            <textarea
+                              value={template.task_description_ru || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], task_description_ru: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, task_description_ru: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.descriptionRuPlaceholder')}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.descriptionEnHint')}
+                            </label>
+                            <textarea
+                              value={template.task_description_en || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], task_description_en: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, task_description_en: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.descriptionEnPlaceholder')}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.animationTitleRuHint')}
+                            </label>
+                            <input
+                              type="text"
+                              value={template.animation_task_title_template_ru || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], animation_task_title_template_ru: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, animation_task_title_template_ru: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.animationTitleRuPlaceholder')}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.animationTitleEnHint')}
+                            </label>
+                            <input
+                              type="text"
+                              value={template.animation_task_title_template_en || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], animation_task_title_template_en: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, animation_task_title_template_en: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.animationTitleEnPlaceholder')}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.animationDescriptionRuHint')}
+                            </label>
+                            <textarea
+                              value={template.animation_task_description_template_ru || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], animation_task_description_template_ru: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, animation_task_description_template_ru: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.animationDescriptionRuPlaceholder')}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              {t('taskSettings.specForm.animationDescriptionEnHint')}
+                            </label>
+                            <textarea
+                              value={template.animation_task_description_template_en || ''}
+                              onChange={(e) => {
+                                if (isNewTemplate) {
+                                  setNewSpecTemplates(prev => ({
+                                    ...prev,
+                                    [editingKey]: { ...prev[editingKey], animation_task_description_template_en: e.target.value }
+                                  }));
+                                } else {
+                                  const updated = { ...template, animation_task_description_template_en: e.target.value };
+                                  handleSaveSpecTemplate(updated);
+                                }
+                              }}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                              placeholder={t('taskSettings.specForm.animationDescriptionEnPlaceholder')}
+                            />
+                          </div>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Описание задачи (используйте {`{qty}`} для количества)
-                          </label>
-                          <textarea
-                            value={template.task_description || ''}
-                            onChange={(e) => {
-                              if (isNewTemplate) {
-                                setNewSpecTemplates(prev => ({
-                                  ...prev,
-                                  [editingKey]: { ...prev[editingKey], task_description: e.target.value }
-                                }));
-                              } else {
-                                const updated = { ...template, task_description: e.target.value };
-                                handleSaveSpecTemplate(updated);
-                              }
-                            }}
-                            rows={2}
-                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                            placeholder="Задача по созданию {item_name} в количестве {qty} шт."
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Шаблон названия задачи с анимацией (используйте {`{item_name}`} и {`{anim_name}`})
-                          </label>
-                          <input
-                            type="text"
-                            value={template.animation_task_title_template || ''}
-                            onChange={(e) => {
-                              if (isNewTemplate) {
-                                setNewSpecTemplates(prev => ({
-                                  ...prev,
-                                  [editingKey]: { ...prev[editingKey], animation_task_title_template: e.target.value }
-                                }));
-                              } else {
-                                const updated = { ...template, animation_task_title_template: e.target.value };
-                                handleSaveSpecTemplate(updated);
-                              }
-                            }}
-                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                            placeholder="Анимация: {item_name} ({anim_name})"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Шаблон описания задачи с анимацией
-                          </label>
-                          <textarea
-                            value={template.animation_task_description_template || ''}
-                            onChange={(e) => {
-                              if (isNewTemplate) {
-                                setNewSpecTemplates(prev => ({
-                                  ...prev,
-                                  [editingKey]: { ...prev[editingKey], animation_task_description_template: e.target.value }
-                                }));
-                              } else {
-                                const updated = { ...template, animation_task_description_template: e.target.value };
-                                handleSaveSpecTemplate(updated);
-                              }
-                            }}
-                            rows={2}
-                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                            placeholder="Задача по созданию анимации для {item_name}: {anim_name}"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Порядок создания (вес)
+                            {t('taskSettings.specForm.sortOrder')}
                           </label>
                           <div className="flex items-center gap-3">
                             <input
@@ -620,7 +801,7 @@ export function TaskAutoCreationSettingsPage() {
                               }}
                               className="w-32 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                             />
-                            <span className="text-xs text-neutral-500">Меньше = выше приоритет. Briefing (шаблон) идёт первым.</span>
+                            <span className="text-xs text-neutral-500">{t('taskSettings.specForm.sortHint')}</span>
                           </div>
                         </div>
                         <TemplateChecklistEditor
@@ -653,7 +834,7 @@ export function TaskAutoCreationSettingsPage() {
                             }}
                             className="px-3 py-1 text-sm text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50"
                           >
-                            Отмена
+                            {t('taskSettings.actions.cancel')}
                           </button>
                           <button
                             type="button"
@@ -661,10 +842,14 @@ export function TaskAutoCreationSettingsPage() {
                               // Для нового шаблона используем актуальные данные из состояния
                               const templateToSave = isNewTemplate ? {
                                 item_id: item.id,
-                                task_title: newTemplateData.task_title || template.task_title,
-                                task_description: newTemplateData.task_description || template.task_description,
-                                animation_task_title_template: newTemplateData.animation_task_title_template || template.animation_task_title_template,
-                                animation_task_description_template: newTemplateData.animation_task_description_template || template.animation_task_description_template,
+                                task_title_ru: newTemplateData.task_title_ru || template.task_title_ru,
+                                task_title_en: newTemplateData.task_title_en || template.task_title_en,
+                                task_description_ru: newTemplateData.task_description_ru || template.task_description_ru,
+                                task_description_en: newTemplateData.task_description_en || template.task_description_en,
+                                animation_task_title_template_ru: newTemplateData.animation_task_title_template_ru || template.animation_task_title_template_ru,
+                                animation_task_title_template_en: newTemplateData.animation_task_title_template_en || template.animation_task_title_template_en,
+                                animation_task_description_template_ru: newTemplateData.animation_task_description_template_ru || template.animation_task_description_template_ru,
+                                animation_task_description_template_en: newTemplateData.animation_task_description_template_en || template.animation_task_description_template_en,
                                 checklist_items: newTemplateData.checklist_items || template.checklist_items || [],
                                 sort_order: newTemplateData.sort_order ?? template.sort_order ?? 999,
                               } : template;
@@ -681,7 +866,7 @@ export function TaskAutoCreationSettingsPage() {
                             }}
                             className="px-3 py-1 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700"
                           >
-                            {isNewTemplate ? 'Создать шаблон' : 'Сохранить'}
+                            {isNewTemplate ? t('taskSettings.actions.createTemplate') : t('taskSettings.actions.save')}
                           </button>
                         </div>
                       </div>
@@ -689,9 +874,14 @@ export function TaskAutoCreationSettingsPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-neutral-900">
-                              {existingTemplate ? template.task_title : `${itemName} (без шаблона)`}
-                            </h3>
+                            <div>
+                              <h3 className="font-semibold text-neutral-900">
+                                {existingTemplate ? (template.task_title_en || template.task_title || itemName) : `${itemName} ${t('taskSettings.noTemplateLabel')}`}
+                              </h3>
+                              {existingTemplate && template.task_title_ru && template.task_title_ru !== template.task_title_en && (
+                                <p className="text-sm text-neutral-500">{template.task_title_ru}</p>
+                              )}
+                            </div>
                             <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded">
                               {itemName}
                             </span>
@@ -700,17 +890,20 @@ export function TaskAutoCreationSettingsPage() {
                             </span>
                             {!existingTemplate && (
                               <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded">
-                                Нет шаблона
+                                {t('taskSettings.status.noTemplate')}
                               </span>
                             )}
                           </div>
-                          {existingTemplate && template.task_description && (
-                            <p className="text-sm text-neutral-600 mb-2">{template.task_description}</p>
+                          {existingTemplate && (template.task_description_ru || template.task_description_en) && (
+                            <div className="text-sm text-neutral-600 mb-2 space-y-1">
+                              {template.task_description_ru && <p><span className="text-neutral-400">RU:</span> {template.task_description_ru}</p>}
+                              {template.task_description_en && <p><span className="text-neutral-400">EN:</span> {template.task_description_en}</p>}
+                            </div>
                           )}
                           {existingTemplate && (
                             <div className="flex items-center gap-4 text-xs text-neutral-500">
-                              <span>Порядок: {template.sort_order ?? '—'}</span>
-                              <span>Анимация: {template.animation_task_title_template || 'По умолчанию'}</span>
+                              <span>{t('taskSettings.labels.order')} {template.sort_order ?? '—'}</span>
+                              <span>{t('taskSettings.labels.animation')} {template.animation_task_title_template_en || template.animation_task_title_template || t('taskSettings.labels.default')}</span>
                             </div>
                           )}
                         </div>
@@ -719,7 +912,7 @@ export function TaskAutoCreationSettingsPage() {
                           onClick={() => setEditingSpecTemplateId(existingTemplate ? template.id : `new-${item.id}`)}
                           className="px-3 py-1 text-sm text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50"
                         >
-                          {existingTemplate ? 'Изменить' : 'Создать шаблон'}
+                          {existingTemplate ? t('taskSettings.actions.edit') : t('taskSettings.actions.createTemplate')}
                         </button>
                       </div>
                     )}
@@ -732,7 +925,7 @@ export function TaskAutoCreationSettingsPage() {
         {/* Задачи из спецификации */}
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-neutral-900">Задачи из спецификации</h2>
+            <h2 className="text-lg font-semibold text-neutral-900">{t('taskSettings.sections.specTasks.title')}</h2>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -748,7 +941,7 @@ export function TaskAutoCreationSettingsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Дней до дедлайна
+                  {t('taskSettings.form.dueDays')}
                 </label>
                 <input
                   type="number"
@@ -758,7 +951,7 @@ export function TaskAutoCreationSettingsPage() {
                   className="w-48 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
                 <p className="text-xs text-neutral-500 mt-1">
-                  Применяется ко всем задачам из спецификации
+                  {t('taskSettings.hints.appliesToAll')}
                 </p>
               </div>
               <div>
@@ -770,11 +963,11 @@ export function TaskAutoCreationSettingsPage() {
                     className="w-4 h-4 text-emerald-600 border-neutral-300 rounded focus:ring-emerald-500"
                   />
                   <span className="text-sm text-neutral-700">
-                    Разделять анимации на отдельные задачи
+                    {t('taskSettings.form.separateAnimations')}
                   </span>
                 </label>
                 <p className="text-xs text-neutral-500 mt-1 ml-6">
-                  Если включено, для каждого элемента с анимацией будет создана отдельная задача по анимации
+                  {t('taskSettings.hints.separateAnimations')}
                 </p>
               </div>
             </div>
@@ -797,14 +990,14 @@ export function TaskAutoCreationSettingsPage() {
             }}
             className="px-4 py-2 text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50"
           >
-            Отмена
+            {t('taskSettings.actions.cancel')}
           </button>
           <button
             type="submit"
             disabled={isSaving || updateSettings.isPending}
             className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving || updateSettings.isPending ? 'Сохранение...' : 'Сохранить настройки'}
+            {isSaving || updateSettings.isPending ? t('taskSettings.actions.saving') : t('taskSettings.actions.saveSettings')}
           </button>
         </div>
       </form>

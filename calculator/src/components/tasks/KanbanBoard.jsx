@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TASK_STATUSES, useUpdateTaskStatus, useReorderTask } from '../../hooks/useTasks';
 import { TaskCard } from './TaskCard';
 
@@ -22,6 +23,7 @@ const COLUMN_DROP_COLORS = {
 };
 
 export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDrag = true, canToggleComplete = false }) {
+  const { t } = useTranslation('tasks');
   const [draggedTask, setDraggedTask] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
   const [dropIndicator, setDropIndicator] = useState({ statusId: null, index: null });
@@ -193,7 +195,7 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${COLUMN_DOT_COLORS[status.id] || 'bg-neutral-400'}`} />
                 <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
-                  {status.label}
+                  {t(`status.${status.id}`)}
                 </h3>
               </div>
               <span className="text-[11px] font-medium text-neutral-400 tabular-nums">
@@ -248,14 +250,14 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
                     <svg className="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
-                    <span className="text-xs">No tasks</span>
+                    <span className="text-xs">{t('kanban.noTasks')}</span>
                   </div>
                 )}
 
                 {/* Drop zone for empty column during drag */}
                 {taskCount === 0 && isDragOver && (
                   <div className="flex items-center justify-center py-10 border-2 border-dashed border-emerald-300 rounded-lg text-emerald-400 text-xs">
-                    Drop here
+                    {t('files.dropHere', { defaultValue: 'Drop here' })}
                   </div>
                 )}
               </div>

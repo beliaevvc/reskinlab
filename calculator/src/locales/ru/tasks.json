@@ -1,0 +1,115 @@
+{
+  "title": "Задачи",
+  "create": {
+    "title": "Создать задачу",
+    "titleLabel": "Название",
+    "titlePlaceholder": "Название задачи",
+    "description": "Описание",
+    "descriptionPlaceholder": "Описание задачи (опционально)",
+    "stage": "Этап",
+    "noStage": "Без этапа",
+    "dueDate": "Срок",
+    "creating": "Создание...",
+    "submit": "Создать задачу"
+  },
+  "detail": {
+    "loading": "Загрузка задачи...",
+    "notFound": "Задача не найдена",
+    "description": "Описание",
+    "addDescription": "Добавить описание...",
+    "noDescription": "Нет описания",
+    "comments": "Комментарии",
+    "noComments": "Пока нет комментариев",
+    "addComment": "Добавить комментарий...",
+    "reply": "Ответить",
+    "replyingTo": "Ответ на",
+    "cancelReply": "Отменить ответ",
+    "checklist": "Чек-лист",
+    "files": "Файлы",
+    "activity": "Активность",
+    "linkedSpec": "Связанная спецификация",
+    "linkedOffer": "Связанная оферта",
+    "viewSpec": "Открыть спец.",
+    "viewOffer": "Открыть оферту",
+    "deadline": "Дедлайн",
+    "setDeadline": "Установить срок",
+    "editDeadline": "Изменить срок",
+    "clearDeadline": "Очистить",
+    "overdue": "Просрочено",
+    "assignee": "Исполнитель",
+    "noAssignee": "Не назначен",
+    "stage": "Этап",
+    "deleteConfirm": "Вы уверены, что хотите удалить эту задачу?",
+    "deleteTask": "Удалить задачу"
+  },
+  "status": {
+    "backlog": "Бэклог",
+    "todo": "К выполнению",
+    "in_progress": "В работе",
+    "review": "На проверке",
+    "done": "Готово"
+  },
+  "card": {
+    "noTitle": "Без названия",
+    "commentsCount": "{{count}} комментарий",
+    "commentsCount_few": "{{count}} комментария",
+    "commentsCount_many": "{{count}} комментариев",
+    "checklistProgress": "{{done}}/{{total}}",
+    "filesCount": "{{count}} файл",
+    "filesCount_few": "{{count}} файла",
+    "filesCount_many": "{{count}} файлов"
+  },
+  "kanban": {
+    "addTask": "Добавить задачу",
+    "noTasks": "Нет задач"
+  },
+  "list": {
+    "title": "Задача",
+    "status": "Статус",
+    "deadline": "Срок",
+    "assignee": "Исполнитель",
+    "noDeadline": "Без срока"
+  },
+  "checklist": {
+    "title": "Чек-лист",
+    "addItem": "Добавить пункт",
+    "itemPlaceholder": "Введите название пункта...",
+    "progress": "{{done}} из {{total}} выполнено",
+    "deleteConfirm": "Удалить этот пункт из чеклиста?",
+    "deleteItem": "Удалить пункт",
+    "empty": "Чеклист пуст. Добавьте первый пункт.",
+    "hide": "Скрыть чеклист",
+    "show": "Показать чеклист"
+  },
+  "deadline": {
+    "date": "Дата",
+    "datetime": "Дата и время",
+    "range": "Период",
+    "quickSelect": "Быстрый выбор:",
+    "today": "Сегодня",
+    "tomorrow": "Завтра",
+    "nextWeek": "Через неделю",
+    "nextMonth": "Через месяц",
+    "start": "Начало",
+    "end": "Окончание",
+    "time": "Время",
+    "inDays": "Через {{count}} дн.",
+    "inWeeks": "Через {{count}} нед.",
+    "clickToSet": "Нажмите для установки срока",
+    "notSet": "Дедлайн не установлен"
+  },
+  "files": {
+    "title": "Файлы",
+    "upload": "Загрузить файлы",
+    "noFiles": "Нет прикреплённых файлов",
+    "dropHere": "Перетащите файлы сюда"
+  },
+  "actions": {
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "markComplete": "Отметить готовым",
+    "markIncomplete": "Вернуть в работу"
+  }
+}

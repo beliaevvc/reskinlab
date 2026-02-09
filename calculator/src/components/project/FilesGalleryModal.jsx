@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
@@ -38,8 +39,17 @@ function getFileType(filename, mimeType) {
   return 'other';
 }
 
+// Helper to get localized task title
+function getLocalizedTaskTitle(task, lang) {
+  if (!task) return '';
+  if (lang === 'ru') {
+    return task.title_ru || task.title || '';
+  }
+  return task.title_en || task.title || '';
+}
+
 // Grid view file card
-function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
+function FileCardGrid({ file, onTaskClick, canDelete, onDelete, t, currentLang }) {
   const { data: signedUrl } = useSignedUrl(file.bucket, file.path);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const fileType = getFileType(file.filename, file.mime_type);
@@ -76,14 +86,14 @@ function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
                 onClick={handleDelete}
                 className="text-xs text-red-500 font-medium"
               >
-                Delete
+                {t('common:actions.delete')}
               </button>
               <span className="text-neutral-300">|</span>
               <button
                 onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false); }}
                 className="text-xs text-neutral-500"
               >
-                Cancel
+                {t('common:actions.cancel')}
               </button>
             </div>
           ) : (
@@ -127,13 +137,13 @@ function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
       {/* Info */}
       <div className="p-3">
         <div className="font-medium text-sm text-neutral-900 truncate" title={file.filename}>
-          {file.filename || 'Unnamed file'}
+          {file.filename || t('common:unknown')}
         </div>
         <div className="text-xs text-neutral-500 mt-0.5">
           {formatFileSize(file.size_bytes)} • {formatDate(file.created_at)}
         </div>
         <div className="text-xs text-neutral-400 mt-0.5">
-          by {file.uploader?.full_name || 'Unknown'}
+          {t('files:card.by')} {file.uploader?.full_name || t('common:unknown')}
         </div>
 
         {/* Task link */}
@@ -145,7 +155,7 @@ function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
             <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <span className="truncate">{file.task.title}</span>
+            <span className="truncate">{getLocalizedTaskTitle(file.task, currentLang)}</span>
           </button>
         )}
 
@@ -158,7 +168,7 @@ function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Download
+            {t('files:browser.download')}
           </button>
         </div>
       </div>
@@ -167,7 +177,7 @@ function FileCardGrid({ file, onTaskClick, canDelete, onDelete }) {
 }
 
 // List view file row
-function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
+function FileCardList({ file, onTaskClick, canDelete, onDelete, t, currentLang }) {
   const { data: signedUrl } = useSignedUrl(file.bucket, file.path);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const fileType = getFileType(file.filename, file.mime_type);
@@ -220,14 +230,14 @@ function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
           rel="noopener noreferrer"
           className="font-medium text-sm text-neutral-900 hover:text-emerald-600 truncate block"
         >
-          {file.filename || 'Unnamed file'}
+          {file.filename || t('common:unknown')}
         </a>
         <div className="flex items-center gap-2 text-xs text-neutral-500 mt-0.5">
           <span>{formatFileSize(file.size_bytes)}</span>
           <span>•</span>
           <span>{formatDate(file.created_at)}</span>
           <span>•</span>
-          <span>by {file.uploader?.full_name || 'Unknown'}</span>
+          <span>{t('files:card.by')} {file.uploader?.full_name || t('common:unknown')}</span>
         </div>
         {file.task_id && file.task && (
           <button
@@ -237,7 +247,7 @@ function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            {file.task.title}
+            {getLocalizedTaskTitle(file.task, currentLang)}
           </button>
         )}
       </div>
@@ -247,7 +257,7 @@ function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
         <button
           onClick={handleDownload}
           className="p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded transition-colors"
-          title="Download"
+          title={t('files:browser.download')}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -261,20 +271,20 @@ function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
                   onClick={handleDelete}
                   className="text-xs text-red-500 font-medium"
                 >
-                  Delete
+                  {t('common:actions.delete')}
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false); }}
                   className="text-xs text-neutral-500"
                 >
-                  Cancel
+                  {t('common:actions.cancel')}
                 </button>
               </div>
             ) : (
               <button
                 onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
                 className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                title="Delete"
+                title={t('common:actions.delete')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -291,6 +301,8 @@ function FileCardList({ file, onTaskClick, canDelete, onDelete }) {
 const FILES_VIEW_MODE_KEY = 'reskin-files-view-mode';
 
 export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, onTaskClick }) {
+  const { t, i18n } = useTranslation(['files', 'common']);
+  const currentLang = i18n.language;
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
@@ -348,7 +360,7 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
     const grouped = {};
     processedFiles.forEach(file => {
       const taskKey = file.task_id || 'unassigned';
-      const taskTitle = file.task?.title || 'Project Files';
+      const taskTitle = file.task?.title || t('gallery.projectFiles');
       if (!grouped[taskKey]) {
         grouped[taskKey] = { title: taskTitle, taskId: file.task_id, files: [] };
       }
@@ -390,9 +402,9 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
         <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 rounded-t-lg z-10">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-bold text-neutral-900">Project Files</h2>
+              <h2 className="text-lg font-bold text-neutral-900">{t('gallery.title')}</h2>
               <p className="text-sm text-neutral-500">
-                {totalFiles} files total • {filteredCount} shown
+                {t('gallery.filesCount', { total: totalFiles, shown: filteredCount })}
               </p>
             </div>
             <button
@@ -428,12 +440,12 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
               value={filter}
               onChange={(val) => setFilter(val)}
               options={[
-                { value: 'all', label: 'All Types' },
-                { value: 'image', label: 'Images' },
-                { value: 'document', label: 'Documents' },
-                { value: 'design', label: 'Design Files' },
-                { value: 'archive', label: 'Archives' },
-                { value: 'video', label: 'Videos' },
+                { value: 'all', label: t('gallery.filter.allTypes') },
+                { value: 'image', label: t('gallery.filter.images') },
+                { value: 'document', label: t('gallery.filter.documents') },
+                { value: 'design', label: t('gallery.filter.design') },
+                { value: 'archive', label: t('gallery.filter.archives') },
+                { value: 'video', label: t('gallery.filter.videos') },
               ]}
               className="min-w-[130px]"
             />
@@ -443,9 +455,9 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
               value={sortBy}
               onChange={(val) => setSortBy(val)}
               options={[
-                { value: 'date', label: 'Newest First' },
-                { value: 'name', label: 'Name A-Z' },
-                { value: 'size', label: 'Largest First' },
+                { value: 'date', label: t('gallery.sort.newest') },
+                { value: 'name', label: t('gallery.sort.name') },
+                { value: 'size', label: t('gallery.sort.largest') },
               ]}
               className="min-w-[130px]"
             />
@@ -455,7 +467,7 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
               <button
                 onClick={() => handleViewModeChange('grid')}
                 className={`p-2 ${viewMode === 'grid' ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-400 hover:text-neutral-600'}`}
-                title="Grid view"
+                title={t('browser.gridView')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -464,7 +476,7 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
               <button
                 onClick={() => handleViewModeChange('list')}
                 className={`p-2 ${viewMode === 'list' ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-400 hover:text-neutral-600'}`}
-                title="List view"
+                title={t('browser.listView')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -522,6 +534,8 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
                           onTaskClick={onTaskClick}
                           canDelete={canDeleteFile(file)}
                           onDelete={handleDeleteFile}
+                          t={t}
+                          currentLang={currentLang}
                         />
                       ))}
                     </div>
@@ -534,6 +548,8 @@ export function FilesGalleryModal({ isOpen, onClose, files = [], projectName, on
                           onTaskClick={onTaskClick}
                           canDelete={canDeleteFile(file)}
                           onDelete={handleDeleteFile}
+                          t={t}
+                          currentLang={currentLang}
                         />
                       ))}
                     </div>

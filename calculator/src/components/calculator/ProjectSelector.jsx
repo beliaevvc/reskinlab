@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProjectsForSelector } from '../../hooks/useProjects';
 import { useAuth } from '../../contexts/AuthContext';
 import useCalculatorStore from '../../stores/calculatorStore';
 import { CreateProjectModal } from '../projects';
 
 export function ProjectSelector({ onProjectChange }) {
+  const { t } = useTranslation('calculator');
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const dropdownRef = useRef(null);
@@ -79,7 +81,7 @@ export function ProjectSelector({ onProjectChange }) {
           />
         </svg>
         <span className={currentProjectId ? 'text-neutral-900 font-medium' : 'text-neutral-500'}>
-          {currentProjectName || 'Select Project'}
+          {currentProjectName || t('projectSelector.selectProject')}
         </span>
         <svg
           className={`w-4 h-4 text-neutral-400 transition-transform ${
@@ -122,7 +124,7 @@ export function ProjectSelector({ onProjectChange }) {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            New Project
+            {t('projectSelector.newProject')}
           </button>
 
           <div className="border-t border-neutral-100 my-1" />
@@ -147,7 +149,7 @@ export function ProjectSelector({ onProjectChange }) {
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-                Clear Selection
+                {t('projectSelector.clearSelection')}
               </button>
               <div className="border-t border-neutral-100 my-1" />
             </>
@@ -156,14 +158,14 @@ export function ProjectSelector({ onProjectChange }) {
           {/* Loading */}
           {isLoading && (
             <div className="px-4 py-3 text-sm text-neutral-500">
-              Loading projects...
+              {t('projectSelector.loadingProjects')}
             </div>
           )}
 
           {/* Projects List */}
           {!isLoading && projects?.length === 0 && (
             <div className="px-4 py-3 text-sm text-neutral-500">
-              No projects yet
+              {t('projectSelector.noProjects')}
             </div>
           )}
 
