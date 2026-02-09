@@ -1,5 +1,32 @@
 # Progress Log
 
+## Calculator Settings (PricingPage) Redesign v2 — ARCHIVED ✅
+
+### Date: 2026-02-09
+
+### Summary
+Комплексный редизайн раздела "Calculator Settings" в админке: sidebar-layout, PairedCard (base + complexity/surcharge), ValueCard, Table view (категории как секции), редактируемые display_name, PairedEditModal. 14 итераций на основе фидбека пользователя.
+
+### Key Changes
+- `groupByItemId()` — группировка configs по item_id
+- `PAIRED_CATEGORIES` — включая Concept Document
+- `PairedEditModal` — редактирование пары в одном окне
+- `SettingsTable` — табличный вид
+- `viewMode` state — cards/table
+- DB migration 053 — display_name field
+
+### Files Modified
+- `calculator/src/pages/admin/PricingPage.jsx`
+- `calculator/src/hooks/usePricing.js`
+- `calculator/src/hooks/useDynamicPricing.js`
+- `calculator/supabase/migrations/053_dynamic_item_names.sql`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-pricing-page-redesign.md`
+📄 `memory-bank/reflection/reflection-pricing-page-redesign.md`
+
+---
+
 ## User Card Redesign & Inline Editing — ARCHIVED ✅
 
 ### Date: 2026-02-09

@@ -5,6 +5,12 @@
 
 ## Recently Completed Tasks
 
+### Calculator Settings Redesign (9 Февраля 2026) — COMPLETED ✅
+Редизайн PricingPage: sidebar + карточки, объединение base+complexity, сдержанный дизайн (emerald, без эмоджи).
+- **Reflection:** `memory-bank/reflection/reflection-pricing-page-redesign.md`
+
+---
+
 ### User Card Redesign & Inline Editing (9 Февраля 2026) — ARCHIVED ✅
 Редизайн Profile/Company табов. Инлайн-редактирование (Full Name, Phone, Role, Company Name, Country, Address). Мутации + кэш-инвалидация.
 - **Archive:** `memory-bank/archive/archive-user-card-inline-editing.md`

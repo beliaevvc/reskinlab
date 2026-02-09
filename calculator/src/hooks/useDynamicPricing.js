@@ -36,7 +36,7 @@ function getLocalFallbackData() {
 /**
  * Merge Supabase price_configs into local data structures.
  * Local files provide metadata (names, descriptions, details).
- * Supabase provides numeric values (base, complexity, coeff).
+ * Supabase provides numeric values (base, complexity, coeff) AND display_name.
  */
 function mergePricingData(configs) {
   if (!configs || !Array.isArray(configs) || configs.length === 0) {
@@ -44,11 +44,11 @@ function mergePricingData(configs) {
   }
 
   // Build lookup maps from configs
-  const itemPrices = {};   // { item_id: { base, complexity, surchargePercent } }
-  const styleCoeffs = {};  // { style_id: coeff }
-  const animCoeffs = {};   // { anim_id: coeff }
-  const rightsCoeffs = {}; // { rights_id: coeff }
-  const paymentCoeffs = {};// { payment_id: coeff }
+  const itemPrices = {};   // { item_id: { base, complexity, surchargePercent, displayName } }
+  const styleCoeffs = {};  // { style_id: { coeff, displayName } }
+  const animCoeffs = {};   // { anim_id: { coeff, displayName } }
+  const rightsCoeffs = {}; // { rights_id: { coeff, displayName } }
+  const paymentCoeffs = {};// { payment_id: { coeff, displayName } }
   let revisionRoundCoeff = null;
 
   configs.forEach((cfg) => {
@@ -57,12 +57,14 @@ function mergePricingData(configs) {
     const animId = cfg.config_data?.anim_id;
     const rightsId = cfg.config_data?.rights_id;
     const paymentId = cfg.config_data?.payment_id;
+    const displayName = cfg.display_name;
 
     switch (cfg.config_type) {
       case 'item_price':
         if (itemId) {
           if (!itemPrices[itemId]) itemPrices[itemId] = {};
           itemPrices[itemId].base = cfg.value;
+          if (displayName) itemPrices[itemId].displayName = displayName;
         }
         break;
       case 'complexity':
@@ -78,16 +80,16 @@ function mergePricingData(configs) {
         }
         break;
       case 'style':
-        if (styleId) styleCoeffs[styleId] = cfg.value;
+        if (styleId) styleCoeffs[styleId] = { coeff: cfg.value, displayName };
         break;
       case 'animation':
-        if (animId) animCoeffs[animId] = cfg.value;
+        if (animId) animCoeffs[animId] = { coeff: cfg.value, displayName };
         break;
       case 'rights':
-        if (rightsId) rightsCoeffs[rightsId] = cfg.value;
+        if (rightsId) rightsCoeffs[rightsId] = { coeff: cfg.value, displayName };
         break;
       case 'payment':
-        if (paymentId) paymentCoeffs[paymentId] = cfg.value;
+        if (paymentId) paymentCoeffs[paymentId] = { coeff: cfg.value, displayName };
         break;
       case 'revision':
         if (cfg.name === 'revision_round_coeff') {
@@ -99,7 +101,7 @@ function mergePricingData(configs) {
     }
   });
 
-  // Merge into CATEGORIES (items get dynamic base/complexity/surchargePercent)
+  // Merge into CATEGORIES (items get dynamic base/complexity/surchargePercent/name)
   const categories = CATEGORIES.map((cat) => ({
     ...cat,
     items: cat.items.map((item) => {
@@ -107,6 +109,7 @@ function mergePricingData(configs) {
       if (!override) return item;
       return {
         ...item,
+        name: override.displayName ?? item.name,
         base: override.base ?? item.base,
         complexity: override.complexity ?? item.complexity,
         surchargePercent: override.surchargePercent ?? item.surchargePercent,
@@ -116,29 +119,45 @@ function mergePricingData(configs) {
 
   const allItems = categories.flatMap((c) => c.items);
 
-  // Merge STYLES (dynamic coeff)
-  const styles = STYLES.map((s) => ({
-    ...s,
-    coeff: styleCoeffs[s.id] ?? s.coeff,
-  }));
+  // Merge STYLES (dynamic coeff and name)
+  const styles = STYLES.map((s) => {
+    const override = styleCoeffs[s.id];
+    return {
+      ...s,
+      name: override?.displayName ?? s.name,
+      coeff: override?.coeff ?? s.coeff,
+    };
+  });
 
-  // Merge ANIMATIONS (dynamic coeff)
-  const animations = ANIMATIONS.map((a) => ({
-    ...a,
-    coeff: animCoeffs[a.id] ?? a.coeff,
-  }));
+  // Merge ANIMATIONS (dynamic coeff and name)
+  const animations = ANIMATIONS.map((a) => {
+    const override = animCoeffs[a.id];
+    return {
+      ...a,
+      name: override?.displayName ?? a.name,
+      coeff: override?.coeff ?? a.coeff,
+    };
+  });
 
-  // Merge USAGE_RIGHTS (dynamic coeff)
-  const usageRightsData = USAGE_RIGHTS.map((r) => ({
-    ...r,
-    coeff: rightsCoeffs[r.id] ?? r.coeff,
-  }));
+  // Merge USAGE_RIGHTS (dynamic coeff and name)
+  const usageRightsData = USAGE_RIGHTS.map((r) => {
+    const override = rightsCoeffs[r.id];
+    return {
+      ...r,
+      name: override?.displayName ?? r.name,
+      coeff: override?.coeff ?? r.coeff,
+    };
+  });
 
-  // Merge PAYMENT_MODELS (dynamic coeff)
-  const paymentModelsData = PAYMENT_MODELS.map((p) => ({
-    ...p,
-    coeff: paymentCoeffs[p.id] ?? p.coeff,
-  }));
+  // Merge PAYMENT_MODELS (dynamic coeff and name)
+  const paymentModelsData = PAYMENT_MODELS.map((p) => {
+    const override = paymentCoeffs[p.id];
+    return {
+      ...p,
+      name: override?.displayName ?? p.name,
+      coeff: override?.coeff ?? p.coeff,
+    };
+  });
 
   // Defaults — find same ID from merged arrays
   const defaultStyle = styles.find((s) => s.id === DEFAULT_STYLE.id) || styles[0];

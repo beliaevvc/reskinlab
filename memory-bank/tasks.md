@@ -1,6 +1,28 @@
 # Tasks
 
 ## Recent Task
+**Calculator Settings (PricingPage) Redesign v2** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-09
+
+### Summary
+Комплексный редизайн раздела "Calculator Settings" в админке с множеством итераций:
+- Sidebar-layout с категориями (emerald акценты, без эмоджи)
+- PairedCard для base price + complexity/surcharge
+- ValueCard для одиночных настроек (унифицированный стиль)
+- Table view (переключатель карточки/таблица) — категории как секции
+- Editable item names — редактирование display_name, отражается в калькуляторе
+- Single modal для paired items (base + secondary в одном окне)
+- Concept Document — base price + surcharge объединены в одну карточку
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-pricing-page-redesign.md`
+- **Reflection:** `memory-bank/reflection/reflection-pricing-page-redesign.md`
+
+---
+
+## Recent Task
 **User Card Redesign & Inline Editing** — ARCHIVED ✅
 
 ### Complexity: Level 2
