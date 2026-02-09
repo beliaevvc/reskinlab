@@ -1,5 +1,18 @@
 # Progress Log
 
+## Task View Switcher — Kanban / List — ARCHIVED ✅
+
+### Date: 2026-02-09
+
+### Summary
+Переключатель вида задач в проекте (Kanban / List). List view — Linear-style компактные строки с бейджами, группировка по статусам, сворачиваемые секции, drag-and-drop. Inline раскрытие чеклиста.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-task-view-switcher.md`
+📄 `memory-bank/reflection/reflection-task-view-switcher.md`
+
+---
+
 ## Public Calculator + Dynamic Pricing — ARCHIVED ✅
 
 ### Date: 2026-02-08

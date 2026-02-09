@@ -8,10 +8,11 @@ import { usePendingApprovals } from '../../hooks/useApprovals';
 import { useProjectFiles } from '../../hooks/useFiles';
 import { ProjectHeader, ProjectSidebar, SpecificationModal, OfferModal, InvoiceModal, FilesGalleryModal, CalculatorModal } from '../../components/project';
 import { StageChangeModal } from '../../components/project/StageChangeModal';
-import { KanbanBoard, TaskDetailModal, CreateTaskModal } from '../../components/tasks';
+import { KanbanBoard, TaskDetailModal, CreateTaskModal, TaskListView } from '../../components/tasks';
 import { TaskCard } from '../../components/tasks/TaskCard';
 
 const SIDEBAR_COLLAPSED_KEY = 'project-sidebar-collapsed';
+const VIEW_MODE_KEY = 'project-view-mode';
 
 export function ProjectPage() {
   const { id: projectId } = useParams();
@@ -21,6 +22,9 @@ export function ProjectPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
     return saved === 'true';
+  });
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem(VIEW_MODE_KEY) || 'kanban';
   });
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
@@ -50,6 +54,12 @@ export function ProjectPage() {
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
+
+  // Save view mode
+  const handleViewModeChange = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem(VIEW_MODE_KEY, mode);
+  };
 
   // Stats
   const taskStats = {
@@ -162,10 +172,42 @@ export function ProjectPage() {
       <div className="flex-1 flex overflow-hidden relative">
         {/* Kanban area */}
         <div className="flex-1 overflow-hidden flex flex-col min-w-0">
-          {/* Compact kanban toolbar */}
+          {/* Compact toolbar with view toggle */}
           <div className="px-4 lg:px-5 py-2 flex items-center justify-between flex-shrink-0 border-b border-neutral-100 bg-white/60 backdrop-blur-sm">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Board</h2>
+            <div className="flex items-center gap-3">
+              {/* View mode toggle */}
+              <div className="flex items-center bg-neutral-100 rounded-lg p-0.5">
+                <button
+                  onClick={() => handleViewModeChange('kanban')}
+                  className={`p-1.5 rounded-md transition-all ${
+                    viewMode === 'kanban'
+                      ? 'bg-white shadow-sm text-neutral-900'
+                      : 'text-neutral-400 hover:text-neutral-600'
+                  }`}
+                  title="Board view"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('list')}
+                  className={`p-1.5 rounded-md transition-all ${
+                    viewMode === 'list'
+                      ? 'bg-white shadow-sm text-neutral-900'
+                      : 'text-neutral-400 hover:text-neutral-600'
+                  }`}
+                  title="List view"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+
               <span className="text-[10px] text-neutral-400 tabular-nums">
                 {taskStats.total} tasks
               </span>
@@ -183,57 +225,75 @@ export function ProjectPage() {
             )}
           </div>
 
-          {/* Mobile column tabs */}
-          <div className="md:hidden flex border-b border-neutral-100 bg-white overflow-x-auto flex-shrink-0">
-            {TASK_STATUSES.map((status) => {
-              const count = tasks?.filter(t => t.status === status.id).length || 0;
-              return (
-                <button
-                  key={status.id}
-                  onClick={() => setMobileColumn(status.id)}
-                  className={`
-                    flex items-center gap-1 px-3 py-2 text-[11px] font-medium whitespace-nowrap transition-colors flex-shrink-0
-                    ${mobileColumn === status.id
-                      ? 'text-neutral-900 border-b-2 border-emerald-500'
-                      : 'text-neutral-400'
-                    }
-                  `}
-                >
-                  {status.label}
-                  {count > 0 && (
-                    <span className={`px-1 rounded text-[9px] tabular-nums ${
-                      mobileColumn === status.id ? 'bg-neutral-200 text-neutral-600' : 'bg-neutral-100 text-neutral-400'
-                    }`}>
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          {/* Mobile column tabs — only show in kanban mode */}
+          {viewMode === 'kanban' && (
+            <div className="md:hidden flex border-b border-neutral-100 bg-white overflow-x-auto flex-shrink-0">
+              {TASK_STATUSES.map((status) => {
+                const count = tasks?.filter(t => t.status === status.id).length || 0;
+                return (
+                  <button
+                    key={status.id}
+                    onClick={() => setMobileColumn(status.id)}
+                    className={`
+                      flex items-center gap-1 px-3 py-2 text-[11px] font-medium whitespace-nowrap transition-colors flex-shrink-0
+                      ${mobileColumn === status.id
+                        ? 'text-neutral-900 border-b-2 border-emerald-500'
+                        : 'text-neutral-400'
+                      }
+                    `}
+                  >
+                    {status.label}
+                    {count > 0 && (
+                      <span className={`px-1 rounded text-[9px] tabular-nums ${
+                        mobileColumn === status.id ? 'bg-neutral-200 text-neutral-600' : 'bg-neutral-100 text-neutral-400'
+                      }`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-          {/* Desktop: Full kanban board */}
-          <div className="hidden md:flex flex-1 overflow-auto p-3 lg:p-4">
-            <KanbanBoard
-              tasks={tasks || []}
-              projectId={projectId}
-              onTaskClick={(task) => setSelectedTaskId(task.id)}
-              onCreateTask={effectiveIsStaff ? () => setShowCreateTask(true) : undefined}
-              canDrag={effectiveIsStaff}
-              canToggleComplete={effectiveIsStaff}
-            />
-          </div>
+          {viewMode === 'kanban' ? (
+            <>
+              {/* Desktop: Full kanban board */}
+              <div className="hidden md:flex flex-1 overflow-auto p-3 lg:p-4">
+                <KanbanBoard
+                  tasks={tasks || []}
+                  projectId={projectId}
+                  onTaskClick={(task) => setSelectedTaskId(task.id)}
+                  onCreateTask={effectiveIsStaff ? () => setShowCreateTask(true) : undefined}
+                  canDrag={effectiveIsStaff}
+                  canToggleComplete={effectiveIsStaff}
+                />
+              </div>
 
-          {/* Mobile: Single column view */}
-          <div className="md:hidden flex-1 overflow-auto p-3">
-            <MobileKanbanColumn
-              tasks={tasks || []}
-              statusId={mobileColumn}
-              projectId={projectId}
-              onTaskClick={(task) => setSelectedTaskId(task.id)}
-              canToggleComplete={effectiveIsStaff}
-            />
-          </div>
+              {/* Mobile: Single column view */}
+              <div className="md:hidden flex-1 overflow-auto p-3">
+                <MobileKanbanColumn
+                  tasks={tasks || []}
+                  statusId={mobileColumn}
+                  projectId={projectId}
+                  onTaskClick={(task) => setSelectedTaskId(task.id)}
+                  canToggleComplete={effectiveIsStaff}
+                />
+              </div>
+            </>
+          ) : (
+            /* List view — both desktop and mobile */
+            <div className="flex-1 overflow-hidden">
+              <TaskListView
+                tasks={tasks || []}
+                projectId={projectId}
+                onTaskClick={(task) => setSelectedTaskId(task.id)}
+                canDrag={effectiveIsStaff}
+                canToggleComplete={effectiveIsStaff}
+                canEdit={effectiveIsStaff}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar */}

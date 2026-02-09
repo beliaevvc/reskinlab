@@ -1,6 +1,18 @@
 # Tasks
 
 ## Recent Task
+**Task View Switcher — Kanban / List** — ARCHIVED ✅
+
+### Complexity: Level 2
+### Date: 2026-02-09
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-task-view-switcher.md`
+- **Reflection:** `memory-bank/reflection/reflection-task-view-switcher.md`
+
+---
+
+## Recent Task
 **Public Calculator + Dynamic Pricing** — ARCHIVED ✅
 
 ### Complexity: Level 3

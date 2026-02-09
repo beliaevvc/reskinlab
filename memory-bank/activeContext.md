@@ -1,9 +1,16 @@
 # Active Context
 
 ## Current Status
-**Ready for Next Task** ✅
+**Нет активной задачи** — Готов к следующей задаче.
 
 ## Recently Completed Tasks
+
+### Task View Switcher — Kanban / List (9 Февраля 2026) — ARCHIVED ✅
+Переключатель вида задач в проекте: Kanban доска и List (список). Список — компактные строки Linear-style с бейджами, сгруппированные по статусу (5 секций), сворачиваемые цветные заголовки, полный drag-and-drop между секциями. Toggle иконки в тулбаре. localStorage persist. Мобильная адаптация.
+- **Archive:** `memory-bank/archive/archive-task-view-switcher.md`
+- **Reflection:** `memory-bank/reflection/reflection-task-view-switcher.md`
+
+---
 
 ### Public Calculator + Dynamic Pricing (8 Февраля 2026) — ARCHIVED ✅
 Динамические цены из Supabase (price_configs → useDynamicPricing). Публичный калькулятор /shared/calculator. Система кодов. Авто-claim. Импорт для зарегистрированных. Rate limiting. pg_cron cleanup.
