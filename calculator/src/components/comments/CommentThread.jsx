@@ -1,8 +1,21 @@
+import { useEffect, useRef } from 'react';
 import { useComments } from '../../hooks/useComments';
 import { CommentItem } from './CommentItem';
 
-export function CommentThread({ entityType, entityId, onReply, onUserClick }) {
+export function CommentThread({ entityType, entityId, onReply, onUserClick, highlightCommentId }) {
   const { data: comments, isLoading } = useComments(entityType, entityId);
+  const highlightRef = useRef(null);
+
+  // Scroll to the highlighted comment once comments are loaded
+  useEffect(() => {
+    if (highlightCommentId && highlightRef.current && !isLoading) {
+      // Small delay to let the DOM settle after render
+      const timer = setTimeout(() => {
+        highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightCommentId, isLoading, comments]);
 
   if (isLoading) {
     return (
@@ -31,6 +44,8 @@ export function CommentThread({ entityType, entityId, onReply, onUserClick }) {
           entityId={entityId}
           onReply={onReply}
           onUserClick={onUserClick}
+          isHighlighted={comment.id === highlightCommentId}
+          highlightRef={comment.id === highlightCommentId ? highlightRef : undefined}
         />
       ))}
     </div>

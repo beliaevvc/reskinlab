@@ -113,6 +113,26 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
               <span className="tabular-nums">{task.checklist_completed}/{task.checklist_total}</span>
             </button>
           )}
+
+          {/* Comments — next to checklist */}
+          {task.comments_count > 0 && (
+            <div
+              className={`shrink-0 inline-flex items-center gap-0.5 text-[10px] ${
+                task.unread_comments_count > 0
+                  ? 'text-emerald-600 font-medium'
+                  : 'text-neutral-400'
+              }`}
+              title={task.unread_comments_count > 0
+                ? `${task.unread_comments_count} unread`
+                : `${task.comments_count} comments`
+              }
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <span>{task.unread_comments_count > 0 ? task.unread_comments_count : task.comments_count}</span>
+            </div>
+          )}
         </div>
 
         {/* Badges row — right side */}
@@ -165,25 +185,6 @@ export function TaskListRow({ task, onClick, isDragging, canToggleComplete = fal
             </div>
           )}
 
-          {/* Comments */}
-          {task.comments_count > 0 && (
-            <div
-              className={`flex items-center gap-0.5 text-[10px] shrink-0 ${
-                task.unread_comments_count > 0
-                  ? 'text-emerald-600 font-medium'
-                  : 'text-neutral-400'
-              }`}
-              title={task.unread_comments_count > 0
-                ? `${task.unread_comments_count} unread`
-                : `${task.comments_count} comments`
-              }
-            >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span>{task.unread_comments_count > 0 ? task.unread_comments_count : task.comments_count}</span>
-            </div>
-          )}
         </div>
       </div>
 

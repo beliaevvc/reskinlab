@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDeleteComment } from '../../hooks/useComments';
@@ -50,9 +50,19 @@ const parseTextWithLinks = (text) => {
   });
 };
 
-export function CommentItem({ comment, entityType, entityId, onReply, onUserClick, isReply = false }) {
+export function CommentItem({ comment, entityType, entityId, onReply, onUserClick, isReply = false, isHighlighted = false, highlightRef }) {
   const { user, isAdmin } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showHighlight, setShowHighlight] = useState(false);
+
+  // Brief flash highlight then fade out
+  useEffect(() => {
+    if (isHighlighted) {
+      setShowHighlight(true);
+      const timer = setTimeout(() => setShowHighlight(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isHighlighted]);
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment();
 
   const isOwn = user?.id === comment.author_id;
@@ -87,7 +97,7 @@ export function CommentItem({ comment, entityType, entityId, onReply, onUserClic
   const avatarColor = getAvatarColor(comment.author?.full_name);
 
   return (
-    <div className="group">
+    <div ref={highlightRef} className={`group transition-all duration-700 ease-out ${showHighlight ? 'bg-emerald-50/60 rounded-lg' : ''}`}>
       <div className="flex gap-3">
         {/* Avatar column with thread line */}
         <div className="flex flex-col items-center">

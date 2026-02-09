@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useViewAsRole } from '../../contexts/ViewAsRoleContext';
 import { useProject, useCompleteProject, useArchiveProject } from '../../hooks/useProjects';
 import { useStages, useCreateStages, DEFAULT_STAGES } from '../../hooks/useStages';
@@ -16,6 +16,7 @@ const VIEW_MODE_KEY = 'project-view-mode';
 
 export function ProjectPage() {
   const { id: projectId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { effectiveIsStaff } = useViewAsRole();
   
   // State
@@ -27,6 +28,7 @@ export function ProjectPage() {
     return localStorage.getItem(VIEW_MODE_KEY) || 'kanban';
   });
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [highlightCommentId, setHighlightCommentId] = useState(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showFilesGallery, setShowFilesGallery] = useState(false);
   const [selectedSpecId, setSelectedSpecId] = useState(null);
@@ -40,6 +42,44 @@ export function ProjectPage() {
   const [mobileColumn, setMobileColumn] = useState('todo');
   // Confirm modal
   const [confirmAction, setConfirmAction] = useState(null); // { type: 'complete' | 'archive', title, message }
+
+  // Deep-link: auto-open modals from URL params
+  // e.g. /projects/:id?task=uuid&comment=uuid
+  //      /projects/:id?offer=uuid
+  //      /projects/:id?invoice=uuid
+  //      /projects/:id?spec=uuid
+  useEffect(() => {
+    const taskParam = searchParams.get('task');
+    const commentParam = searchParams.get('comment');
+    const offerParam = searchParams.get('offer');
+    const invoiceParam = searchParams.get('invoice');
+    const specParam = searchParams.get('spec');
+
+    let hasParam = false;
+
+    if (taskParam) {
+      setSelectedTaskId(taskParam);
+      setHighlightCommentId(commentParam || null);
+      hasParam = true;
+    }
+    if (offerParam) {
+      setSelectedOfferId(offerParam);
+      hasParam = true;
+    }
+    if (invoiceParam) {
+      setSelectedInvoiceId(invoiceParam);
+      hasParam = true;
+    }
+    if (specParam) {
+      setSelectedSpecId(specParam);
+      hasParam = true;
+    }
+
+    // Clean up URL params so they don't persist on refresh/back
+    if (hasParam) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Data fetching
   const { data: project, isLoading: projectLoading, error: projectError } = useProject(projectId);
@@ -312,9 +352,10 @@ export function ProjectPage() {
       {/* Modals (unchanged) */}
       <TaskDetailModal
         isOpen={!!selectedTaskId}
-        onClose={() => setSelectedTaskId(null)}
+        onClose={() => { setSelectedTaskId(null); setHighlightCommentId(null); }}
         taskId={selectedTaskId}
         projectId={projectId}
+        highlightCommentId={highlightCommentId}
         onOpenSpecification={(specId) => {
           setReturnToTaskId(selectedTaskId);
           setSelectedTaskId(null);
@@ -392,7 +433,7 @@ export function ProjectPage() {
         onClose={() => setSelectedStageForChange(null)}
         stage={selectedStageForChange}
         projectId={projectId}
-        allStages={stages || []}
+        allStages={mergedStages}
       />
 
       {/* Confirm Action Modal */}

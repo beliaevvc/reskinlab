@@ -5,6 +5,13 @@
 
 ## Recently Completed Tasks
 
+### Notification Center (9 Февраля 2026) — ARCHIVED ✅
+Полная система in-app уведомлений: 14 DB-триггеров, батч-RPC для стадий, поллинг 15с, deep-linking (offer/invoice/spec/task/comment → модалки), карточный UI, фильтры. Фикс стадий (плейсхолдеры + RPC). Z-index fix. 3 роли.
+- **Archive:** `memory-bank/archive/archive-notification-center.md`
+- **Reflection:** `memory-bank/reflection/reflection-notification-center.md`
+
+---
+
 ### Task View Switcher — Kanban / List (9 Февраля 2026) — ARCHIVED ✅
 Переключатель вида задач в проекте: Kanban доска и List (список). Список — компактные строки Linear-style с бейджами, сгруппированные по статусу (5 секций), сворачиваемые цветные заголовки, полный drag-and-drop между секциями. Toggle иконки в тулбаре. localStorage persist. Мобильная адаптация.
 - **Archive:** `memory-bank/archive/archive-task-view-switcher.md`

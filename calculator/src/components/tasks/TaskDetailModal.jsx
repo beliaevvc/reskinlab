@@ -70,7 +70,7 @@ const parseTextWithLinks = (text) => {
   });
 };
 
-export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpecification, onOpenOffer }) {
+export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpecification, onOpenOffer, highlightCommentId }) {
   const { data: task, isLoading } = useTask(taskId);
   const { data: specifications } = useSpecifications(projectId);
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
@@ -734,6 +734,7 @@ export function TaskDetailModal({ isOpen, onClose, taskId, projectId, onOpenSpec
                   entityId={task.id} 
                   onReply={handleReply}
                   onUserClick={canViewUsers ? setSelectedUserId : undefined}
+                  highlightCommentId={highlightCommentId}
                 />
               </div>
             </div>

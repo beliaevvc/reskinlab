@@ -1,6 +1,21 @@
 # Tasks
 
 ## Recent Task
+**Notification Center** — ARCHIVED ✅
+
+### Complexity: Level 3
+### Date: 2026-02-09
+
+### Summary
+Полная система in-app уведомлений: 14 триггеров PostgreSQL, RPC для батч-уведомлений стадий, поллинг 15с, deep-linking (offers/invoices/specs/tasks/comments → модалки), карточный UI, фильтры (All/Unread + Categories). 3 роли: client, AM, admin.
+
+### Archive Documents
+- **Archive:** `memory-bank/archive/archive-notification-center.md`
+- **Reflection:** `memory-bank/reflection/reflection-notification-center.md`
+
+---
+
+## Recent Task
 **Task View Switcher — Kanban / List** — ARCHIVED ✅
 
 ### Complexity: Level 2

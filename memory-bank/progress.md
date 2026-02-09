@@ -1,5 +1,55 @@
 # Progress Log
 
+## Notification Center — ARCHIVED ✅
+
+### Date: 2026-02-09
+
+### Summary
+Полная система in-app уведомлений: 14 PostgreSQL триггеров, батчевые уведомления стадий через RPC, поллинг каждые 15 секунд, deep-linking в модалки проекта, карточный UI с фильтрами (All/Unread + Categories). Покрывает 3 роли: client, AM, admin. Сопутствующие фиксы: активация стадий с плейсхолдерами, z-index header'а, позиционирование иконки комментариев в TaskListRow.
+
+### Completed Items
+
+| Item | Status | Notes |
+|------|--------|-------|
+| DB: notifications table + 14 triggers | ✅ | 051_notification_center.sql |
+| DB: stage batch RPC | ✅ | 052_fix_stage_notifications.sql (replaced per-row trigger) |
+| DB: pg_cron cleanup (90 days) | ✅ | Удаление read notifications |
+| Frontend: useNotifications hook | ✅ | Fetch, count, mark read, navigation, polling |
+| UI: NotificationBell | ✅ | Badge count, dropdown toggle, immediate refetch on open |
+| UI: NotificationDropdown | ✅ | Filters (read/category), separator, card list |
+| UI: NotificationItem | ✅ | Card-style, rich content, emerald accents |
+| Deep-linking: tasks/comments | ✅ | Query params → TaskDetailModal → CommentThread scroll |
+| Deep-linking: offers/invoices/specs | ✅ | Query params → modals in ProjectPage |
+| Stage fix: placeholder handling | ✅ | INSERT placeholders, UPDATE real stages |
+| Stage fix: batch notifications | ✅ | Single consolidated notification for batch ops |
+| Fix: supabase.rpc try/catch | ✅ | PostgrestBuilder ≠ Promise (.catch not supported) |
+| UI: z-index header fix | ✅ | z-30 → z-40 (sidebar arrow overlap) |
+| UI: comment icon in TaskListRow | ✅ | Moved to left, after checklist badge |
+| UI: filter separation | ✅ | border-t divider between read/category chips |
+
+### Files Created
+- `calculator/supabase/migrations/051_notification_center.sql`
+- `calculator/supabase/migrations/052_fix_stage_notifications.sql`
+- `calculator/src/hooks/useNotifications.js`
+- `calculator/src/components/notifications/NotificationBell.jsx`
+- `calculator/src/components/notifications/NotificationDropdown.jsx`
+- `calculator/src/components/notifications/NotificationItem.jsx`
+- `calculator/src/components/notifications/index.js`
+
+### Files Modified
+- `calculator/src/components/layout/AppHeader.jsx`
+- `calculator/src/hooks/useStages.js`
+- `calculator/src/pages/projects/ProjectPage.jsx`
+- `calculator/src/components/comments/CommentThread.jsx`
+- `calculator/src/components/comments/CommentItem.jsx`
+- `calculator/src/components/tasks/TaskDetailModal.jsx`
+- `calculator/src/components/tasks/TaskListRow.jsx`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-notification-center.md`
+
+---
+
 ## Task View Switcher — Kanban / List — ARCHIVED ✅
 
 ### Date: 2026-02-09

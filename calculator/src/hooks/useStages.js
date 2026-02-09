@@ -180,41 +180,74 @@ export function useActivateStageWithPrevious() {
         stage => stage.order <= targetStage.order && stage.status === 'pending'
       );
 
-      if (stagesToActivate.length === 0) {
-        // Если нет этапов для активации, просто обновляем выбранный
-        const updateData = {
-          status: 'in_progress',
-          started_at: new Date().toISOString(),
-          completed_at: null,
-        };
-
-        const { data, error } = await supabase
-          .from('workflow_stages')
-          .update(updateData)
-          .eq('id', stageId)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return { ...data, projectId };
-      }
-
-      // Массовое обновление всех этапов
-      const stageIds = stagesToActivate.map(s => s.id);
-      const updateData = {
+      const now = new Date().toISOString();
+      const activateData = {
         status: 'in_progress',
-        started_at: new Date().toISOString(),
+        started_at: now,
         completed_at: null,
       };
 
-      const { data, error } = await supabase
-        .from('workflow_stages')
-        .update(updateData)
-        .in('id', stageIds)
-        .select();
+      // Разделяем на реальные стадии из БД и плейсхолдеры
+      const placeholderStages = stagesToActivate.filter(s => s._isPlaceholder);
+      const realStages = stagesToActivate.filter(s => !s._isPlaceholder);
 
-      if (error) throw error;
-      return { stages: data, projectId };
+      // Сначала создаём плейсхолдерные стадии в БД со статусом in_progress
+      if (placeholderStages.length > 0) {
+        const newStages = placeholderStages.map(s => ({
+          project_id: projectId,
+          stage_key: s.stage_key,
+          name: s.name,
+          description: '',
+          order: s.order,
+          status: 'in_progress',
+          started_at: now,
+        }));
+
+        const { error: insertError } = await supabase
+          .from('workflow_stages')
+          .insert(newStages);
+
+        if (insertError) throw insertError;
+      }
+
+      // Обновляем существующие стадии из БД
+      if (realStages.length > 0) {
+        const stageIds = realStages.map(s => s.id);
+
+        const { error } = await supabase
+          .from('workflow_stages')
+          .update(activateData)
+          .in('id', stageIds)
+          .select();
+
+        if (error) throw error;
+      } else if (placeholderStages.length === 0) {
+        // Если нет ни плейсхолдеров, ни реальных стадий для активации,
+        // просто обновляем выбранный этап
+        if (!targetStage._isPlaceholder) {
+          const { data, error } = await supabase
+            .from('workflow_stages')
+            .update(activateData)
+            .eq('id', stageId)
+            .select()
+            .single();
+
+          if (error) throw error;
+        }
+      }
+
+      // Отправляем одно батч-уведомление через RPC (не блокируем UI при ошибке)
+      try {
+        const stageNames = stagesToActivate.map(s => s.name);
+        await supabase.rpc('notify_stages_changed', {
+          p_project_id: projectId,
+          p_target_stage_name: targetStage.name,
+          p_action: 'activated',
+          p_stage_names: stageNames,
+        });
+      } catch { /* ignore notification errors */ }
+
+      return { projectId };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['stages', data.projectId] });
@@ -235,16 +268,23 @@ export function useDeactivateStageWithPrevious() {
       const targetStage = allStages.find(s => s.id === stageId);
       if (!targetStage) throw new Error('Stage not found');
 
+      // Плейсхолдеры нельзя деактивировать — они и так pending
+      if (targetStage._isPlaceholder) {
+        return { projectId };
+      }
+
       // Находим все этапы, которые нужно деактивировать:
       // - все этапы с order >= выбранного этапа (выбранный этап и все последующие)
       // - которые находятся в активном статусе (in_progress, review) или завершены (completed, approved)
+      // - только реальные стадии из БД (не плейсхолдеры)
       const stagesToDeactivate = allStages
         .filter(
-          stage => stage.order >= targetStage.order && 
+          stage => !stage._isPlaceholder &&
+          stage.order >= targetStage.order && 
           (stage.status === 'in_progress' || stage.status === 'review' || 
            stage.status === 'completed' || stage.status === 'approved')
         )
-        .sort((a, b) => b.order - a.order); // Сортируем от большего к меньшему (справа налево)
+        .sort((a, b) => b.order - a.order);
 
       if (stagesToDeactivate.length === 0) {
         // Если нет этапов для деактивации, просто обновляем выбранный
@@ -280,6 +320,18 @@ export function useDeactivateStageWithPrevious() {
         .select();
 
       if (error) throw error;
+
+      // Отправляем одно батч-уведомление через RPC (не блокируем UI при ошибке)
+      try {
+        const stageNames = stagesToDeactivate.map(s => s.name);
+        await supabase.rpc('notify_stages_changed', {
+          p_project_id: projectId,
+          p_target_stage_name: targetStage.name,
+          p_action: 'deactivated',
+          p_stage_names: stageNames,
+        });
+      } catch { /* ignore notification errors */ }
+
       return { stages: data, projectId };
     },
     onSuccess: (data) => {
