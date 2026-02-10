@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Monitor, Smartphone } from 'lucide-react';
+import { Icon } from './Icon';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 const MOBILE_BREAKPOINT = 768;
@@ -46,11 +46,11 @@ export function MobileBlocker({ children }) {
           <div className="relative">
             {/* Desktop icon (main) */}
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/20">
-              <Monitor className="w-12 h-12 text-white" />
+              <Icon name="monitor" size={48} className="text-white" />
             </div>
             {/* Mobile icon (crossed out, smaller) */}
             <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-neutral-700 rounded-xl flex items-center justify-center border-2 border-neutral-900">
-              <Smartphone className="w-5 h-5 text-neutral-400" />
+              <Icon name="smartphone" size={20} className="text-neutral-400" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-8 h-0.5 bg-red-500 rotate-45 rounded-full" />
               </div>
