@@ -334,5 +334,16 @@
     "processing": "Processing...",
     "deactivate": "Deactivate",
     "activate": "Activate"
+  },
+  "mobileBlocker": {
+    "title": "Desktop Version Recommended",
+    "description": "ReSkin Lab is designed for desktop use. For the best experience with all features, please open this application on a computer or tablet.",
+    "features": {
+      "title": "Features optimized for desktop:",
+      "charts": "Interactive charts and dashboards",
+      "kanban": "Kanban boards and task management",
+      "files": "File management and previews"
+    },
+    "continueAnyway": "Continue on mobile anyway"
   }
 }

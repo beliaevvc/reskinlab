@@ -6,6 +6,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ViewAsRoleProvider } from './contexts/ViewAsRoleContext';
 
+// Components
+import { MobileBlocker } from './components/MobileBlocker';
+
 // Layouts
 import { AppLayout } from './components/layout';
 
@@ -161,7 +164,9 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <LanguageProvider>
-              <AppContent />
+              <MobileBlocker>
+                <AppContent />
+              </MobileBlocker>
             </LanguageProvider>
           </AuthProvider>
         </BrowserRouter>
