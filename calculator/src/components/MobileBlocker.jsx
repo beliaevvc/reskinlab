@@ -5,18 +5,23 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 
 const MOBILE_BREAKPOINT = 768;
 
+// Check mobile on initial load (before React hydration)
+const getInitialIsMobile = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth < MOBILE_BREAKPOINT;
+  }
+  return false;
+};
+
 export function MobileBlocker({ children }) {
   const { t } = useTranslation('common');
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(getInitialIsMobile);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
-
-    // Initial check
-    checkMobile();
 
     // Listen for resize
     window.addEventListener('resize', checkMobile);
