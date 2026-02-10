@@ -16,7 +16,6 @@ const getInitialIsMobile = () => {
 export function MobileBlocker({ children }) {
   const { t } = useTranslation('common');
   const [isMobile, setIsMobile] = useState(getInitialIsMobile);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -28,16 +27,16 @@ export function MobileBlocker({ children }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // If not mobile or user dismissed, show children
-  if (!isMobile || dismissed) {
+  // If not mobile, show children
+  if (!isMobile) {
     return children;
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-[9999] bg-[#FAFAFA] flex items-center justify-center p-6">
       {/* Language switcher in corner */}
       <div className="absolute top-4 right-4">
-        <LanguageSwitcher className="text-white hover:bg-white/10 [&_svg]:text-white/80" />
+        <LanguageSwitcher />
       </div>
 
       <div className="max-w-sm w-full text-center">
@@ -45,55 +44,28 @@ export function MobileBlocker({ children }) {
         <div className="mb-8 flex justify-center">
           <div className="relative">
             {/* Desktop icon (main) */}
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/20">
-              <Icon name="monitor" size={48} className="text-white" />
+            <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-neutral-200">
+              <Icon name="monitor" size={40} className="text-neutral-700" />
             </div>
             {/* Mobile icon (crossed out, smaller) */}
-            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-neutral-700 rounded-xl flex items-center justify-center border-2 border-neutral-900">
-              <Icon name="smartphone" size={20} className="text-neutral-400" />
+            <div className="absolute -bottom-2 -right-2 w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-neutral-200 shadow-sm">
+              <Icon name="smartphone" size={18} className="text-neutral-400" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-8 h-0.5 bg-red-500 rotate-45 rounded-full" />
+                <div className="w-7 h-0.5 bg-red-400 rotate-45 rounded-full" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-white mb-3">
+        <h1 className="text-xl font-semibold text-neutral-900 mb-2">
           {t('mobileBlocker.title')}
         </h1>
 
         {/* Description */}
-        <p className="text-neutral-400 mb-8 leading-relaxed">
+        <p className="text-neutral-500 text-sm leading-relaxed">
           {t('mobileBlocker.description')}
         </p>
-
-        {/* Features list */}
-        <div className="bg-white/5 rounded-xl p-4 mb-8 text-left">
-          <p className="text-sm text-neutral-300 mb-3">{t('mobileBlocker.features.title')}</p>
-          <ul className="space-y-2 text-sm text-neutral-400">
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-              {t('mobileBlocker.features.charts')}
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-              {t('mobileBlocker.features.kanban')}
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-              {t('mobileBlocker.features.files')}
-            </li>
-          </ul>
-        </div>
-
-        {/* Continue anyway button */}
-        <button
-          onClick={() => setDismissed(true)}
-          className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors underline underline-offset-4"
-        >
-          {t('mobileBlocker.continueAnyway')}
-        </button>
       </div>
     </div>
   );
