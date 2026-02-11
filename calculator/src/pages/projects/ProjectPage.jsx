@@ -32,6 +32,7 @@ export function ProjectPage() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [highlightCommentId, setHighlightCommentId] = useState(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [createTaskInitialStatus, setCreateTaskInitialStatus] = useState('backlog');
   const [showFilesGallery, setShowFilesGallery] = useState(false);
   const [selectedSpecId, setSelectedSpecId] = useState(null);
   const [returnToTaskId, setReturnToTaskId] = useState(null);
@@ -306,9 +307,13 @@ export function ProjectPage() {
                   tasks={tasks || []}
                   projectId={projectId}
                   onTaskClick={(task) => setSelectedTaskId(task.id)}
-                  onCreateTask={effectiveIsStaff ? () => setShowCreateTask(true) : undefined}
+                  onCreateTask={effectiveIsStaff ? (statusId) => {
+                    setCreateTaskInitialStatus(statusId || 'backlog');
+                    setShowCreateTask(true);
+                  } : undefined}
                   canDrag={effectiveIsStaff}
                   canToggleComplete={effectiveIsStaff}
+                  canEditChecklist={effectiveIsStaff}
                 />
               </div>
 
@@ -320,6 +325,7 @@ export function ProjectPage() {
                   projectId={projectId}
                   onTaskClick={(task) => setSelectedTaskId(task.id)}
                   canToggleComplete={effectiveIsStaff}
+                  canEditChecklist={effectiveIsStaff}
                 />
               </div>
             </>
@@ -374,6 +380,7 @@ export function ProjectPage() {
         isOpen={showCreateTask}
         onClose={() => setShowCreateTask(false)}
         projectId={projectId}
+        initialStatus={createTaskInitialStatus}
       />
 
       <SpecificationModal
@@ -486,7 +493,7 @@ export function ProjectPage() {
 }
 
 // Mobile single-column kanban view
-function MobileKanbanColumn({ tasks, statusId, projectId, onTaskClick, canToggleComplete }) {
+function MobileKanbanColumn({ tasks, statusId, projectId, onTaskClick, canToggleComplete, canEditChecklist = false }) {
   const { t } = useTranslation('projects');
   const { mutate: updateStatus } = useUpdateTaskStatus();
 
@@ -520,6 +527,7 @@ function MobileKanbanColumn({ tasks, statusId, projectId, onTaskClick, canToggle
           isDragging={false}
           canToggleComplete={canToggleComplete}
           onToggleComplete={handleToggleComplete}
+          canEdit={canEditChecklist}
         />
       ))}
     </div>

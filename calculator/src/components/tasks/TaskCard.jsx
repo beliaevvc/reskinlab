@@ -1,13 +1,21 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/utils';
+import { useTaskChecklist, useUpdateChecklistItem } from '../../hooks/useTaskChecklist';
 
-export function TaskCard({ task, onClick, isDragging, canToggleComplete = false, onToggleComplete }) {
+export function TaskCard({ task, onClick, isDragging, canToggleComplete = false, onToggleComplete, canEdit = false }) {
   const { t, i18n } = useTranslation('tasks');
   const currentLang = i18n.language;
+  const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done';
   const isDone = task.status === 'done';
+  const hasChecklist = task.checklist_total > 0;
   
   const hasPendingApproval = task.pending_approval || task.needs_approval;
+
+  // Lazy-load checklist items only when expanded
+  const { data: checklistItems = [], isLoading: checklistLoading } = useTaskChecklist(isChecklistExpanded ? task.id : null);
+  const updateChecklistItem = useUpdateChecklistItem();
 
   // Get localized title
   const getLocalizedTitle = () => {
@@ -22,6 +30,19 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
     if (onToggleComplete) {
       onToggleComplete(task);
     }
+  };
+
+  const handleChecklistExpandToggle = (e) => {
+    e.stopPropagation();
+    setIsChecklistExpanded(!isChecklistExpanded);
+  };
+
+  const handleChecklistItemToggle = async (e, item) => {
+    e.stopPropagation();
+    await updateChecklistItem.mutateAsync({
+      itemId: item.id,
+      updates: { completed: !item.completed },
+    });
   };
 
   const checklistProgress = task.checklist_total > 0
@@ -119,11 +140,25 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
       )}
 
       {/* Bottom row: checklist + comments */}
-      {(task.checklist_total > 0 || task.comments_count > 0) && (
+      {(hasChecklist || task.comments_count > 0) && (
         <div className="mt-2.5 flex items-center justify-between gap-2">
-          {/* Checklist progress */}
-          {task.checklist_total > 0 ? (
-            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+          {/* Checklist progress - clickable to expand */}
+          {hasChecklist ? (
+            <button
+              onClick={handleChecklistExpandToggle}
+              className="flex items-center gap-1.5 flex-1 min-w-0 group/checklist hover:opacity-80 transition-opacity"
+              title={isChecklistExpanded ? t('checklist.hide', { defaultValue: 'Hide checklist' }) : t('checklist.show', { defaultValue: 'Show checklist' })}
+            >
+              {/* Chevron indicator */}
+              <svg
+                className={`w-3 h-3 text-neutral-400 transition-transform duration-200 flex-shrink-0 ${isChecklistExpanded ? 'rotate-90' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
               <div className="flex-1 h-1 bg-neutral-100 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all ${
@@ -135,7 +170,7 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
               <span className="text-[10px] text-neutral-400 tabular-nums flex-shrink-0">
                 {task.checklist_completed}/{task.checklist_total}
               </span>
-            </div>
+            </button>
           ) : <div />}
 
           {/* Comments */}
@@ -159,6 +194,50 @@ export function TaskCard({ task, onClick, isDragging, canToggleComplete = false,
               ) : (
                 <span>{task.comments_count}</span>
               )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Expanded checklist items */}
+      {isChecklistExpanded && hasChecklist && (
+        <div className="mt-2 pt-2 border-t border-neutral-100">
+          {checklistLoading ? (
+            <div className="flex items-center gap-2 py-1 text-neutral-400 text-xs">
+              <div className="animate-spin rounded-full h-3 w-3 border border-neutral-300 border-t-emerald-500" />
+              {t('common:loading', { defaultValue: 'Loading...' })}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {checklistItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-start gap-2 group/item"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Checklist item checkbox */}
+                  <button
+                    onClick={(e) => canEdit && handleChecklistItemToggle(e, item)}
+                    disabled={!canEdit}
+                    className={`shrink-0 mt-0.5 w-3.5 h-3.5 rounded border-[1.5px] flex items-center justify-center transition-all ${
+                      item.completed
+                        ? 'bg-emerald-500 border-emerald-500'
+                        : 'border-neutral-300 group-hover/item:border-emerald-400'
+                    } ${canEdit ? 'cursor-pointer' : 'cursor-default'}`}
+                  >
+                    {item.completed && (
+                      <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
+                  <span className={`text-[11px] leading-snug ${
+                    item.completed ? 'text-neutral-400 line-through' : 'text-neutral-600'
+                  }`}>
+                    {item.title}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
         </div>

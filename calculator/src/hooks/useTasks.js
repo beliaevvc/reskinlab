@@ -208,16 +208,17 @@ export function useCreateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, stageId, title, title_ru, title_en, description, description_ru, description_en, dueDate }) => {
-      // Get max order for this project
+    mutationFn: async ({ projectId, stageId, title, title_ru, title_en, description, description_ru, description_en, dueDate, status = 'backlog' }) => {
+      // Get max order for this project and status
       const { data: maxOrderData } = await supabase
         .from('tasks')
         .select('order')
         .eq('project_id', projectId)
+        .eq('status', status)
         .order('order', { ascending: false })
         .limit(1);
 
-      const nextOrder = (maxOrderData?.[0]?.order || 0) + 1;
+      const nextOrder = (maxOrderData?.[0]?.order || 0) + 1000;
 
       const { data, error } = await supabase
         .from('tasks')
@@ -231,7 +232,7 @@ export function useCreateTask() {
           description_ru: description_ru || null,
           description_en: description_en || null,
           due_date: dueDate || null,
-          status: 'backlog', // Tasks start in backlog
+          status,
           order: nextOrder,
         })
         .select()

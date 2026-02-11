@@ -22,7 +22,7 @@ const COLUMN_DROP_COLORS = {
   done: 'border-emerald-300 bg-emerald-50/30',
 };
 
-export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDrag = true, canToggleComplete = false }) {
+export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDrag = true, canToggleComplete = false, canEditChecklist = false }) {
   const { t } = useTranslation('tasks');
   const [draggedTask, setDraggedTask] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
@@ -197,10 +197,22 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
                 <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
                   {t(`status.${status.id}`)}
                 </h3>
+                <span className="text-[11px] font-medium text-neutral-400 tabular-nums">
+                  {taskCount}
+                </span>
               </div>
-              <span className="text-[11px] font-medium text-neutral-400 tabular-nums">
-                {taskCount}
-              </span>
+              {/* Add task button */}
+              {onCreateTask && (
+                <button
+                  onClick={() => onCreateTask(status.id)}
+                  className="w-5 h-5 flex items-center justify-center rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors"
+                  title={t('kanban.addTask', { defaultValue: 'Add task' })}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              )}
             </div>
 
             {/* Tasks area */}
@@ -234,6 +246,7 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, onCreateTask, canDr
                         isDragging={canDrag && draggedTask?.id === task.id}
                         canToggleComplete={canToggleComplete}
                         onToggleComplete={handleToggleComplete}
+                        canEdit={canEditChecklist}
                       />
                     </div>
                   </div>
