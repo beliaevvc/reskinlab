@@ -1,5 +1,570 @@
 # Progress Log
 
+## 2026-04-01 — ReTracker: Скетч (рисование) в чате задачи [АРХИВИРОВАНО]
+- Уровень: 3
+- Архив: `memory-bank/archive/archive-sketch-editor-chat.md`
+- Рефлексия: `memory-bank/reflection/reflection-sketch-editor.md`
+- Creative: `memory-bank/creative/creative-sketch-editor.md`
+- Файлы: SketchEditor.jsx (новый), AttachmentMenu.jsx, CommentInput.jsx
+- Creative: `memory-bank/creative/creative-sketch-editor.md`
+
+---
+
+## 2026-04-01 — ReTracker: ложная «(ред.)» при треде [АРХИВИРОВАНО]
+- Уровень: 2
+- Архив: `memory-bank/archive/archive-thread-edited-label-fix.md`
+- Рефлексия: `memory-bank/reflection/reflection-thread-edited-label-fix.md`
+
+---
+
+## 2026-03-31 — ReTracker: ImageViewer 3D-режим — АРХИВИРОВАНО ✅
+
+### Уровень: 2
+### Архив: `memory-bank/archive/archive-image-viewer-3d-mode.md`
+### Рефлексия: `memory-bank/reflection/reflection-image-viewer-3d-mode.md`
+
+---
+
+## 2026-03-31 — ReTracker: ImageViewer 3D-режим и прозрачные PNG
+
+### Уровень: 2
+### Статус: REFLECT завершён (после BUILD и UX-итераций)
+
+### Изменения
+Полноэкранный `ImageViewer`: переключаемый псевдо-3D просмотр (`perspective`, `rotateX`/`rotateY`, `translateZ`, scale), rAF+lerp по позиции мыши относительно кадра; отключение при режиме комментария и `prefers-reduced-motion`. Иконка режима — «куб». Прозрачные PNG: убран градиентный блик с blend, тени `drop-shadow` вместо `box-shadow`; то же в `FilePreviewOverlay` (`CommentAttachments.jsx`).
+
+### Файлы
+- `retracker/src/components/comments/ImageViewer.jsx`
+- `retracker/src/components/comments/CommentAttachments.jsx`
+
+### Проверки
+- `npm run build` (retracker) — успешно
+- `npm run test:permissions:sql` — пройдены
+
+### Рефлексия
+📄 `memory-bank/reflection/reflection-image-viewer-3d-mode.md`
+
+---
+
+## ReTracker: AI Insights Chat Enhancements — ARCHIVED ✅
+
+### Date: 2026-02-21
+### Complexity: Level 3
+### Commit: `18c05ad`
+
+### Summary
+Завершен цикл улучшений AI-чата ReTracker: селектор моделей в инпуте, персистентные usage-метрики токенов и стоимости из БД, breakdown по моделям, улучшенная навигация embed-карточек, и стабилизация UI инпута/дропдауна.
+
+### Key Outcomes
+- Модель передается сквозь фронт и бэк (UI -> hook -> Edge Function).
+- Usage считается по данным БД и сохраняется независимо от удаления чатов.
+- Добавлен breakdown затрат по моделям в расширенной статистике.
+- Исправлены UX-дефекты чата (двойная обводка, якорь dropdown, единый визуальный контур).
+
+### Files
+- `retracker/src/components/dashboard/AIInsights/components/ChatView.jsx`
+- `retracker/src/components/dashboard/AIInsights/components/TokenUsage.jsx`
+- `retracker/src/hooks/useAIChat.js`
+- `retracker/src/hooks/useAIDashboardData.js`
+- `retracker/src/pages/DashboardPage.jsx`
+- `retracker/supabase/functions/chat-dashboard/index.ts`
+- `retracker/supabase/migrations/055_ai_persistent_usage.sql`
+
+### Reflection Reference
+📄 `memory-bank/reflection/reflection-ai-insights-chat-enhancements.md`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-ai-insights-chat-enhancements.md`
+
+---
+
+## ReTracker: AI Summary Tab — ARCHIVED ✅
+
+### Date: 2026-02-21
+### Complexity: Level 3-4
+### Commits: `ee4be69`, `551ec72`
+
+### Summary
+Вкладка "AI Summary" в модалке задачи ReTracker. GPT-powered анализ задачи (название, описание, чеклисты, виджеты, комментарии + голосовые транскрипции) с генерацией структурированного саммари. Расширенный staleCheck для обнаружения изменений task.updated_at.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 6 |
+| Files Modified | 5 |
+| Lines Added | ~1500 |
+| Migrations | 3 |
+| Debug Iterations | ~15 |
+| UI Iterations | ~8 |
+| Hypotheses Generated | 6 |
+
+### Components Created
+- `TaskAISummary.jsx` — основной компонент вкладки с переключателем тона, stale check, markdown parsing
+
+### Hooks Created
+- `useTaskSummary.js` — React Query hooks для fetching и генерации саммари
+
+### Edge Function
+- `summarize-task/index.ts` — OpenAI GPT с strict JSON schema, service role для RLS bypass
+
+### Database Changes
+- `047_task_summaries.sql` — таблица task_summaries + RLS + grants
+- `048_task_summaries_per_tone.sql` — `UNIQUE(task_id, tone)` constraint
+- `049_task_summaries_track_task_updated.sql` — `task_updated_at` column + stale function
+
+### Key Features
+- Три тона: деловой, нейтральный, простой
+- Per-tone caching — отдельный кеш для каждого тона
+- Stale check — проверка `last_comment_id` + `task.updated_at` для экономии токенов
+- Markdown parsing — `**bold**` → `<strong>`
+- Brand colors — все акценты emerald green
+
+### Debug Challenges Resolved
+- **JWT 401** → `--no-verify-jwt` deploy flag
+- **Constraint violation** → tone mapping fix (`casual` → `informal`)
+- **Circular JSON** → arrow function wrappers
+- **RLS denied** → service role client
+- **staleCheck not activating** → fixed updateTask argument structure in TaskDetailModal
+
+### Archive Reference
+📄 `memory-bank/archive/archive-ai-summary-tab.md`
+📄 `memory-bank/reflection/reflection-ai-summary-tab.md`
+
+---
+
+## Project Header Description & Sidebar Improvements — ARCHIVED ✅
+
+### Date: 2026-02-20
+### Complexity: Level 2
+
+### Summary
+Добавление описания проекта в header с inline-редактированием + улучшения сайдбара при свёрнутом состоянии.
+
+### Key Changes
+- **BoardHeader** — описание проекта под названием, inline editing
+- **Layout** — упрощён свёрнутый сайдбар (только иконка папки)
+
+### Files Modified
+- `retracker/src/components/board/BoardHeader.jsx`
+- `retracker/src/components/layout/Layout.jsx`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-project-header-description.md`
+📄 `memory-bank/reflection/reflection-project-header-description.md`
+
+---
+
+## ReTracker: Clickable Widgets on Kanban/List — ARCHIVED ✅
+
+### Date: 2026-02-19/20
+### Complexity: Level 2-3
+
+### Summary
+Кликабельные виджеты на карточках задач в Kanban и List view — редактирование значений прямо на доске без открытия модалки. Виджет "Время в колонке" (Time in Column) с историей статусов.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 3 |
+| Files Modified | 7 |
+| Migrations | 2 |
+| Dropdown Components | 6 |
+
+### Components Created
+- `TimeInColumnSticker.jsx` — виджет времени в колонке с dropdown историей
+
+### Components Modified
+- `WidgetSticker.jsx` — добавлены inline dropdown editors для всех типов виджетов
+- `TaskWidgets.jsx` — кнопка "+" для добавления виджетов, editable prop
+
+### Database Changes
+- `038_time_in_column.sql` — ENUM value + status_changed_at column + widget template
+- `039_task_status_history.sql` — history table + triggers (SECURITY DEFINER)
+
+### Key Features
+- Клик на виджет → inline dropdown редактор
+- Кнопка "+" при наведении для добавления новых виджетов
+- Time in Column: автообновление, история статусов в dropdown
+- Сортировка истории: новые сверху
+- Event propagation fix: клик на виджет не открывает карточку
+
+### Archive Reference
+📄 `memory-bank/archive/archive-clickable-widgets-kanban.md`
+📄 `memory-bank/reflection/reflection-clickable-widgets-kanban.md`
+
+---
+
+## ReTracker: Card Covers & Cover Crop — ARCHIVED ✅
+
+### Date: 2026-02-19
+### Complexity: Level 2-3
+
+### Summary
+Обложки для карточек задач в канбане: автоматическая установка при загрузке изображений, контекстное меню (установить/удалить обложку, скачать), настройка области кадрирования (drag + zoom) через модалку.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 4 |
+| Files Modified | 8 |
+| Migrations | 1 |
+| UI Iterations | 5+ |
+
+### Components Created
+- `CoverCropModal.jsx` — модалка настройки области кадрирования
+- `ImageContextMenu.jsx` — контекстное меню на изображениях в чате
+- `DisplaySettings.jsx` — настройки отображения доски (auto-cover)
+
+### Hooks Created
+- `useTaskCover.js` — set/remove cover, auto-set, update position
+
+### Database Changes
+- `036_task_covers.sql` — cover_file_id, cover_pinned, cover_position, RPC functions
+
+### Key Features
+- Auto-cover при загрузке изображений (настройка на уровне доски)
+- Контекстное меню: "Установить обложкой", "Удалить обложку", "Скачать"
+- Pinned covers не заменяются автоматически
+- Drag-to-move и zoom в модалке кадрирования
+- Полноширинная обложка на карточке канбана
+
+### Archive Reference
+📄 `memory-bank/archive/archive-card-covers-crop.md`
+📄 `memory-bank/reflection/reflection-card-covers-crop.md`
+
+---
+
+## Reactions in ReadersPopover — ARCHIVED ✅
+
+### Date: 2026-02-18
+### Complexity: Level 1
+
+Добавлено отображение эмодзи-реакций в попапе "Прочитано" — справа от имени пользователя.
+
+**Archive:** `memory-bank/archive/archive-readers-popover-reactions.md`
+
+---
+
+## ReTracker: Message Read Receipts — ARCHIVED ✅
+
+### Date: 2026-02-18
+
+### Summary
+Функциональность прочтения сообщений в чате задач (как в Telegram): галочки статуса (✓/✓✓), попап со списком прочитавших, автоматическая пометка при просмотре через IntersectionObserver, Realtime обновления.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 4 |
+| Files Modified | 5 |
+| RPC Functions | 3 |
+| UI Iterations | ~5 |
+
+### Components Created
+- `ReadIndicator.jsx` — галочка статуса прочтения
+- `ReadersPopover.jsx` — попап со списком прочитавших (createPortal)
+
+### Hooks Created
+- `useCommentReads.js` — batch marking, readers fetching, Realtime subscription
+
+### Database Changes
+- `035_message_read_receipts.sql` — RPC функции, RLS политики, Realtime publication
+
+### Key Features
+- Галочки: ✓ (доставлено) / ✓✓ зелёная (прочитано)
+- Клик на галочку → попап со списком читателей + время
+- IntersectionObserver для автопрочтения при скролле
+- Закрытие попапа при скролле
+- Автор видит себя в списке прочитавших
+
+### Archive Reference
+📄 `memory-bank/archive/archive-message-read-receipts.md`
+📄 `memory-bank/reflection/reflection-message-read-receipts.md`
+
+---
+
+## Voice Quote Playback Fix — ARCHIVED ✅
+
+### Date: 2026-02-18
+
+### Summary
+Исправлен баг воспроизведения цитат голосовых сообщений (VoiceQuote). Две проблемы: условный рендер `<audio>` элемента терял event listeners; `setIsPlaying(true)` вызывался до успешного `audio.play()`.
+
+### Root Cause
+1. `{audioUrl && <audio />}` — пересоздание элемента при изменении audioUrl
+2. Синхронный `setIsPlaying(true)` до resolve промиса `play()`
+
+### Fix
+- Audio элемент всегда рендерится: `<audio src={audioUrl || ''} />`
+- `setIsPlaying(true)` только в `.then()` промиса `play()`
+
+### Files Modified
+- `retracker/src/components/comments/VoiceQuote.jsx`
+
+### Archive Reference
+📄 `memory-bank/archive/archive-voice-quote-playback-fix.md`
+📄 `memory-bank/reflection/reflection-voice-quote-playback-fix.md`
+
+---
+
+## ReTracker: MediaGallery Refactor & Comment Improvements — ARCHIVED ✅
+
+### Date: 2026-02-18
+
+### Summary
+Рефакторинг раздела "Медиа" в карточке задачи: отдельный таб для голосовых сообщений, переключатель вида grid/list, бейджи комментариев на изображениях, интеграция ImageViewer с комментариями и редактированием, исправления пагинации и error handling для изображений.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Modified | 5 |
+| Bug Fixes | 4 |
+| New Components | ~10 (sub-components) |
+
+### Components Modified
+- `MediaGallery.jsx` — voice tab, view toggle, comment badges, ImageViewer integration
+- `CommentThread.jsx` — scroll preservation on pagination
+- `CommentAttachments.jsx` — image error handling
+- `CommentItem.jsx` — ImageThumbnail for replies
+- `TaskDetailModal.jsx` — onEditAndSend prop
+
+### Key Features
+- Таб "Голосовые" для voice messages (`file_category === 'voice_message'`)
+- Сортировка файлов: новые вверху
+- Переключатель grid/list для фото, видео, голосовых
+- Бейджи комментариев на превью изображений
+- ImageViewer с комментариями при клике на изображение
+- Редактирование изображений из галереи
+- Улучшенная пагинация с сохранением позиции скролла
+
+### Bug Fixes
+- Optional chaining для `mediaData?.voice?.length`
+- Hook initialization order
+- Performance fix: ref вместо зависимости в useCallback
+- Image error handling с placeholder fallback
+
+### Archive
+📄 `memory-bank/archive/archive-media-gallery-refactor.md`
+📄 `memory-bank/reflection/reflection-media-gallery-refactor.md`
+
+---
+
+## ReTracker: Image Comments Figma-style — COMPLETED ✅
+
+### Date: 2026-02-18
+
+### Summary
+Комментарии на изображениях в стиле Figma: кликабельные пины с координатами, resolve-статусы (как в Figma), polling каждые 2 сек для обновлений в реальном времени. Слоистая архитектура аннотаций для будущей редактируемости.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 9 |
+| Files Modified | 2 |
+| Migrations Created | 2 |
+| Lines Added | ~1200 |
+
+### Components Created
+- `ImageViewer.jsx` — полноэкранный просмотрщик с пинами комментариев
+- `CommentPin.jsx` — маркер комментария на изображении
+- `CommentPopover.jsx` — попап с деталями комментария и действиями
+- `AnnotationRenderer.jsx` — рендер слоя аннотаций поверх изображения
+- `ImageCommentBadge.jsx` — бейдж количества комментариев в чате
+
+### Hooks Created
+- `useImageComments.js` — CRUD + polling для комментариев на изображениях
+- `useImageAnnotations.js` — CRUD для слоистых аннотаций
+
+### Database Changes
+- `031_image_comments.sql` — таблица image_comments с координатами и resolve-статусами
+- `032_image_annotations.sql` — таблица image_annotations для хранения аннотаций как JSONB
+
+### Key Features
+- Клик на изображение в чате → открывает ImageViewer
+- Режим добавления комментариев (кнопка "Комментарий")
+- Пины с номерами (1, 2, 3...), resolved показываются галочкой
+- Popover с редактированием, удалением, resolve/unresolve
+- Фильтр resolved комментариев
+- Бейдж количества комментариев на превью изображений в чате
+- Polling каждые 2 сек когда viewer открыт
+
+### Integration Points
+- `CommentAttachments.jsx` — интегрирован ImageViewer для изображений
+- ImageAttachment теперь показывает бейдж комментариев и открывает ImageViewer
+
+---
+
+## ReTracker: Voice Messages with Transcription — ARCHIVED ✅
+
+### Date: 2026-02-17/18
+
+### Summary
+Голосовые сообщения в чате задач ReTracker: запись, воспроизведение (wavesurfer.js), транскрипция (OpenAI Whisper API), word-level timestamps, цитирование фрагментов.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 9 |
+| Files Modified | 8 |
+| Debug Iterations | ~15 |
+| Lines Added | ~2000 |
+
+### Components Created
+- `VoiceRecorder.jsx` — UI записи
+- `VoiceMessagePlayer.jsx` — плеер с транскриптом
+- `TranscriptDisplay.jsx` — кликабельные слова
+- `VoiceQuoteSelector.jsx` — выбор фрагмента
+- `VoiceQuote.jsx` — отображение цитаты
+
+### Hooks Created
+- `useVoiceRecorder.js` — MediaRecorder wrapper
+- `useVoiceTranscripts.js` — CRUD транскриптов
+
+### Database Changes
+- `030_voice_messages.sql` — voice_transcripts table, file_category, voice_quote column in comments
+
+### Edge Function
+- `transcribe-audio/index.ts` — secure Whisper API calls
+
+### Debug Fixes
+- MediaRecorder timeslice removed (audio glitching)
+- Edge Function refactored to direct REST API (RLS issues)
+- `.single()` → `.maybeSingle()` (406 errors)
+- DOM nesting fixed in formatText.jsx
+- Voice quote prop chain fixed (TaskDetailModal → CommentThread → CommentItem)
+- Input focus on reply/quote
+
+### Archive Reference
+📄 `memory-bank/archive/archive-voice-messages.md`
+📄 `memory-bank/reflection/reflection-voice-messages.md`
+
+---
+
+## ReTracker: My Tasks Inline Creation — ARCHIVED ✅
+
+### Date: 2026-02-17
+
+### Summary
+Inline-создание задач в "Моих задачах" с поддержкой задач без расположения (`board_id = NULL`), LocationPickerModal для назначения расположения, логирование изменений в Activity Log.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Files Created | 2 |
+| Files Modified | 10 |
+| Files Deleted | 1 |
+| Debug Iterations | 5 |
+
+### Components Created
+- `LocationPickerModal.jsx` — модалка выбора расположения (Проект → Доска → Статус)
+
+### Database Changes
+- `029_tasks_nullable_board.sql` — nullable board_id/status_id + RLS policies
+
+### Debug Fixes
+- SQL: `creator_id` → `created_by`
+- Mutation arg: `{ taskId }` → `taskId`
+- Empty statuses: wrong property name
+- Browser selects: created CustomSelect
+- Cache invalidation: added all keys
+
+### Archive Reference
+📄 `memory-bank/archive/archive-mytasks-inline-creation.md`
+📄 `memory-bank/reflection/reflection-mytasks-inline-creation.md`
+
+---
+
+## ReTracker: Board Header Redesign — ARCHIVED ✅
+
+### Date: 2026-02-16
+
+### Summary
+Редизайн верхней панели доски в ReTracker: функциональный поиск задач с live-filtering и расширенными фильтрами, аватары участников проекта, кнопка избранного с optimistic update, плейсхолдеры для настроек и уведомлений.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Commits | 3 |
+| Files Created | 7 |
+| Lines Added | ~1600 |
+| Debug Iterations | 1 (priority field fix) |
+
+### Components Created
+- `BoardHeader.jsx` — главный компонент панели
+- `TaskSearchDropdown.jsx` — расширяющийся поиск (192px → 480px)
+- `SearchFilters.jsx` — кастомные dropdown фильтры с галочками
+- `MemberAvatars.jsx` — стек аватаров с "+N" overflow
+
+### Hooks Created
+- `useTaskSearch.js` — debounced поиск по title, description, comments
+- `useFavoriteBoards.js` — toggle favorite с optimistic update
+
+### Archive Reference
+📄 `memory-bank/archive/archive-board-header-redesign.md`
+📄 `memory-bank/reflection/reflection-board-header-redesign.md`
+
+---
+
+## ReTracker Chat Features — ARCHIVED ✅
+
+### Date: 2026-02-14
+
+### Summary
+Масштабная сессия по разработке чата в ReTracker. 19 коммитов, 15+ фич: threads, polls, text formatting, media gallery, @mentions, task links (KAN-001), image annotation editor, scheduled messages, GIF search (GIPHY), sticker packs с pop-анимацией.
+
+### Key Metrics
+| Metric | Value |
+|--------|-------|
+| Commits | 19 |
+| Files Created | ~25 |
+| Lines Added | ~3500+ |
+| User Iterations | 50+ |
+
+### Archive Reference
+📄 `memory-bank/archive/archive-retracker-chat-features.md`
+📄 `memory-bank/reflection/reflection-retracker-chat-features.md`
+
+---
+
+## ReTracker Seed: Lucky Fruits Slot — ARCHIVED ✅
+
+### Date: 2026-02-14
+
+### Summary
+20 тестовых задач по разработке слота Lucky Fruits. Node-скрипт (auth) + SQL seed. Исправлена ошибка PL/pgSQL в VALUES.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-retracker-slot-seed.md`
+📄 `memory-bank/reflection/reflection-retracker-slot-seed.md`
+
+---
+
+## ReTracker Performance Fix — ARCHIVED ✅
+
+### Date: 2026-02-14
+
+### Summary
+Критический фикс медленной загрузки ReTracker: убран await перед fetchProfile в AuthContext. 11.3с → 0.97с (ускорение в 11 раз). Документация в systemPatterns.md, правило retracker-performance.mdc.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-retracker-performance-fix.md`
+📄 `memory-bank/reflection/reflection-retracker-performance-fix.md`
+
+---
+
+## Kanban Enhancements — ARCHIVED ✅
+
+### Date: 2026-02-11
+
+### Summary
+Раскрывающийся чек-лист в TaskCard, кнопка "+" в колонках, редизайн CreateTaskModal под TaskDetailModal, чек-лист при создании задачи.
+
+### Archive Reference
+📄 `memory-bank/archive/archive-kanban-enhancements.md`
+📄 `memory-bank/reflection/reflection-kanban-enhancements.md`
+
+---
+
 ## Calculator Settings (PricingPage) Redesign v2 — ARCHIVED ✅
 
 ### Date: 2026-02-09

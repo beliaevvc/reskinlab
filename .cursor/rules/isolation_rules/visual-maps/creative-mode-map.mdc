@@ -1,7 +1,7 @@
 ---
 description: Visual process map for CREATIVE mode (Design Decisions)
 globs: "**/creative*/**", "**/design*/**", "**/decision*/**"
-alwaysApply: false
+alwaysApply: true
 ---
 
 # CREATIVE MODE: DESIGN PROCESS MAP

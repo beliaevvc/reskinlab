@@ -67,7 +67,7 @@ import { Select } from '../Select';
 <input
   type="text"
   className="w-full border border-neutral-200 rounded-lg bg-white px-3 py-2 text-sm text-neutral-700 
-             focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+             focus:outline-none focus:ring-0 focus:border-emerald-400 
              hover:border-neutral-300 transition-colors"
 />
 ```
@@ -78,7 +78,7 @@ import { Select } from '../Select';
 <input
   type="date"
   className="w-full border border-neutral-200 rounded-lg bg-white px-3 py-2 text-sm text-neutral-700 
-             focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+             focus:outline-none focus:ring-0 focus:border-emerald-400 
              hover:border-neutral-300 transition-colors"
 />
 ```
@@ -265,17 +265,88 @@ import { Icon } from '../Icon';
 
 ---
 
-## 10. Общие правила
+## 10. Изображения в комментариях (ImageAttachment)
+
+**Компонент:** `src/components/comments/CommentAttachments.jsx` → `ImageAttachment`
+
+Используется для отображения картинок, прикреплённых к комментариям задачи.
+
+### Размеры и пропорции
+| Свойство | Значение |
+|---|---|
+| Max width | `240px` (`max-w-[240px]`) |
+| Max height | `180px` (`max-h-[180px]`) |
+| Object fit | `object-cover` |
+| Skeleton (loading) | `192×128px` (`w-48 h-32`) |
+
+### Стили контейнера
+```jsx
+<img
+  className="max-w-[240px] max-h-[180px] rounded-lg border border-neutral-200 
+             hover:border-emerald-400 hover:shadow-md transition-all 
+             object-cover cursor-zoom-in"
+/>
+```
+
+### Hover-оверлей
+```jsx
+<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg 
+                transition-colors flex items-center justify-center 
+                opacity-0 group-hover:opacity-100">
+  <div className="p-2 bg-white/90 rounded-full shadow-lg">
+    {/* Иконка лупы w-5 h-5 text-neutral-700 */}
+  </div>
+</div>
+```
+
+### Бейдж комментариев (bottom-right)
+| Состояние | Классы |
+|---|---|
+| Есть открытые | `bg-emerald-500 text-white` |
+| Все решены | `bg-neutral-500/80 text-white` |
+
+```jsx
+<div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-full 
+                text-[10px] font-medium flex items-center gap-1">
+  {/* Иконка чата w-3 h-3 + число */}
+</div>
+```
+
+### Бейдж "Обложка" (bottom-left)
+```jsx
+<div className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded 
+                bg-black/50 backdrop-blur-sm flex items-center gap-1">
+  <span className="text-[10px] text-white font-medium">Обложка</span>
+</div>
+```
+
+### Контекстное меню (top-right)
+```jsx
+<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+```
+
+### Fallback (ошибка загрузки)
+```jsx
+<div className="w-48 h-32 bg-neutral-100 rounded-lg border border-neutral-200 
+                flex items-center justify-center">
+  {/* Иконка placeholder w-10 h-10 text-neutral-300 */}
+</div>
+```
+
+---
+
+## 11. Общие правила
 
 1. **Не использовать нативные `<select>`** — только `<Select>` из `src/components/Select.jsx`
 2. **Не использовать нативные `confirm()` / `alert()`** — только кастомные модалки (см. секцию 9)
 3. **Не использовать `!important`**
-4. **Focus-стили:** `focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500`
+4. **Focus-стили:** `focus:outline-none focus:ring-0 focus:border-emerald-400` — только одинарная тонкая рамка, **НЕ** использовать `ring-2`
 5. **Hover-стили для интерактивных элементов** — всегда добавлять `transition-colors`
 6. **Скругления:** `rounded` для мелких элементов, `rounded-lg` для карточек и инпутов
 7. **Тени:** `shadow-lg` только для выпадающих списков и модальных окон
 8. **z-index:** `z-50` для выпадающих списков, `z-[9999]` для модальных окон
+9. **Выделение выбранных элементов:** `border border-emerald-400` — одинарная рамка, **НЕ** использовать `ring-2`
 
 ---
 
-*Последнее обновление: 2026-02-07*
+*Последнее обновление: 2026-02-21*

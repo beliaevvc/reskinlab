@@ -32,3 +32,6 @@ npm-debug.log*
 *.tmp
 *.temp
 cursor-memory-bank/
+
+# ReTracker has its own git repo
+retracker/

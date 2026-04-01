@@ -1,7 +1,7 @@
 ---
 description: Visual process map for PLAN mode (Code Implementation)
 globs: plan-mode-map.mdc
-alwaysApply: false
+alwaysApply: true
 ---
 
 # PLAN MODE: TASK PLANNING PROCESS MAP

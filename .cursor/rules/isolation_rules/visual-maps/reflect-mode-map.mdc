@@ -1,7 +1,7 @@
 ---
 description: Visual process map for REFLECT mode (Task Reflection)
 globs: "**/reflect*/**", "**/review*/**", "**/retrospect*/**"
-alwaysApply: false
+alwaysApply: true
 ---
 
 # REFLECT MODE: TASK REVIEW PROCESS MAP

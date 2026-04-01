@@ -1,0 +1,32 @@
+---
+description: Критические правила производительности ReTracker. ОБЯЗАТЕЛЬНО сверяться при любых изменениях в AuthContext, хуках данных (useWorkspaces, useBoards, useTasks), React Query настройках или Supabase запросах.
+globs:
+  - retracker/src/contexts/AuthContext.jsx
+  - retracker/src/hooks/useWorkspaces.js
+  - retracker/src/hooks/useBoards.js
+  - retracker/src/hooks/useTasks.js
+  - retracker/src/main.jsx
+  - retracker/src/lib/supabase.js
+alwaysApply: false
+---
+
+# ReTracker: Критические правила производительности
+
+**ПЕРЕД ЛЮБЫМ ИЗМЕНЕНИЕМ** файлов AuthContext, хуков данных или настроек React Query — **ОБЯЗАТЕЛЬНО ПРОЧИТАЙ** файл `memory-bank/systemPatterns.md`.
+
+## Абсолютные запреты
+
+1. **НЕ добавлять `await` перед `fetchProfile()`** в `AuthContext.jsx` (в `onAuthStateChange` и `getSession().then()`). Это блокирует `setLoading(false)` на 3+ секунды.
+
+2. **НЕ оборачивать Supabase запросы в `withTimeout()`** или `Promise.race()` с таймаутами в хуках данных. Это только ухудшает производительность при cold start.
+
+3. **НЕ добавлять `retry` / `retryDelay`** в `defaultOptions.queries` React Query для борьбы с медленными запросами.
+
+4. **НЕ менять `enabled` условия** в хуках `useBoards`, `useBoard`, `useTasks` — они обеспечивают правильную последовательность загрузки.
+
+## Если приложение медленно загружается
+
+- Проблема почти всегда в **Supabase cold start** (free tier, ~5-10с на первый запрос)
+- Решение — **параллелизм запросов**, а не таймауты или ретраи
+- `fetchProfile()` без await позволяет хукам стартовать одновременно с профилем
+- Полная документация: `memory-bank/systemPatterns.md`

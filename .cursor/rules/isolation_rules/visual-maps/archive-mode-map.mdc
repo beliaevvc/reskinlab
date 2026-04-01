@@ -1,7 +1,7 @@
 ---
 description: Visual process map for ARCHIVE mode (Task Documentation)
 globs: "**/archive*/**", "**/document*/**", "**/complete*/**"
-alwaysApply: false
+alwaysApply: true
 ---
 
 # ARCHIVE MODE: TASK DOCUMENTATION PROCESS MAP

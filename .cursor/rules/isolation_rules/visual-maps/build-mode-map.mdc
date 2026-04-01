@@ -1,7 +1,7 @@
 ---
 description: Visual process map for BUILD mode (Code Implementation)
 globs: implementation-mode-map.mdc
-alwaysApply: false
+alwaysApply: true
 ---
 
 # BUILD MODE: CODE EXECUTION PROCESS MAP

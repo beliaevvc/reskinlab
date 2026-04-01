@@ -1,7 +1,7 @@
 ---
 description: Visual process map for VAN mode (Index/Entry Point)
 globs: van-mode-map.mdc
-alwaysApply: false
+alwaysApply: true
 ---
 # VAN MODE: INITIALIZATION PROCESS MAP
 
